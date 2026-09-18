@@ -330,7 +330,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 type="file" 
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
                 required 
-                accept=".stl,.obj,.stp,.step,.igs,.iges" 
+                accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf" 
                 onChange={handleFileChange}
               />
               <div className="text-center pointer-events-none relative z-10 flex flex-col items-center gap-2">
@@ -342,7 +342,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                      <span className="font-bold text-text-muted uppercase tracking-wide">Select or Drop 3D File</span>
                    )}
                 </div>
-                <p className="text-xs text-text-muted font-sans mt-1">.stl, .obj, .stp, .iges (Max: 100MB)</p>
+                <p className="text-xs text-text-muted font-sans mt-1">.stl, .obj, .stp, .iges, .3mf (Max: 100MB)</p>
               </div>
             </div>
 
