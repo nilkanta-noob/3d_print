@@ -20,7 +20,7 @@ export default function PricingSection() {
               <tr>
                 <th className="px-6 py-4">Material</th>
                 <th className="px-6 py-4">Standard Rate</th>
-                <th className="px-6 py-4 text-accent-primary">Student Rate</th>
+                <th className="px-6 py-4 text-text-primary">Student Rate</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50 text-sm">
@@ -35,17 +35,17 @@ export default function PricingSection() {
                   <span className="text-[10px] bg-accent-primary-deep/20 text-accent-primary px-2 py-0.5 rounded-sm uppercase tracking-widest">Engineering</span>
                 </td>
                 <td className="px-6 py-5 text-text-muted">₹4 <span className="text-xs uppercase tracking-widest">/ gram</span></td>
-                <td className="px-6 py-5 text-text-muted italic opacity-70 text-xs">No student discount</td>
+                <td className="px-6 py-5 text-text-muted italic opacity-70 text-xs uppercase tracking-widest">Coming soon</td>
               </tr>
               <tr className="hover:bg-surface/50 transition-colors">
                 <td className="px-6 py-5 font-bold text-text-primary">PETG</td>
-                <td className="px-6 py-5 text-text-muted">₹8 <span className="text-xs uppercase tracking-widest">/ gram</span></td>
-                <td className="px-6 py-5 text-text-muted italic opacity-70 text-xs">TBD</td>
+                <td className="px-6 py-5 text-text-muted">₹5.5 <span className="text-xs uppercase tracking-widest">/ gram</span></td>
+                <td className="px-6 py-5 text-text-muted italic opacity-70 text-xs uppercase tracking-widest">Coming soon</td>
               </tr>
             </tbody>
           </table>
         </div>
-        
+
         <div className="mt-6 flex items-start gap-3 bg-accent-primary-deep/10 border border-accent-primary/20 p-4 rounded-sm">
           <Info className="w-5 h-5 text-accent-primary shrink-0 mt-0.5" />
           <p className="text-sm text-text-muted font-sans leading-relaxed">

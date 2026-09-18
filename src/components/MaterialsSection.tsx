@@ -15,7 +15,7 @@ export default function MaterialsSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          
+
           {/* PLA */}
           <div className="bg-surface border border-border hover:border-accent-primary/30 p-8 flex flex-col transition-colors duration-300">
             <div className="w-12 h-12 bg-accent-primary-deep/20 border border-accent-primary/20 rounded-sm flex items-center justify-center mb-6">

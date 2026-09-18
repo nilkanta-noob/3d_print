@@ -5,11 +5,12 @@ interface SendEmailOptions {
   subject: string;
   text: string;
   html?: string;
+  attachments?: { filename: string; content: Buffer | string }[];
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function sendEmail({ to, subject, text, html }: SendEmailOptions) {
+export async function sendEmail({ to, subject, text, html, attachments }: SendEmailOptions) {
   try {
     const { data, error } = await resend.emails.send({
       from: 'PrintWarriors <onboarding@resend.dev>', // Default testing domain provided by Resend
@@ -17,6 +18,7 @@ export async function sendEmail({ to, subject, text, html }: SendEmailOptions) {
       subject: subject,
       text: text,
       html: html,
+      attachments: attachments,
     });
 
     if (error) {

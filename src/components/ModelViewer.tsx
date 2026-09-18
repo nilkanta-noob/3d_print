@@ -8,13 +8,12 @@ import { OBJLoader } from 'three-stdlib';
 import * as THREE from 'three';
 
 function Loader() {
-  const { progress, active } = useProgress();
   return (
     <Html center>
       <div className="flex flex-col items-center justify-center bg-surface/90 border border-border p-4 rounded-sm backdrop-blur-sm min-w-[150px]">
         <div className="w-8 h-8 border-4 border-accent-primary border-t-transparent rounded-full animate-spin mb-3"></div>
         <span className="text-xs font-bold uppercase tracking-widest text-accent-primary whitespace-nowrap">
-          {active ? `Parsing: ${progress.toFixed(0)}%` : "Loading Geometry..."}
+          Loading Geometry...
         </span>
       </div>
     </Html>

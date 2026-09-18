@@ -9,6 +9,9 @@ export default function QuoteForm() {
     email: '',
     phone: '',
     material: 'PLA',
+    state: '',
+    city: '',
+    pincode: '',
   });
   const [file, setFile] = useState<File | null>(null);
 
@@ -17,7 +20,7 @@ export default function QuoteForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
   const [verifiedToken, setVerifiedToken] = useState<string | null>(null);
-  
+
   // Submission State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -31,11 +34,6 @@ export default function QuoteForm() {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    if (!selectedFile.name.toLowerCase().endsWith('.stl') && !selectedFile.name.toLowerCase().endsWith('.3mf')) {
-      alert('Only .stl and .3mf files are accepted.');
-      e.target.value = '';
-      return;
-    }
 
     if (selectedFile.size > 100 * 1024 * 1024) {
       alert('File size must be under 100MB.');
@@ -51,7 +49,7 @@ export default function QuoteForm() {
       alert('Please enter an email address first.');
       return;
     }
-    
+
     // basic email validation
     if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       alert('Please enter a valid email address.');
@@ -103,10 +101,19 @@ export default function QuoteForm() {
 
   const submitQuote = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!verifiedToken || !file || !formData.name || !formData.phone || !formData.material) return;
+    if (!verifiedToken || !file || !formData.name || !formData.material || !formData.city || !formData.state || !formData.pincode) return;
 
     setIsSubmitting(true);
     setSubmitError(null);
+
+    // Validate Phone Number (Indian)
+    const phoneRegex = /^(\+91[\-\s]?)?[6789]\d{9}$/;
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      setSubmitError("Please enter a valid Indian phone number.");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const submitData = new FormData();
       submitData.append('verifiedToken', verifiedToken);
@@ -114,6 +121,9 @@ export default function QuoteForm() {
       submitData.append('email', formData.email);
       submitData.append('phone', formData.phone);
       submitData.append('material', formData.material);
+      submitData.append('state', formData.state);
+      submitData.append('city', formData.city);
+      submitData.append('pincode', formData.pincode);
       submitData.append('file', file);
 
       const res = await fetch('/api/quote/submit', {
@@ -134,7 +144,7 @@ export default function QuoteForm() {
     }
   };
 
-  const isSubmitDisabled = !verifiedToken || !file || !formData.name || !formData.email || !formData.phone || isSubmitting;
+  const isSubmitDisabled = !verifiedToken || !file || !formData.name || !formData.email || !formData.phone || !formData.state || !formData.city || !formData.pincode || isSubmitting;
 
   if (orderNumber) {
     return (
@@ -143,7 +153,21 @@ export default function QuoteForm() {
         <h3 className="text-2xl font-display font-black text-text-primary uppercase tracking-widest mb-4">Request Received</h3>
         <p className="text-text-muted font-sans text-lg mb-2">Thanks! We've received your request.</p>
         <p className="text-accent-primary font-mono text-xl mb-6">Order #{orderNumber}</p>
-        <p className="text-sm text-text-muted opacity-80">Please check your email. You will receive a reply within 30 minutes to 1 hour.</p>
+        <p className="text-sm text-text-muted opacity-80 mb-8">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
+
+        <button
+          onClick={() => {
+            setOrderNumber(null);
+            setFile(null);
+            setFormData({ name: '', email: '', phone: '', material: 'PLA', state: '', city: '', pincode: '' });
+            setVerifiedToken(null);
+            setOtpSent(false);
+            setOtp('');
+          }}
+          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-surface rounded-sm font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
+        >
+          Submit Another Request
+        </button>
       </div>
     );
   }
@@ -153,7 +177,7 @@ export default function QuoteForm() {
       <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary-deep/10 blur-[80px] rounded-full pointer-events-none"></div>
 
       <div className="relative z-10 space-y-8">
-        
+
         {submitError && (
           <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-sm flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -165,7 +189,7 @@ export default function QuoteForm() {
           {/* Name */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Full Name *</label>
-            <input 
+            <input
               name="name" type="text" required value={formData.name} onChange={handleInputChange}
               className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
               placeholder="John Doe"
@@ -175,11 +199,42 @@ export default function QuoteForm() {
           {/* Phone */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Phone Number *</label>
-            <input 
-              name="phone" type="tel" required value={formData.phone} onChange={handleInputChange}
-              className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
-              placeholder="+1 234 567 8900"
+            <input
+              name="phone" type="tel" value={formData.phone} onChange={handleInputChange}
+              className="w-full bg-surface border border-border px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-accent-primary transition-colors text-text-primary"
+              placeholder="+91 98765 43210"
             />
+          </div>
+        </div>
+
+        {/* Billing Address */}
+        <div>
+          <h3 className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-3 border-b border-border pb-1">Billing & Shipping Address</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1.5">State/Prov *</label>
+              <input
+                name="state" type="text" required value={formData.state} onChange={handleInputChange}
+                className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
+                placeholder="Maharashtra"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1.5">City *</label>
+              <input
+                name="city" type="text" required value={formData.city} onChange={handleInputChange}
+                className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
+                placeholder="Mumbai"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1.5">Pin/Zip Code *</label>
+              <input
+                name="pincode" type="text" required value={formData.pincode} onChange={handleInputChange}
+                className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
+                placeholder="400001"
+              />
+            </div>
           </div>
         </div>
 
@@ -187,16 +242,16 @@ export default function QuoteForm() {
         <div className="p-4 bg-background/50 border border-border/50 rounded-sm">
           <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Email Address *</label>
           <div className="flex flex-col md:flex-row gap-3">
-            <input 
+            <input
               name="email" type="email" required value={formData.email} onChange={handleInputChange}
               disabled={!!verifiedToken || otpSent}
               className="flex-1 px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary disabled:opacity-60 font-sans"
               placeholder="john@example.com"
             />
-            
+
             {!verifiedToken && !otpSent && (
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={sendOtp}
                 disabled={isVerifying || !formData.email}
                 className="px-6 py-2.5 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-surface rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
@@ -214,23 +269,23 @@ export default function QuoteForm() {
 
           {otpSent && !verifiedToken && (
             <div className="mt-4 flex flex-col md:flex-row items-center gap-3 animate-in fade-in slide-in-from-top-2">
-              <input 
-                type="text" 
-                placeholder="Enter 6-digit OTP" 
-                value={otp} 
+              <input
+                type="text"
+                placeholder="Enter 6-digit OTP"
+                value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 maxLength={6}
                 className="w-full md:w-auto flex-1 px-4 py-2.5 bg-background border border-accent-primary/50 rounded-sm focus:border-accent-primary outline-none text-text-primary text-center tracking-widest font-mono"
               />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={confirmOtp}
                 disabled={isVerifying || otp.length < 6}
                 className="w-full md:w-auto px-6 py-2.5 bg-accent-primary text-surface rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
               >
                 {isVerifying ? 'Checking...' : 'Confirm OTP'}
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => { setOtpSent(false); setOtp(''); }}
                 className="text-xs text-text-muted hover:text-text-primary underline mt-2 md:mt-0"
@@ -244,7 +299,7 @@ export default function QuoteForm() {
         {/* Material Selection */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Material Specification *</label>
-          <select 
+          <select
             name="material" required value={formData.material} onChange={handleInputChange}
             className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary appearance-none font-sans"
           >
@@ -273,17 +328,17 @@ export default function QuoteForm() {
 
         {/* Submit Button */}
         <div className="pt-6 border-t border-border mt-8">
-          <button 
+          <button
             type="submit"
             disabled={isSubmitDisabled}
-            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-accent-primary hover:bg-accent-primary-deep text-surface transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_25px_rgba(34,211,238,0.4)] disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-text-primary hover:bg-black text-surface transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <UploadCloud className="w-5 h-5" strokeWidth={2} />
             {isSubmitting ? 'Submitting...' : 'Send Quotation'}
           </button>
-          
+
           {!verifiedToken && (
-             <p className="text-center text-xs text-red-400 mt-3">* Please verify your email before submitting.</p>
+            <p className="text-center text-xs text-text-muted mt-3">* Please verify your email before submitting.</p>
           )}
         </div>
 

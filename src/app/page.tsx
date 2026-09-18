@@ -6,6 +6,7 @@ import ScrollPrintSequence from '@/components/ScrollPrintSequence';
 import AboutSection from '@/components/AboutSection';
 import PricingSection from '@/components/PricingSection';
 import MaterialsSection from '@/components/MaterialsSection';
+import FAQSection from '@/components/FAQSection';
 import QueryFormModal, { QuoteFormCore } from '@/components/QueryForm';
 import { Layers, Mail } from 'lucide-react';
 
@@ -37,11 +38,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen text-text-primary font-sans selection:bg-accent-primary/30 relative">
-      
+
       {/* GLOBAL FIXED BACKGROUND VIDEO */}
       <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
-        <video 
-          src="/hero___video.mp4" 
+        <video
+          src="/hero___video.mp4"
           className="w-full h-full object-cover brightness-[0.4]"
           playsInline
           autoPlay
@@ -55,12 +56,13 @@ export default function Home() {
 
       <div className="relative z-10">
         <Header onOpenQuery={() => setIsQueryFormOpen(true)} />
-        
+
         <main>
           <ScrollPrintSequence />
           <AboutSection />
           <MaterialsSection />
           <PricingSection />
+          <FAQSection />
 
           {/* Embedded Form Section */}
           <section className="py-24 relative overflow-hidden border-t border-border/50 bg-transparent" id="quote">
@@ -73,10 +75,10 @@ export default function Home() {
                   Upload geometry. Receive quotation. Deploy part.
                 </p>
               </div>
-              
+
               {/* Embedded core form */}
               <div className="shadow-2xl rounded-sm overflow-hidden border border-border/50 backdrop-blur-xl bg-surface/40">
-                 <QuoteFormCore />
+                <QuoteFormCore />
               </div>
             </div>
           </section>
@@ -85,20 +87,20 @@ export default function Home() {
         {/* Footer */}
         <footer className="bg-background/80 backdrop-blur-md text-text-muted pt-20 pb-10 border-t border-border/50">
           <div className="container mx-auto px-4">
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
-              
+
               {/* Brand Column */}
               <div className="flex flex-col items-start text-left">
                 <div className="flex items-center gap-3 mb-4 group">
-                  <div className="relative flex items-center justify-center w-8 h-8 overflow-hidden bg-background border border-border/50 rounded-sm group-hover:border-accent-primary/50 transition-colors">
-                    <Layers className="w-4 h-4 text-accent-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
+                  <div className="relative flex items-center justify-center w-8 h-8 overflow-hidden bg-background border border-border/50 rounded-sm transition-colors">
+                    <Layers className="w-4 h-4 text-text-primary transition-transform" strokeWidth={1.5} />
                   </div>
-                  <span className="font-display font-bold tracking-widest text-text-primary uppercase text-lg group-hover:text-accent-primary transition-colors">
+                  <span className="font-display font-bold tracking-widest text-text-primary uppercase text-lg transition-colors">
                     PrintWarriors
                   </span>
                 </div>
-                <p className="uppercase tracking-widest text-xs text-accent-primary font-mono mb-4">Precision. Speed. Reliability.</p>
+                <p className="uppercase tracking-widest text-xs text-text-primary font-mono mb-4">Precision. Speed. Reliability.</p>
                 <p className="text-sm font-sans opacity-80 max-w-xs leading-relaxed">
                   Closing the cost gap for students and engineers to rapidly iterate from CAD to physical parts.
                 </p>
@@ -108,10 +110,11 @@ export default function Home() {
               <div className="flex flex-col items-start">
                 <h4 className="font-bold text-xs uppercase tracking-widest text-text-primary mb-6">Quick Links</h4>
                 <nav className="flex flex-col gap-4 text-sm">
-                  <a href="#materials" className="hover:text-accent-primary transition-colors">Materials Guide</a>
-                  <a href="#pricing" className="hover:text-accent-primary transition-colors">Transparent Pricing</a>
-                  <a href="#quote" className="hover:text-accent-primary transition-colors">Get a Quote</a>
-                  <a href="#about" className="hover:text-accent-primary transition-colors">About</a>
+                  <a href="#materials" className="hover:text-text-primary transition-colors">Materials Guide</a>
+                  <a href="#pricing" className="hover:text-text-primary transition-colors">Transparent Pricing</a>
+                  <a href="#faq" className="hover:text-text-primary transition-colors">FAQ</a>
+                  <a href="#quote" className="hover:text-text-primary transition-colors">Get a Quote</a>
+                  <a href="#about" className="hover:text-text-primary transition-colors">About</a>
                 </nav>
               </div>
 
@@ -119,7 +122,7 @@ export default function Home() {
               <div className="flex flex-col items-start">
                 <h4 className="font-bold text-xs uppercase tracking-widest text-text-primary mb-6">Contact & Service Area</h4>
                 <div className="flex flex-col gap-4 text-sm mb-8">
-                  <a href="mailto:hello@printwarriors.com" className="hover:text-accent-primary transition-colors flex items-center gap-2">
+                  <a href="mailto:hello@printwarriors.com" className="hover:text-text-primary transition-colors flex items-center gap-2">
                     <Mail className="w-4 h-4" /> hello@printwarriors.com
                   </a>
                   <span className="flex items-center gap-2 opacity-80">
@@ -127,13 +130,13 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="flex gap-4">
-                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-accent-primary hover:border-accent-primary/50 transition-all">
+                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-text-primary transition-all">
                     <InstagramIcon className="w-4 h-4" />
                   </a>
-                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-accent-primary hover:border-accent-primary/50 transition-all">
+                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-text-primary transition-all">
                     <LinkedinIcon className="w-4 h-4" />
                   </a>
-                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-accent-primary hover:border-accent-primary/50 transition-all">
+                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-text-primary transition-all">
                     <YoutubeIcon className="w-4 h-4" />
                   </a>
                 </div>
@@ -147,8 +150,8 @@ export default function Home() {
                 © {new Date().getFullYear()} PrintWarriors. All rights reserved.
               </p>
               <div className="flex gap-6 text-xs uppercase tracking-widest">
-                <a href="#" className="hover:text-accent-primary transition-colors">Privacy Policy</a>
-                <a href="#" className="hover:text-accent-primary transition-colors">Terms of Service</a>
+                <a href="#" className="hover:text-text-primary transition-colors">Privacy Policy</a>
+                <a href="#" className="hover:text-text-primary transition-colors">Terms of Service</a>
               </div>
             </div>
 
@@ -156,9 +159,9 @@ export default function Home() {
         </footer>
       </div>
 
-      <QueryFormModal 
-        isOpen={isQueryFormOpen} 
-        onClose={() => setIsQueryFormOpen(false)} 
+      <QueryFormModal
+        isOpen={isQueryFormOpen}
+        onClose={() => setIsQueryFormOpen(false)}
       />
     </div>
   );

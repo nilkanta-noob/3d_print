@@ -45,7 +45,7 @@ export default function Header({ onOpenQuery }: HeaderProps) {
           <a href="#services" className="hover:text-accent-primary transition-colors">Services</a>
           <a href="#materials" className="hover:text-accent-primary transition-colors">Materials</a>
           <a href="#pricing" className="hover:text-accent-primary transition-colors">Pricing</a>
-          <a href="#projects" className="hover:text-accent-primary transition-colors">Projects</a>
+          <a href="#faq" className="hover:text-accent-primary transition-colors">FAQ</a>
         </nav>
 
         {/* Right Actions */}

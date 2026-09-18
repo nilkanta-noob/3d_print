@@ -20,7 +20,7 @@ export default function ScrollPrintSequence() {
             <span className="text-accent-primary">we print.</span>
           </h1>
           <p className="mt-8 text-xl text-text-primary/90 max-w-xl font-sans drop-shadow-lg">
-            Upload your CAD geometry. Our industrial machines handle the rest.
+            Upload your CAD geometry. we handle the rest. 
           </p>
         </motion.div>
 
