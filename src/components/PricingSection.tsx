@@ -1,58 +1,81 @@
 import React from 'react';
 import { Info } from 'lucide-react';
+import SectionHeading from './SectionHeading';
+
+const RATES = [
+  { material: 'PLA', standard: '₹3.5', student: '₹2.5' },
+  { material: 'PLA Pro+', tag: 'Engineering', standard: '₹4', student: null },
+  { material: 'PETG', standard: '₹5.5', student: null },
+];
 
 export default function PricingSection() {
   return (
-    <section className="py-24 bg-transparent relative overflow-hidden border-t border-border/50" id="pricing">
-      <div className="container mx-auto px-4 relative z-10 max-w-4xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-display font-black text-text-primary uppercase tracking-tight mb-4">
-            Transparent <span className="text-accent-primary">Pricing</span>
-          </h2>
-          <p className="text-text-muted text-lg">
-            Priced by material, per gram. No hidden setup fees.
-          </p>
-        </div>
+    <section className="py-24 md:py-32 bg-background" id="pricing">
+      <div className="container mx-auto px-4">
+        {/* One large surface container holds the whole section; the rate table is a card inside it */}
+        <div className="rounded-2xl border border-border bg-surface px-4 py-10 sm:px-10 sm:py-14 lg:px-14">
+          <div className="grid gap-10 lg:grid-cols-12 lg:gap-14 lg:items-start">
 
-        <div className="bg-background border border-border rounded-sm overflow-hidden shadow-2xl">
-          <table className="w-full text-left font-sans">
-            <thead className="bg-surface border-b border-border text-xs font-bold uppercase tracking-widest text-text-muted">
-              <tr>
-                <th className="px-6 py-4">Material</th>
-                <th className="px-6 py-4">Standard Rate</th>
-                <th className="px-6 py-4 text-text-primary">Student Rate</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50 text-sm">
-              <tr className="hover:bg-surface/50 transition-colors">
-                <td className="px-6 py-5 font-bold text-text-primary">PLA</td>
-                <td className="px-6 py-5 text-text-muted">₹3.5 <span className="text-xs uppercase tracking-widest">/ gram</span></td>
-                <td className="px-6 py-5 text-accent-primary font-bold">₹2.5 <span className="text-xs uppercase tracking-widest font-normal">/ gram</span></td>
-              </tr>
-              <tr className="hover:bg-surface/50 transition-colors">
-                <td className="px-6 py-5 font-bold text-text-primary flex items-center gap-2">
-                  PLA Pro+
-                  <span className="text-[10px] bg-accent-primary-deep/20 text-accent-primary px-2 py-0.5 rounded-sm uppercase tracking-widest">Engineering</span>
-                </td>
-                <td className="px-6 py-5 text-text-muted">₹4 <span className="text-xs uppercase tracking-widest">/ gram</span></td>
-                <td className="px-6 py-5 text-text-muted italic opacity-70 text-xs uppercase tracking-widest">Coming soon</td>
-              </tr>
-              <tr className="hover:bg-surface/50 transition-colors">
-                <td className="px-6 py-5 font-bold text-text-primary">PETG</td>
-                <td className="px-6 py-5 text-text-muted">₹5.5 <span className="text-xs uppercase tracking-widest">/ gram</span></td>
-                <td className="px-6 py-5 text-text-muted italic opacity-70 text-xs uppercase tracking-widest">Coming soon</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            <div className="lg:col-span-5">
+              <SectionHeading
+                eyebrow="Pricing"
+                title="Transparent pricing"
+                description="Priced by material, per gram. No hidden setup fees."
+              />
+              <div className="mt-8 flex items-start gap-3 text-sm leading-relaxed text-text-muted">
+                <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <p>
+                  <strong className="font-semibold text-text-primary">Student eligibility:</strong> Student rate requires a valid college ID or referral at checkout. Simply check the &quot;Apply Student Discount&quot; box and upload your ID when requesting a quote.
+                </p>
+              </div>
+            </div>
 
-        <div className="mt-6 flex items-start gap-3 bg-accent-primary-deep/10 border border-accent-primary/20 p-4 rounded-sm">
-          <Info className="w-5 h-5 text-accent-primary shrink-0 mt-0.5" />
-          <p className="text-sm text-text-muted font-sans leading-relaxed">
-            <strong className="text-accent-primary">Student eligibility:</strong> Student rate requires a valid college ID or referral at checkout. Simply check the "Apply Student Discount" box and upload your ID when requesting a quote.
-          </p>
-        </div>
+            <div className="lg:col-span-7 overflow-hidden rounded-xl border border-border bg-card">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-border text-xs uppercase tracking-[0.14em] text-text-muted">
+                    <th scope="col" className="px-3 sm:px-6 py-4 font-medium">Material</th>
+                    <th scope="col" className="px-3 sm:px-6 py-4 font-medium">Standard</th>
+                    <th scope="col" className="px-3 sm:px-6 py-4 font-medium">Student</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {RATES.map((rate) => (
+                    <tr key={rate.material}>
+                      <th scope="row" className="px-3 sm:px-6 py-5 font-semibold text-text-primary">
+                        <span className="flex flex-wrap items-center gap-2">
+                          {rate.material}
+                          {/* Hidden on phones: the tag can't wrap and would push the table past the card (it's also on the material card) */}
+                          {rate.tag && (
+                            <span className="hidden sm:inline rounded-full border border-border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-text-muted">
+                              {rate.tag}
+                            </span>
+                          )}
+                        </span>
+                      </th>
+                      <td className="px-3 sm:px-6 py-5 tabular-nums">
+                        <span className="font-display text-xl font-bold text-text-primary">{rate.standard}</span>
+                        <span className="text-sm text-text-muted"> /g</span>
+                      </td>
+                      <td className="px-3 sm:px-6 py-5 tabular-nums">
+                        {rate.student ? (
+                          <>
+                            {/* The one highlighted value: red at 20px bold counts as large text for contrast */}
+                            <span className="font-display text-xl font-bold text-accent-primary">{rate.student}</span>
+                            <span className="text-sm text-text-muted"> /g</span>
+                          </>
+                        ) : (
+                          <span className="text-sm text-text-muted">Coming soon</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
+          </div>
+        </div>
       </div>
     </section>
   );

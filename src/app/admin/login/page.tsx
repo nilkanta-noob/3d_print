@@ -39,8 +39,6 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 text-text-primary">
       <div className="w-full max-w-md p-8 bg-surface border border-border/50 rounded-sm shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-primary-deep/20 blur-[60px] rounded-full pointer-events-none"></div>
-        
         <div className="relative z-10">
           <div className="flex justify-center mb-6">
             <div className="w-12 h-12 rounded-full bg-accent-primary/10 flex items-center justify-center border border-accent-primary/30">
@@ -81,7 +79,7 @@ export default function AdminLogin() {
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full mt-4 px-4 py-3 bg-accent-primary text-surface font-bold text-sm tracking-widest uppercase rounded-sm hover:bg-accent-primary-deep transition-colors disabled:opacity-50"
+              className="w-full mt-4 px-4 py-3 bg-accent-primary text-text-primary font-bold text-sm tracking-widest uppercase rounded-sm hover:bg-accent-hover transition-colors disabled:opacity-50"
             >
               {isLoading ? "Authenticating..." : "Login"}
             </button>

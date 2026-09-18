@@ -7,6 +7,7 @@ import AboutSection from '@/components/AboutSection';
 import PricingSection from '@/components/PricingSection';
 import MaterialsSection from '@/components/MaterialsSection';
 import FAQSection from '@/components/FAQSection';
+import SectionHeading from '@/components/SectionHeading';
 import QueryFormModal, { QuoteFormCore } from '@/components/QueryForm';
 import { Layers, Mail } from 'lucide-react';
 
@@ -39,45 +40,28 @@ export default function Home() {
   return (
     <div className="min-h-screen text-text-primary font-sans selection:bg-accent-primary/30 relative">
 
-      {/* GLOBAL FIXED BACKGROUND VIDEO */}
-      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
-        <video
-          src="/hero___video.mp4"
-          className="w-full h-full object-cover brightness-[0.4]"
-          playsInline
-          autoPlay
-          muted
-          loop
-        />
-        {/* Dark overlay to ensure text legibility */}
-        <div className="absolute inset-0 bg-background/50 z-10"></div>
-        <div className="absolute inset-0 bg-accent-primary-deep/5 mix-blend-overlay z-10"></div>
-      </div>
-
       <div className="relative z-10">
         <Header onOpenQuery={() => setIsQueryFormOpen(true)} />
 
         <main>
-          <ScrollPrintSequence />
+          <ScrollPrintSequence onOpenQuery={() => setIsQueryFormOpen(true)} />
           <AboutSection />
           <MaterialsSection />
           <PricingSection />
           <FAQSection />
 
           {/* Embedded Form Section */}
-          <section className="py-24 relative overflow-hidden border-t border-border/50 bg-transparent" id="quote">
-            <div className="container mx-auto px-4 max-w-4xl relative z-10">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-5xl font-display font-bold text-text-primary uppercase tracking-tight mb-4 drop-shadow-lg">
-                  Initialize <span className="text-accent-primary">Manufacture</span>
-                </h2>
-                <p className="text-text-primary/80 uppercase tracking-widest text-sm font-mono drop-shadow-md">
-                  Upload geometry. Receive quotation. Deploy part.
-                </p>
-              </div>
+          <section className="py-24 md:py-32 bg-background" id="quote">
+            <div className="container mx-auto px-4">
+              <SectionHeading
+                align="center"
+                eyebrow="Get a quote"
+                title="Start your print"
+                description="Upload your model and choose your settings. We review every file and email your quote — usually within the hour."
+              />
 
-              {/* Embedded core form */}
-              <div className="shadow-2xl rounded-sm overflow-hidden border border-border/50 backdrop-blur-xl bg-surface/40">
+              {/* Embedded core form — same surface container as the pricing section */}
+              <div className="mx-auto mt-14 max-w-5xl overflow-hidden rounded-2xl border border-border bg-surface">
                 <QuoteFormCore />
               </div>
             </div>
@@ -85,7 +69,7 @@ export default function Home() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-background/80 backdrop-blur-md text-text-muted pt-20 pb-10 border-t border-border/50">
+        <footer className="bg-surface text-text-muted pt-20 pb-10 border-t border-border">
           <div className="container mx-auto px-4">
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
@@ -93,14 +77,14 @@ export default function Home() {
               {/* Brand Column */}
               <div className="flex flex-col items-start text-left">
                 <div className="flex items-center gap-3 mb-4 group">
-                  <div className="relative flex items-center justify-center w-8 h-8 overflow-hidden bg-background border border-border/50 rounded-sm transition-colors">
+                  <div className="relative flex items-center justify-center w-8 h-8 overflow-hidden border border-border rounded-md transition-colors">
                     <Layers className="w-4 h-4 text-text-primary transition-transform" strokeWidth={1.5} />
                   </div>
                   <span className="font-display font-bold tracking-widest text-text-primary uppercase text-lg transition-colors">
                     PrintWarriors
                   </span>
                 </div>
-                <p className="uppercase tracking-widest text-xs text-text-primary font-mono mb-4">Precision. Speed. Reliability.</p>
+                <p className="uppercase tracking-[0.18em] text-xs font-semibold text-text-primary mb-4">Precision. Speed. Reliability.</p>
                 <p className="text-sm font-sans opacity-80 max-w-xs leading-relaxed">
                   Closing the cost gap for students and engineers to rapidly iterate from CAD to physical parts.
                 </p>
@@ -130,13 +114,13 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="flex gap-4">
-                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-text-primary transition-all">
+                  <a href="#" className="p-2 bg-card border border-border rounded-md text-text-muted hover:text-text-primary transition-colors">
                     <InstagramIcon className="w-4 h-4" />
                   </a>
-                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-text-primary transition-all">
+                  <a href="#" className="p-2 bg-card border border-border rounded-md text-text-muted hover:text-text-primary transition-colors">
                     <LinkedinIcon className="w-4 h-4" />
                   </a>
-                  <a href="#" className="p-2 bg-background border border-border/50 rounded-sm text-text-muted hover:text-text-primary transition-all">
+                  <a href="#" className="p-2 bg-card border border-border rounded-md text-text-muted hover:text-text-primary transition-colors">
                     <YoutubeIcon className="w-4 h-4" />
                   </a>
                 </div>

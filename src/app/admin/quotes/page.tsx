@@ -61,7 +61,7 @@ export default async function AdminQuotesPage() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4">
-                      <span className="px-2.5 py-1 bg-accent-secondary/10 text-accent-secondary border border-accent-secondary/30 rounded-sm text-xs font-bold tracking-widest uppercase">
+                      <span className="px-2.5 py-1 bg-accent-primary/10 text-accent-primary border border-accent-primary/30 rounded-sm text-xs font-bold tracking-widest uppercase">
                         {order.status}
                       </span>
                     </td>

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import SectionHeading from './SectionHeading';
 
 const faqs = [
   {
@@ -59,62 +60,57 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="py-24 bg-transparent relative overflow-hidden border-t border-border/50" id="faq">
-      {/* Background aesthetics */}
-      <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-accent-primary-deep/5 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 -translate-x-1/2"></div>
+    <section className="py-24 md:py-32 bg-surface border-y border-border" id="faq">
+      <div className="container mx-auto px-4 grid gap-12 lg:grid-cols-12 lg:gap-16">
+        <SectionHeading
+          className="lg:col-span-4 lg:sticky lg:top-28 lg:self-start"
+          eyebrow="FAQ"
+          title="Frequently asked questions"
+          description="Everything you need to know about our services, pricing, and process."
+        />
 
-      <div className="container mx-auto px-4 max-w-3xl relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-display font-bold text-text-primary uppercase tracking-tight mb-4 drop-shadow-lg">
-            Frequently Asked <span className="text-accent-primary">Questions</span>
-          </h2>
-          <div className="w-24 h-1 bg-accent-primary mx-auto mb-6 opacity-50"></div>
-          <p className="text-text-muted uppercase tracking-widest text-sm font-mono max-w-2xl mx-auto">
-            Everything you need to know about our services, pricing, and process.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {(showAll ? faqs : faqs.slice(0, 2)).map((faq, index) => {
-            const isOpen = openIndex === index;
-            return (
-              <div
-                key={index}
-                className={`border border-border/50 rounded-sm overflow-hidden transition-all duration-300 backdrop-blur-sm ${isOpen ? 'bg-surface/40 border-accent-primary/50 shadow-[0_0_15px_rgba(34,211,238,0.05)]' : 'bg-transparent hover:border-accent-primary/30 hover:bg-surface/20'}`}
-              >
-                <button
-                  onClick={() => toggleFaq(index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
-                >
-                  <span className={`font-bold uppercase tracking-wider text-sm transition-colors text-text-primary`}>
-                    {faq.question}
-                  </span>
-                  <ChevronDown className={`w-5 h-5 text-text-muted transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180 text-accent-primary' : ''}`} />
-                </button>
-
+        <div className="lg:col-span-8">
+          <div className="space-y-3">
+            {(showAll ? faqs : faqs.slice(0, 2)).map((faq, index) => {
+              const isOpen = openIndex === index;
+              return (
                 <div
-                  className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
+                  key={index}
+                  className={`rounded-xl border bg-card overflow-hidden transition-colors duration-300 ${isOpen ? 'border-accent-primary/40' : 'border-border hover:border-text-primary/20'}`}
                 >
-                  <div className="text-text-muted text-sm leading-relaxed font-sans border-t border-border/30 pt-4 whitespace-pre-line">
-                    {faq.answer}
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    aria-expanded={isOpen}
+                    className="w-full px-6 py-5 flex items-center justify-between gap-6 text-left rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-primary"
+                  >
+                    <span className="text-base font-medium text-text-primary">
+                      {faq.question}
+                    </span>
+                    <ChevronDown className={`w-5 h-5 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-accent-primary' : 'text-text-muted'}`} />
+                  </button>
+
+                  <div
+                    className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
+                  >
+                    <div className="border-t border-border pt-4 text-[15px] leading-relaxed text-text-muted whitespace-pre-line">
+                      {faq.answer}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        {faqs.length > 2 && (
-          <div className="mt-8 flex justify-center">
+          {faqs.length > 2 && (
             <button
               onClick={() => setShowAll(!showAll)}
-              className="px-6 py-3 bg-background border border-accent-primary/50 text-accent-primary hover:bg-accent-primary hover:text-surface rounded-sm font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2"
+              className="mt-6 inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium text-text-primary transition-colors hover:border-text-primary/40"
             >
-              {showAll ? 'Show Less' : 'View All FAQs'}
+              {showAll ? 'Show less' : 'View all FAQs'}
               <ChevronDown className={`w-4 h-4 transition-transform ${showAll ? 'rotate-180' : ''}`} />
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

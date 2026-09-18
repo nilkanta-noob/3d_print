@@ -20,11 +20,14 @@ function Loader() {
   );
 }
 
+// Palette secondary text (--color-text-muted in globals.css) — a neutral "printed part" gray
+const MODEL_COLOR = "#CBD5E1";
+
 function STLModel({ url }: { url: string }) {
   const geometry = useLoader(STLLoader, url);
   return (
     <mesh geometry={geometry}>
-      <meshStandardMaterial color="#22d3ee" roughness={0.3} metalness={0.1} />
+      <meshStandardMaterial color={MODEL_COLOR} roughness={0.3} metalness={0.1} />
     </mesh>
   );
 }
@@ -36,7 +39,7 @@ function OBJModel({ url }: { url: string }) {
     obj.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         (child as THREE.Mesh).material = new THREE.MeshStandardMaterial({
-          color: "#22d3ee",
+          color: MODEL_COLOR,
           roughness: 0.3,
           metalness: 0.1,
         });

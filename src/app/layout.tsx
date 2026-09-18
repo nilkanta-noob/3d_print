@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { Outfit, Fira_Code } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-sans",
+// Body text
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const firaCode = Fira_Code({
-  variable: "--font-mono",
+// All headings (h1–h6 via globals.css, plus the font-display utility)
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -21,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${firaCode.variable} font-sans h-full antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} font-sans h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-text-primary">{children}</body>
     </html>

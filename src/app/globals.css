@@ -1,32 +1,43 @@
 @import "tailwindcss";
 
-:root {
-  --background: #0A0E0F;
-  --surface: #12181A;
-  --accent-primary: #E11D48;
-  --accent-primary-deep: #BE123C;
-  --accent-secondary: #F43F5E;
-  --text-primary: #F5F5F0;
-  --text-muted: #8A9296;
-  --border: #1F2729;
+/*
+ * Design tokens — Tailwind v4 CSS-first config (this project has no tailwind.config.js).
+ * Each --color-* token generates utilities: bg-background, bg-card, text-text-muted, border-accent-primary, …
+ *
+ * Usage rules:
+ * - Three slate steps, darkest to lightest: background (hero base, main sections) → surface
+ *   (alternating section bands, large containers) → card (cards). Contrast between sections comes
+ *   from these steps, all one hue family.
+ * - Red (accent-primary / accent-hover) is only for CTAs, key highlighted words, active states,
+ *   small badges and small accents — no large red areas.
+ */
+@theme {
+  --color-background: #0F172A;     /* page background */
+  --color-card: #1E293B;           /* cards — the lightest surface */
+  /* Section bands and large containers: halfway between background and card, not a new hue */
+  --color-surface: color-mix(in oklab, var(--color-card) 50%, var(--color-background));
+  --color-text-primary: #FFFFFF;
+  --color-text-muted: #CBD5E1;     /* secondary text */
+  --color-accent-primary: #EF4444; /* accent red */
+  /* Hover: the accent, slightly deepened */
+  --color-accent-hover: color-mix(in oklab, var(--color-accent-primary) 88%, black);
+
+  --color-border: rgba(255, 255, 255, 0.08);
 }
 
+/* next/font declares --font-inter and --font-space-grotesk on <html> (see layout.tsx), so map them inline. */
 @theme inline {
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-accent-primary: var(--accent-primary);
-  --color-accent-primary-deep: var(--accent-primary-deep);
-  --color-accent-secondary: var(--accent-secondary);
-  --color-text-primary: var(--text-primary);
-  --color-text-muted: var(--text-muted);
-  --color-border: var(--border);
-
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--text-primary);
+@layer base {
+  body {
+    background: var(--color-background);
+    color: var(--color-text-primary);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
 }

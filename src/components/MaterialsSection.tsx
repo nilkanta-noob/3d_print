@@ -1,81 +1,67 @@
 import React from 'react';
-import { Layers, Zap, Droplet } from 'lucide-react';
+import { Check } from 'lucide-react';
+import SectionHeading from './SectionHeading';
+
+const MATERIALS = [
+  {
+    name: 'PLA',
+    tag: 'Standard',
+    description: 'The industry standard for high-detail visual models and rapid non-functional prototyping. Excellent dimensional accuracy.',
+    applications: ['Visual prototypes and display models', 'Low-stress, easy-to-print parts', 'Best entry point — fast, cheap'],
+  },
+  {
+    name: 'PLA Pro+',
+    tag: 'Engineering',
+    highlighted: true,
+    description: 'A step up in toughness and layer adhesion from standard PLA, while staying easy to print — the middle ground before PETG.',
+    applications: ['Functional prototypes (durability)', 'Brackets, enclosures, jigs', 'Light-mechanical-stress parts'],
+  },
+  {
+    name: 'PETG',
+    tag: 'Durable',
+    description: 'More impact-resistant and flexible than PLA, better dimensional stability than ABS. Ideal for parts needing real durability.',
+    applications: ['Water-resistant containers', 'Snap-fit joints', 'Mechanical parts (moderate stress)'],
+  },
+];
 
 export default function MaterialsSection() {
   return (
-    <section className="py-24 bg-transparent border-t border-border/50" id="materials">
-      <div className="container relative z-10 mx-auto px-4 max-w-6xl">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-5xl font-display font-black text-text-primary uppercase tracking-tight mb-4">
-            Materials <span className="text-accent-primary">Guide</span>
-          </h2>
-          <p className="text-text-muted text-lg font-sans">
-            Compare material properties to select the optimal filament for your engineering, prototyping, or display application.
-          </p>
-        </div>
+    <section className="py-24 md:py-32 bg-surface border-y border-border" id="materials">
+      <div className="container mx-auto px-4">
+        <SectionHeading
+          eyebrow="Materials"
+          title="Materials guide"
+          description="Compare material properties to select the optimal filament for your engineering, prototyping, or display application."
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8">
+          {MATERIALS.map((material) => (
+            <article key={material.name} className="flex flex-col rounded-xl border border-border bg-card p-8 lg:p-10">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-2xl font-display font-bold text-text-primary">{material.name}</h3>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-text-muted">
+                  {material.highlighted && <span className="size-1.5 rounded-full bg-accent-primary" aria-hidden="true" />}
+                  {material.tag}
+                </span>
+              </div>
 
-          {/* PLA */}
-          <div className="bg-surface border border-border hover:border-accent-primary/30 p-8 flex flex-col transition-colors duration-300">
-            <div className="w-12 h-12 bg-accent-primary-deep/20 border border-accent-primary/20 rounded-sm flex items-center justify-center mb-6">
-              <Layers className="w-6 h-6 text-accent-primary" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-2xl font-display font-black text-text-primary tracking-widest uppercase mb-3">PLA</h3>
-            <p className="text-text-muted mb-8 leading-relaxed flex-1">
-              The industry standard for high-detail visual models and rapid non-functional prototyping. Excellent dimensional accuracy.
-            </p>
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Applications</h4>
-              <ul className="text-sm text-text-primary opacity-80 space-y-2">
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Visual prototypes and display models</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Low-stress, easy-to-print parts</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Best entry point — fast, cheap</li>
-              </ul>
-            </div>
-          </div>
+              <p className="mt-4 flex-1 text-[15px] leading-relaxed text-text-muted">
+                {material.description}
+              </p>
 
-          {/* PLA Pro+ */}
-          <div className="bg-surface border border-border hover:border-accent-primary/30 p-8 flex flex-col transition-colors duration-300 relative">
-            <div className="absolute top-0 right-0 bg-accent-primary-deep/20 text-accent-primary px-4 py-1.5 text-xs font-bold uppercase tracking-widest border-b border-l border-accent-primary/20">
-              Engineering
-            </div>
-            <div className="w-12 h-12 bg-accent-primary-deep/20 border border-accent-primary/20 rounded-sm flex items-center justify-center mb-6">
-              <Zap className="w-6 h-6 text-accent-primary" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-2xl font-display font-black text-text-primary tracking-widest uppercase mb-3">PLA Pro+</h3>
-            <p className="text-text-muted mb-8 leading-relaxed flex-1">
-              A step up in toughness and layer adhesion from standard PLA, while staying easy to print — the middle ground before PETG.
-            </p>
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Applications</h4>
-              <ul className="text-sm text-text-primary opacity-80 space-y-2">
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Functional prototypes (durability)</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Brackets, enclosures, jigs</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Light-mechanical-stress parts</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* PETG */}
-          <div className="bg-surface border border-border hover:border-accent-primary/30 p-8 flex flex-col transition-colors duration-300">
-            <div className="w-12 h-12 bg-accent-primary-deep/20 border border-accent-primary/20 rounded-sm flex items-center justify-center mb-6">
-              <Droplet className="w-6 h-6 text-accent-primary" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-2xl font-display font-black text-text-primary tracking-widest uppercase mb-3">PETG</h3>
-            <p className="text-text-muted mb-8 leading-relaxed flex-1">
-              More impact-resistant and flexible than PLA, better dimensional stability than ABS. Ideal for parts needing real durability.
-            </p>
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Applications</h4>
-              <ul className="text-sm text-text-primary opacity-80 space-y-2">
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Water-resistant containers</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Snap-fit joints</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Mechanical parts (moderate stress)</li>
-              </ul>
-            </div>
-          </div>
-
+              <div className="mt-8 border-t border-border pt-6">
+                <h4 className="text-xs font-medium uppercase tracking-[0.14em] text-text-muted">Applications</h4>
+                <ul className="mt-4 space-y-3 text-sm text-text-primary">
+                  {material.applications.map((application) => (
+                    <li key={application} className="flex gap-3">
+                      <Check className="mt-0.5 size-4 shrink-0 text-text-muted" strokeWidth={2} aria-hidden="true" />
+                      {application}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>

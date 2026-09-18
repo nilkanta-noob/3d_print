@@ -195,7 +195,7 @@ export default function QuoteForm() {
             setOtpSent(false);
             setOtp('');
           }}
-          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-surface rounded-sm font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
+          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-text-primary rounded-sm font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
         >
           Submit Another Request
         </button>
@@ -205,8 +205,6 @@ export default function QuoteForm() {
 
   return (
     <form onSubmit={submitQuote} className="p-6 md:p-8 bg-surface rounded-sm shadow-2xl border border-border/50 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary-deep/10 blur-[80px] rounded-full pointer-events-none"></div>
-
       <div className="relative z-10 space-y-8">
 
         {submitError && (
@@ -285,7 +283,7 @@ export default function QuoteForm() {
                 type="button"
                 onClick={sendOtp}
                 disabled={isVerifying || !formData.email}
-                className="px-6 py-2.5 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-surface rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
+                className="px-6 py-2.5 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-text-primary rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
               >
                 {isVerifying ? 'Sending...' : 'Verify'}
               </button>
@@ -312,7 +310,7 @@ export default function QuoteForm() {
                 type="button"
                 onClick={confirmOtp}
                 disabled={isVerifying || otp.length < 6}
-                className="w-full md:w-auto px-6 py-2.5 bg-accent-primary text-surface rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
+                className="w-full md:w-auto px-6 py-2.5 bg-accent-primary text-text-primary rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
               >
                 {isVerifying ? 'Checking...' : 'Confirm OTP'}
               </button>
@@ -347,7 +345,7 @@ export default function QuoteForm() {
             <div className="space-y-2 text-center">
               <FileIcon className="mx-auto h-8 w-8 text-text-muted group-hover:text-accent-primary transition-colors" strokeWidth={1.5} />
               <div className="flex text-sm text-text-muted justify-center">
-                <label className="relative cursor-pointer rounded-sm font-bold text-accent-primary hover:text-accent-primary-deep uppercase tracking-wide">
+                <label className="relative cursor-pointer rounded-sm font-bold text-accent-primary hover:text-accent-hover uppercase tracking-wide">
                   <span>{file ? file.name : 'Select File'}</span>
                   <input name="file" type="file" className="sr-only" required accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf,.zip" onChange={handleFileChange} />
                 </label>
@@ -362,7 +360,7 @@ export default function QuoteForm() {
           <button
             type="submit"
             disabled={isSubmitDisabled}
-            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-text-primary hover:bg-[#e0e0e0] text-surface transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-accent-primary hover:bg-accent-hover text-text-primary transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting || isUploading ? (
               <>

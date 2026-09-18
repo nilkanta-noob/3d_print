@@ -58,7 +58,7 @@ export default function SectorSelector() {
   const activeSector = SECTORS.find(s => s.id === activeSectorId) || SECTORS[0];
 
   return (
-    <section className="py-24 bg-transparent border-t border-border/50" id="services">
+    <section className="py-24 bg-background border-t border-border/50" id="services">
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         
         <div className="text-center mb-16">
@@ -83,7 +83,7 @@ export default function SectorSelector() {
                   onClick={() => setActiveSectorId(sector.id)}
                   className={`flex items-center gap-4 px-6 py-4 rounded-sm transition-all duration-300 border text-left
                     ${isActive 
-                      ? 'bg-accent-primary-deep/20 border-accent-primary/50 text-accent-primary shadow-[0_0_15px_rgba(34,211,238,0.1)]' 
+                      ? 'bg-accent-primary/10 border-accent-primary/50 text-accent-primary' 
                       : 'bg-surface border-border text-text-muted hover:bg-surface/80 hover:text-text-primary'
                     }
                   `}
@@ -113,9 +113,8 @@ export default function SectorSelector() {
               >
                 {/* Visual Placeholder for the Sector */}
                 <div className={`w-full md:w-1/2 h-48 md:h-full bg-gradient-to-br ${activeSector.imageBg} relative flex items-center justify-center border-b md:border-b-0 md:border-r border-border`}>
-                  <Hexagon className="w-32 h-32 text-accent-primary/20 absolute" strokeWidth={0.5} />
+                  <Hexagon className="w-32 h-32 text-text-muted/20 absolute" strokeWidth={0.5} />
                   <activeSector.icon className="w-16 h-16 text-text-muted relative z-10" strokeWidth={1} />
-                  <div className="absolute inset-0 bg-accent-primary-deep/20 mix-blend-overlay"></div>
                 </div>
 
                 {/* Text Content */}
