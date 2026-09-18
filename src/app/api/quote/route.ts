@@ -5,6 +5,7 @@ import { tmpdir } from 'os';
 import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 import { sendEmail } from '@/lib/email';
+import { verifyQuoteJwt } from '@/lib/otp';
 
 const prisma = new PrismaClient();
 
@@ -35,10 +36,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields or unverified email' }, { status: 400 });
     }
 
-    // Verify OTP token matches email
-    const storedTokenData = (global as any).verifiedTokens?.[email];
-    if (!storedTokenData || storedTokenData.token !== verifiedToken) {
-      return NextResponse.json({ error: 'Invalid or expired verification session' }, { status: 401 });
+    // Verify the JWT
+    const jwtResult = verifyQuoteJwt(verifiedToken);
+    if (!jwtResult.valid || jwtResult.email !== email) {
+      return NextResponse.json({ error: 'Invalid or expired token. Please verify your email again.' }, { status: 401 });
     }
 
     // Download the file from UploadThing server-side
