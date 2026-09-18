@@ -28,15 +28,35 @@ export async function POST(request: NextRequest) {
     const state = formData.get('state') as string || 'Pending';
     const city = formData.get('city') as string || 'Pending';
     const pincode = formData.get('pincode') as string || 'Pending';
+    const fileUrl = formData.get('fileUrl') as string;
+    const verifiedToken = formData.get('verifiedToken') as string;
 
-    if (!file || !name || !email) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!verifiedToken || !email || !fileUrl) {
+      return NextResponse.json({ error: 'Missing required fields or unverified email' }, { status: 400 });
     }
 
-    // Extract the STL file buffer directly (No local saving needed for Vercel)
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // Verify OTP token matches email
+    const storedTokenData = (global as any).verifiedTokens?.[email];
+    if (!storedTokenData || storedTokenData.token !== verifiedToken) {
+      return NextResponse.json({ error: 'Invalid or expired verification session' }, { status: 401 });
+    }
 
+    // Download the file from UploadThing server-side
+    // This bypasses Vercel's 4.5MB request limit because it's an outbound fetch!
+    let fileBuffer: Buffer | null = null;
+    let fileName = fileUrl.split('/').pop() || '3d_model.stl';
+    
+    try {
+      const fileRes = await fetch(fileUrl);
+      if (fileRes.ok) {
+        const arrayBuffer = await fileRes.arrayBuffer();
+        fileBuffer = Buffer.from(arrayBuffer);
+      } else {
+        console.error("Failed to download file from UploadThing URL:", fileUrl);
+      }
+    } catch (err) {
+      console.error("Error downloading file from UploadThing:", err);
+    }
 
     // Save to Database
     const dbUser = await prisma.user.upsert({
@@ -61,10 +81,10 @@ export async function POST(request: NextRequest) {
         billingCountry: country,
         files: {
           create: {
-            fileName: file.name,
-            storageKey: file.name,
-            fileSize: file.size,
-            mimeType: file.type || 'application/octet-stream'
+            fileName: fileName,
+            storageKey: fileUrl,
+            fileSize: fileBuffer ? fileBuffer.byteLength : 0,
+            mimeType: 'application/octet-stream'
           }
         }
       }
@@ -84,11 +104,11 @@ export async function POST(request: NextRequest) {
       </div>
     `;
 
-    const isFileTooLarge = buffer.byteLength > 35 * 1024 * 1024; // 35 MB limit (Resend max is 40MB)
+    const isFileTooLarge = fileBuffer ? fileBuffer.byteLength > 35 * 1024 * 1024 : false; // 35 MB limit (Resend max is 40MB)
 
     const attachmentsList = [];
-    if (!isFileTooLarge) {
-      attachmentsList.push({ filename: file.name, content: buffer });
+    if (fileBuffer && !isFileTooLarge) {
+      attachmentsList.push({ filename: fileName, content: fileBuffer });
     }
 
     if (isStudent && studentIdFile && studentIdFile.size > 0) {
@@ -104,7 +124,7 @@ export async function POST(request: NextRequest) {
       html: isFileTooLarge 
         ? emailHtml + '<p style="color: #eab308;"><strong>Note:</strong> The 3D file was larger than 35MB so it could not be attached due to Resend API limits.</p>'
         : emailHtml,
-      attachments: attachmentsList.length > 0 ? attachmentsList : undefined
+      attachments: fileBuffer ? [{ filename: fileName, content: fileBuffer }] : undefined
     };
 
     // Send admin notification in the background using Next.js 'after'

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { UploadCloud, CheckCircle, AlertCircle, File as FileIcon } from 'lucide-react';
+import { useUploadThing } from '@/lib/uploadthing';
 
 export default function QuoteForm() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,21 @@ export default function QuoteForm() {
     pincode: '',
   });
   const [file, setFile] = useState<File | null>(null);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
+
+  const { startUpload, isUploading } = useUploadThing("cadUploader", {
+    onUploadProgress: (p) => {
+      setUploadProgress(p);
+    },
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        setUploadedFileUrl(res[0].url);
+      }
+    },
+    onUploadError: (e) => {
+      alert("Upload failed: " + e.message);
+    }
+  });
 
   // Verification State
   const [isVerifying, setIsVerifying] = useState(false);
@@ -43,6 +59,11 @@ export default function QuoteForm() {
     }
 
     setFile(selectedFile);
+    
+    // Start upload immediately
+    setUploadProgress(0);
+    setUploadedFileUrl(null);
+    startUpload([selectedFile]);
   };
 
   const sendOtp = async () => {
@@ -104,6 +125,13 @@ export default function QuoteForm() {
     e.preventDefault();
     if (!verifiedToken || !file || !formData.name || !formData.material || !formData.city || !formData.state || !formData.pincode) return;
 
+    if (!uploadedFileUrl) {
+      if (isUploading) {
+        return alert("Please wait for the 3D file to finish uploading before submitting!");
+      }
+      return alert("Please select and upload a 3D file.");
+    }
+
     setIsSubmitting(true);
     setSubmitError(null);
 
@@ -125,35 +153,16 @@ export default function QuoteForm() {
       submitData.append('state', formData.state);
       submitData.append('city', formData.city);
       submitData.append('pincode', formData.pincode);
-      submitData.append('file', file);
+      // Don't send the physical file, send the cloud URL
+      submitData.delete('file');
+      submitData.append('fileUrl', uploadedFileUrl);
 
-      setUploadProgress(0);
-
-      const response = await new Promise<{ok: boolean, text: string, status: number, statusText: string}>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/quote/submit');
-        
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
-            setUploadProgress(percent);
-          }
-        };
-
-        xhr.onload = () => {
-          resolve({
-            ok: xhr.status >= 200 && xhr.status < 300,
-            text: xhr.responseText,
-            status: xhr.status,
-            statusText: xhr.statusText
-          });
-        };
-
-        xhr.onerror = () => reject(new Error('Network error during upload'));
-        xhr.send(submitData);
+      const response = await fetch('/api/quote/submit', {
+        method: 'POST',
+        body: submitData,
       });
 
-      const data = JSON.parse(response.text);
+      const data = await response.json();
       if (response.ok) {
         setOrderNumber(data.orderNumber);
       } else {
@@ -355,10 +364,10 @@ export default function QuoteForm() {
             disabled={isSubmitDisabled}
             className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-text-primary hover:bg-black text-surface transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {isSubmitting ? (
+            {isSubmitting || isUploading ? (
               <>
                 <UploadCloud className="w-5 h-5 animate-pulse" strokeWidth={2} />
-                {uploadProgress > 0 && uploadProgress < 100 ? `Uploading File: ${uploadProgress}%` : 'Processing Request...'}
+                {isUploading ? `Uploading File: ${uploadProgress}%` : 'Processing Request...'}
               </>
             ) : (
               <>

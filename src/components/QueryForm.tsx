@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, UploadCloud, File, CheckCircle, Check, ShieldCheck, Mail } from 'lucide-react';
 import ModelViewer from './ModelViewer';
+import { useUploadThing } from '@/lib/uploadthing';
 
 export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -11,6 +12,21 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   const [isStudent, setIsStudent] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
+
+  const { startUpload, isUploading } = useUploadThing("cadUploader", {
+    onUploadProgress: (p) => {
+      setUploadProgress(p);
+    },
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        setUploadedFileUrl(res[0].url);
+      }
+    },
+    onUploadError: (e) => {
+      alert("Upload failed: " + e.message);
+    }
+  });
 
   // OTP State
   const [email, setEmail] = useState('');
@@ -47,9 +63,16 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       const url = URL.createObjectURL(file);
       setFileUrl(url);
       setFileName(file.name);
+      
+      // Start upload to cloud immediately
+      setUploadProgress(0);
+      setUploadedFileUrl(null);
+      startUpload([file]);
+      
     } else {
       setFileUrl(null);
       setFileName('');
+      setUploadedFileUrl(null);
     }
   };
 
@@ -110,6 +133,13 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       return alert("Please verify your email with the OTP before submitting.");
     }
 
+    if (!uploadedFileUrl) {
+      if (isUploading) {
+        return alert("Please wait for the 3D file to finish uploading before submitting!");
+      }
+      return alert("Please select and upload a 3D file.");
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -124,31 +154,14 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       formData.append('verifiedToken', verifiedToken); // Attach verified token
       // Ensure email in formData matches verified email just in case
       formData.set('email', email);
+      
+      // Don't send the physical file, send the cloud URL
+      formData.delete('file');
+      formData.append('fileUrl', uploadedFileUrl);
 
-      setUploadProgress(0);
-
-      const response = await new Promise<{ok: boolean, text: string, status: number, statusText: string}>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/quote');
-        
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
-            setUploadProgress(percent);
-          }
-        };
-
-        xhr.onload = () => {
-          resolve({
-            ok: xhr.status >= 200 && xhr.status < 300,
-            text: xhr.responseText,
-            status: xhr.status,
-            statusText: xhr.statusText
-          });
-        };
-
-        xhr.onerror = () => reject(new Error('Network error during upload'));
-        xhr.send(formData);
+      const response = await fetch('/api/quote', {
+        method: 'POST',
+        body: formData,
       });
 
       if (response.ok) {
@@ -442,10 +455,10 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           }`}
         >
           <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"></div>
-          {isSubmitting ? (
+          {isSubmitting || isUploading ? (
             <>
               <UploadCloud className="w-5 h-5 animate-pulse" strokeWidth={2} />
-              {uploadProgress > 0 && uploadProgress < 100 ? `Uploading File: ${uploadProgress}%` : 'Processing Request...'}
+              {isUploading ? `Uploading File: ${uploadProgress}%` : 'Processing Request...'}
             </>
           ) : !isOtpVerified ? (
             <>
