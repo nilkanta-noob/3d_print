@@ -33,19 +33,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Save the STL file to public/uploads so it can be downloaded via link
+    // Extract the STL file buffer directly (No local saving needed for Vercel)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {} // ignore if exists
-    
-    const randomSuffix = crypto.randomUUID();
-    const fileName = `${Date.now()}-${randomSuffix}-${file.name.replace(/\s+/g, '_')}`;
-    const filePath = join(uploadDir, fileName);
-    await writeFile(filePath, buffer);
+
 
     // Save to Database
     const dbUser = await prisma.user.upsert({
@@ -89,7 +80,7 @@ export async function POST(request: NextRequest) {
         <p><strong>Material:</strong> ${material}</p>
         <p><strong>Address:</strong> ${city}, ${state} - ${pincode}</p>
         <p><strong>Notes:</strong> Infill: ${infill}, Finalize: ${finalize}, Student: ${isStudent ? 'Yes' : 'No'}</p>
-        <p><strong>File Download:</strong> <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/uploads/${fileName}">Click here to download ${file.name}</a></p>
+        <p>The uploaded CAD file is attached.</p>
       </div>
     `;
 
@@ -111,7 +102,7 @@ export async function POST(request: NextRequest) {
       subject: `New Query Request: ${order.orderNumber}`,
       text: `New query request received from ${name} (${email}). Phone: ${phone}. Material: ${material}.`,
       html: isFileTooLarge 
-        ? emailHtml + '<p style="color: #eab308;"><strong>Note:</strong> The 3D file was larger than 35MB so it was not attached to avoid email bounce. Please use the download link above.</p>'
+        ? emailHtml + '<p style="color: #eab308;"><strong>Note:</strong> The 3D file was larger than 35MB so it could not be attached due to Resend API limits.</p>'
         : emailHtml,
       attachments: attachmentsList.length > 0 ? attachmentsList : undefined
     };
@@ -122,7 +113,7 @@ export async function POST(request: NextRequest) {
         console.error('Failed to send admin notification email with attachment, attempting fallback without attachment...', emailResult.error);
         const fallbackResult = await sendEmail({
           ...emailPayload,
-          html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The file attachment failed (likely due to Resend API timeout). Please use the download link above.</p>',
+          html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The file attachment failed (likely due to Resend API timeout).</p>',
           attachments: undefined
         });
         if (!fallbackResult.success) {
