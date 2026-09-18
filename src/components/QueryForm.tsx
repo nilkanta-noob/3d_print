@@ -145,7 +145,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       <div className="p-12 flex flex-col items-center justify-center text-center bg-surface border border-accent-primary/20 rounded-sm h-full">
         <CheckCircle className="w-16 h-16 text-accent-primary mb-4 animate-pulse" strokeWidth={1.5} />
         <h3 className="text-2xl font-display font-black text-text-primary uppercase tracking-widest mb-2">Request Logged</h3>
-        <p className="text-text-muted font-sans">Your files have been received into the queue. A quotation will be generated shortly.</p>
+        <p className="text-text-muted font-sans">Please check your email. You will receive a reply within 30 minutes to 1 hour.</p>
       </div>
     );
   }

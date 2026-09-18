@@ -3,6 +3,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { prisma } from '@/lib/prisma';
 import { verifyQuoteJwt } from '@/lib/otp';
+import { sendEmail } from '@/lib/email';
 import crypto from 'crypto';
 
 import { tmpdir } from 'os';
@@ -69,6 +70,13 @@ export async function POST(request: NextRequest) {
           }
         }
       }
+    });
+
+    // Send confirmation email to user
+    await sendEmail({
+      to: email,
+      subject: 'Quotation Request Received - PrintWarriors',
+      text: `Hello ${name},\n\nThank you for submitting your quotation request. We have received your 3D model and requirements (Material: ${material}).\n\nWe will review your request and reply to you within 30 minutes to 1 hour.\n\nYour Order Number is ${order.orderNumber}.\n\nBest regards,\nThe PrintWarriors Team`,
     });
 
     return NextResponse.json({ success: true, orderNumber: order.orderNumber });

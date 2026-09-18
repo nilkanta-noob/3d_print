@@ -143,7 +143,7 @@ export default function QuoteForm() {
         <h3 className="text-2xl font-display font-black text-text-primary uppercase tracking-widest mb-4">Request Received</h3>
         <p className="text-text-muted font-sans text-lg mb-2">Thanks! We've received your request.</p>
         <p className="text-accent-primary font-mono text-xl mb-6">Order #{orderNumber}</p>
-        <p className="text-sm text-text-muted opacity-80">We will email you a quote shortly.</p>
+        <p className="text-sm text-text-muted opacity-80">Please check your email. You will receive a reply within 30 minutes to 1 hour.</p>
       </div>
     );
   }

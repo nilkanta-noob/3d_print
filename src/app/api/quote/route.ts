@@ -4,6 +4,7 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
+import { sendEmail } from '@/lib/email';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,8 @@ export async function POST(request: NextRequest) {
     
     const file = formData.get('file') as File;
     const studentIdFile = formData.get('studentId') as File | null;
+    const infill = formData.get('infill') as string || 'Not Specified';
+    const finalize = formData.get('finalize') as string || 'Not Specified';
 
     if (!file || !name || !email || !phone) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -34,21 +37,46 @@ export async function POST(request: NextRequest) {
     const filePath = join(uploadDir, fileName);
     await writeFile(filePath, buffer);
 
-    // Save to Database (Disabled during UI redesign phase until Auth/Order schema is finalized in Phase 5)
-    /*
-    const quotation = await prisma.quotationRequest.create({
+    // Save to Database
+    const dbUser = await prisma.user.upsert({
+      where: { email },
+      update: { name, phone },
+      create: { email, name, phone },
+    });
+
+    const order = await prisma.order.create({
       data: {
-        name,
-        email,
-        phone,
-        material,
-        isStudent,
-        filePath: fileName,
+        orderNumber: `ORD-${Date.now()}`,
+        userId: dbUser.id,
+        quantity: 1,
+        material: material,
+        color: "Not Specified",
+        customerNotes: `Infill: ${infill}, Finalize: ${finalize}, Student: ${isStudent ? 'Yes' : 'No'}`,
+        billingName: name,
+        billingAddress: "Pending",
+        billingCity: "Pending",
+        billingState: "Pending",
+        billingPin: "Pending",
+        billingCountry: "Pending",
+        files: {
+          create: {
+            fileName: file.name,
+            storageKey: fileName,
+            fileSize: file.size,
+            mimeType: file.type || 'application/octet-stream'
+          }
+        }
       }
     });
-    */
 
-    return NextResponse.json({ success: true, quotation: { filePath: fileName } });
+    // Send confirmation email to user
+    await sendEmail({
+      to: email,
+      subject: 'Quotation Request Received - PrintWarriors',
+      text: `Hello ${name},\n\nThank you for submitting your quotation request. We have received your 3D model and requirements (Material: ${material}).\n\nWe will review your request and reply to you within 30 minutes to 1 hour.\n\nYour Order Number is ${order.orderNumber}.\n\nBest regards,\nThe PrintWarriors Team`,
+    });
+
+    return NextResponse.json({ success: true, orderNumber: order.orderNumber });
 
   } catch (error: any) {
     console.error('Error handling quote request:', error);
