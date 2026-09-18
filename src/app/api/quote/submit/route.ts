@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 import { verifyQuoteJwt } from '@/lib/otp';
 import crypto from 'crypto';
 
+import { tmpdir } from 'os';
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -27,16 +29,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired token. Please verify your email again.' }, { status: 401 });
     }
 
-    // Save the STL file locally with a safe random name
+    // Save the STL file temporarily to /tmp (since Vercel is serverless)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const uploadDir = join(process.cwd(), 'uploads');
-    
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-      // Ignore if exists
-    }
+    const uploadDir = tmpdir();
 
     // Generate safe filename to avoid path traversal/collisions
     const randomSuffix = crypto.randomUUID();
