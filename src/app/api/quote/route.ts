@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         files: {
           create: {
             fileName: file.name,
-            storageKey: fileName,
+            storageKey: file.name,
             fileSize: file.size,
             mimeType: file.type || 'application/octet-stream'
           }
