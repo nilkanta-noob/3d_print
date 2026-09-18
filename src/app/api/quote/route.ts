@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
@@ -107,20 +107,23 @@ export async function POST(request: NextRequest) {
       attachments: attachmentsList.length > 0 ? attachmentsList : undefined
     };
 
-    // Send admin notification (Must use await so Vercel doesn't kill the background process)
-    const emailResult = await sendEmail(emailPayload);
-    
-    if (!emailResult.success) {
-      console.error('Failed to send admin notification email with attachment, attempting fallback without attachment...', emailResult.error);
-      const fallbackResult = await sendEmail({
-        ...emailPayload,
-        html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The file attachment failed (likely due to Resend API timeout).</p>',
-        attachments: undefined
-      });
-      if (!fallbackResult.success) {
-        console.error('Fallback email also failed:', fallbackResult.error);
+    // Send admin notification in the background using Next.js 'after'
+    // This allows Vercel to return the response instantly without killing the background process!
+    after(async () => {
+      const emailResult = await sendEmail(emailPayload);
+      
+      if (!emailResult.success) {
+        console.error('Failed to send admin notification email with attachment, attempting fallback without attachment...', emailResult.error);
+        const fallbackResult = await sendEmail({
+          ...emailPayload,
+          html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The file attachment failed (likely due to Resend API timeout).</p>',
+          attachments: undefined
+        });
+        if (!fallbackResult.success) {
+          console.error('Fallback email also failed:', fallbackResult.error);
+        }
       }
-    }
+    });
 
     return NextResponse.json({ success: true, orderNumber: order.orderNumber });
 
