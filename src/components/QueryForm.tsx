@@ -7,6 +7,7 @@ import ModelViewer from './ModelViewer';
 export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isStudent, setIsStudent] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
@@ -124,20 +125,40 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       // Ensure email in formData matches verified email just in case
       formData.set('email', email);
 
-      const response = await fetch('/api/quote', {
-        method: 'POST',
-        body: formData,
+      setUploadProgress(0);
+
+      const response = await new Promise<{ok: boolean, text: string, status: number, statusText: string}>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/quote');
+        
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setUploadProgress(percent);
+          }
+        };
+
+        xhr.onload = () => {
+          resolve({
+            ok: xhr.status >= 200 && xhr.status < 300,
+            text: xhr.responseText,
+            status: xhr.status,
+            statusText: xhr.statusText
+          });
+        };
+
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(formData);
       });
 
       if (response.ok) {
         setIsSuccess(true);
       } else {
-        const text = await response.text();
         try {
-          const errorData = JSON.parse(text);
+          const errorData = JSON.parse(response.text);
           alert(errorData?.error || "Failed to submit request. Please try again.");
         } catch {
-          alert(`Server Error (${response.status} ${response.statusText}):\n\n${text.substring(0, 100)}...`);
+          alert(`Server Error (${response.status} ${response.statusText}):\n\n${response.text.substring(0, 100)}...`);
         }
       }
     } catch (error) {
@@ -424,7 +445,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           {isSubmitting ? (
             <>
               <UploadCloud className="w-5 h-5 animate-pulse" strokeWidth={2} />
-              Processing Request...
+              {uploadProgress > 0 && uploadProgress < 100 ? `Uploading File: ${uploadProgress}%` : 'Processing Request...'}
             </>
           ) : !isOtpVerified ? (
             <>

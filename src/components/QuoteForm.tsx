@@ -24,6 +24,7 @@ export default function QuoteForm() {
   // Submission State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -126,13 +127,34 @@ export default function QuoteForm() {
       submitData.append('pincode', formData.pincode);
       submitData.append('file', file);
 
-      const res = await fetch('/api/quote/submit', {
-        method: 'POST',
-        body: submitData,
+      setUploadProgress(0);
+
+      const response = await new Promise<{ok: boolean, text: string, status: number, statusText: string}>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/quote/submit');
+        
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setUploadProgress(percent);
+          }
+        };
+
+        xhr.onload = () => {
+          resolve({
+            ok: xhr.status >= 200 && xhr.status < 300,
+            text: xhr.responseText,
+            status: xhr.status,
+            statusText: xhr.statusText
+          });
+        };
+
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(submitData);
       });
 
-      const data = await res.json();
-      if (res.ok) {
+      const data = JSON.parse(response.text);
+      if (response.ok) {
         setOrderNumber(data.orderNumber);
       } else {
         setSubmitError(data.error || "Failed to submit request.");
@@ -333,8 +355,17 @@ export default function QuoteForm() {
             disabled={isSubmitDisabled}
             className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-text-primary hover:bg-black text-surface transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            <UploadCloud className="w-5 h-5" strokeWidth={2} />
-            {isSubmitting ? 'Submitting...' : 'Send Quotation'}
+            {isSubmitting ? (
+              <>
+                <UploadCloud className="w-5 h-5 animate-pulse" strokeWidth={2} />
+                {uploadProgress > 0 && uploadProgress < 100 ? `Uploading File: ${uploadProgress}%` : 'Processing Request...'}
+              </>
+            ) : (
+              <>
+                <UploadCloud className="w-5 h-5" strokeWidth={2} />
+                Send Quotation
+              </>
+            )}
           </button>
 
           {!verifiedToken && (
