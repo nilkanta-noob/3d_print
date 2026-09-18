@@ -124,8 +124,13 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           if (onSuccess) onSuccess();
         }, 3000);
       } else {
-        const errorData = await response.json().catch(() => null);
-        alert(errorData?.error || "Failed to submit request. Please try again.");
+        const text = await response.text();
+        try {
+          const errorData = JSON.parse(text);
+          alert(errorData?.error || "Failed to submit request. Please try again.");
+        } catch {
+          alert(`Server Error (${response.status} ${response.statusText}):\n\n${text.substring(0, 100)}...`);
+        }
       }
     } catch (error) {
       console.error(error);
