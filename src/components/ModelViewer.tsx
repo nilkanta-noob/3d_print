@@ -2,7 +2,7 @@
 
 import React, { useMemo, Suspense } from 'react';
 import { Canvas, useLoader } from '@react-three/fiber';
-import { OrbitControls, Stage, Center, Html, useProgress } from '@react-three/drei';
+import { OrbitControls, Center, Html } from '@react-three/drei';
 import { STLLoader } from 'three-stdlib';
 import { OBJLoader } from 'three-stdlib';
 import * as THREE from 'three';
@@ -80,12 +80,13 @@ export default function ModelViewer({ fileUrl, fileName }: { fileUrl: string; fi
       <Canvas shadows camera={{ position: [0, 0, 150], fov: 45 }}>
         <color attach="background" args={['transparent']} />
         <Suspense fallback={<Loader />}>
-          <Stage environment="city" intensity={0.5} adjustCamera={1.2}>
-            <Center>
-              {isStl && <STLModel url={fileUrl} />}
-              {isObj && <OBJModel url={fileUrl} />}
-            </Center>
-          </Stage>
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[10, 10, 10]} intensity={1.5} />
+          <directionalLight position={[-10, -10, -10]} intensity={0.5} />
+          <Center>
+            {isStl && <STLModel url={fileUrl} />}
+            {isObj && <OBJModel url={fileUrl} />}
+          </Center>
         </Suspense>
         <OrbitControls makeDefault />
       </Canvas>
