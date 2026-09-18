@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import { join } from 'path';
+import { tmpdir } from 'os';
+import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -25,16 +27,10 @@ export async function POST(request: NextRequest) {
     // Save the STL file locally
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const uploadDir = join(process.cwd(), 'uploads');
+    const uploadDir = tmpdir();
     
-    // Ensure uploads directory exists
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-      // Ignore if exists
-    }
-
-    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+    const randomSuffix = crypto.randomUUID();
+    const fileName = `${Date.now()}-${randomSuffix}-${file.name.replace(/\s+/g, '_')}`;
     const filePath = join(uploadDir, fileName);
     await writeFile(filePath, buffer);
 
