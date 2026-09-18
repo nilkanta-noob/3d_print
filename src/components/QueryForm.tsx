@@ -13,6 +13,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
+  const [studentIdUrl, setStudentIdUrl] = useState<string | null>(null);
 
   const { startUpload, isUploading } = useUploadThing("cadUploader", {
     onUploadProgress: (p) => {
@@ -25,6 +26,17 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
     },
     onUploadError: (e) => {
       alert("Upload failed: " + e.message);
+    }
+  });
+
+  const { startUpload: startStudentIdUpload, isUploading: isStudentIdUploading } = useUploadThing("cadUploader", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        setStudentIdUrl(res[0].url);
+      }
+    },
+    onUploadError: (e) => {
+      alert("Student ID upload failed: " + e.message);
     }
   });
 
@@ -155,9 +167,21 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       // Ensure email in formData matches verified email just in case
       formData.set('email', email);
       
-      // Don't send the physical file, send the cloud URL
+      // Don't send the physical files, send the cloud URLs
       formData.delete('file');
+      formData.delete('studentId');
+      
       formData.append('fileUrl', uploadedFileUrl);
+      
+      if (isStudent) {
+        if (!studentIdUrl) {
+          if (isStudentIdUploading) {
+            return alert("Please wait for the Student ID image to finish uploading.");
+          }
+          return alert("Please upload your Student ID.");
+        }
+        formData.append('studentIdUrl', studentIdUrl);
+      }
 
       const response = await fetch('/api/quote', {
         method: 'POST',
@@ -390,13 +414,35 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           {isStudent && (
             <div className="animate-in fade-in slide-in-from-top-4 duration-300 pt-2">
               <label className="block text-xs font-bold uppercase tracking-wider text-accent-secondary mb-1.5">Verification: College ID</label>
-              <input
-                name="studentId"
-                type="file"
-                accept="image/*"
-                required={isStudent}
-                className="w-full text-sm text-text-muted file:mr-4 file:py-2.5 file:px-4 file:rounded-sm file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-surface file:text-text-primary hover:file:bg-border transition-colors font-sans"
-              />
+              <div className="flex flex-col gap-2">
+                <input
+                  name="studentId"
+                  type="file"
+                  accept="image/*"
+                  required={isStudent && !studentIdUrl}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.size > 16 * 1024 * 1024) {
+                        alert("Student ID image must be under 16MB.");
+                        e.target.value = "";
+                        return;
+                      }
+                      setStudentIdUrl(null);
+                      startStudentIdUpload([file]);
+                    }
+                  }}
+                  className="w-full text-sm text-text-muted file:mr-4 file:py-2.5 file:px-4 file:rounded-sm file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-surface file:text-text-primary hover:file:bg-border transition-colors font-sans"
+                />
+                {isStudentIdUploading && (
+                  <span className="text-xs text-text-muted animate-pulse">Uploading ID...</span>
+                )}
+                {studentIdUrl && (
+                  <span className="text-xs text-green-500 font-bold flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" /> ID Uploaded Successfully
+                  </span>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -412,7 +458,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 type="file"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                 required
-                accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf"
+                accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf,.zip"
                 onChange={handleFileChange}
               />
               <div className="text-center pointer-events-none relative z-10 flex flex-col items-center gap-2">
@@ -424,7 +470,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                     <span className="font-bold text-text-muted uppercase tracking-wide">Select or Drop 3D File</span>
                   )}
                 </div>
-                <p className="text-xs text-text-muted font-sans mt-1">.stl, .obj, .stp, .iges, .3mf (Max: 100MB)</p>
+                <p className="text-xs text-text-muted font-sans mt-1">.stl, .obj, .stp, .iges, .3mf, .zip (Max: 100MB)</p>
               </div>
             </div>
 
@@ -456,10 +502,10 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           }`}
         >
           <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"></div>
-          {isSubmitting || isUploading ? (
+          {isSubmitting || isUploading || isStudentIdUploading ? (
             <>
               <UploadCloud className="w-5 h-5 animate-pulse" strokeWidth={2} />
-              {isUploading ? `Uploading File: ${uploadProgress}%` : 'Processing Request...'}
+              {isUploading ? `Uploading File: ${uploadProgress}%` : isStudentIdUploading ? 'Uploading ID...' : 'Processing Request...'}
             </>
           ) : !isOtpVerified ? (
             <>

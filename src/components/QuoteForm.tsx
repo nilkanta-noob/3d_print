@@ -342,17 +342,17 @@ export default function QuoteForm() {
 
         {/* File Upload */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">3D Model (.stl, .3mf) *</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">3D Model (.stl, .3mf, .zip) *</label>
           <div className="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-dashed border-border rounded-sm hover:border-accent-primary/50 transition-colors bg-background/30 group">
             <div className="space-y-2 text-center">
               <FileIcon className="mx-auto h-8 w-8 text-text-muted group-hover:text-accent-primary transition-colors" strokeWidth={1.5} />
               <div className="flex text-sm text-text-muted justify-center">
                 <label className="relative cursor-pointer rounded-sm font-bold text-accent-primary hover:text-accent-primary-deep uppercase tracking-wide">
                   <span>{file ? file.name : 'Select File'}</span>
-                  <input name="file" type="file" className="sr-only" required accept=".stl,.3mf" onChange={handleFileChange} />
+                  <input name="file" type="file" className="sr-only" required accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf,.zip" onChange={handleFileChange} />
                 </label>
               </div>
-              <p className="text-xs text-text-muted font-sans">Max size: 100MB</p>
+              <p className="text-xs text-text-muted font-sans">Max size: 100MB (.stl, .obj, .3mf, .zip)</p>
             </div>
           </div>
         </div>

@@ -18,9 +18,7 @@ export async function POST(request: NextRequest) {
     const phone = formData.get('phone') as string;
     const material = formData.get('material') as string;
     const isStudent = formData.get('isStudent') === 'on';
-    
-    const file = formData.get('file') as File;
-    const studentIdFile = formData.get('studentId') as File | null;
+    const studentIdUrl = formData.get('studentIdUrl') as string | null;
     const infill = formData.get('infill') as string || 'Not Specified';
     const finalize = formData.get('finalize') as string || 'Not Specified';
     
@@ -88,6 +86,12 @@ export async function POST(request: NextRequest) {
         <p><strong>Material:</strong> ${material}</p>
         <p><strong>Address:</strong> ${city}, ${state} - ${pincode}</p>
         <p><strong>Notes:</strong> Infill: ${infill}, Finalize: ${finalize}, Student: ${isStudent ? 'Yes' : 'No'}</p>
+        ${isStudent && studentIdUrl ? `
+        <div style="margin-top: 10px; padding: 10px; background-color: #fef2f2; border-radius: 5px;">
+          <p style="margin-top: 0; color: #dc2626; font-weight: bold;">Student ID Verification:</p>
+          <a href="${studentIdUrl}" style="color: #ef4444;">View Student ID Image</a>
+        </div>
+        ` : ''}
         <div style="margin-top: 20px; padding: 15px; background-color: #f3f4f6; border-radius: 5px;">
           <p style="margin-top: 0;"><strong>3D Model File:</strong></p>
           <a href="${fileUrl}?download=true" style="display: inline-block; padding: 10px 15px; background-color: #22d3ee; color: #000; text-decoration: none; font-weight: bold; border-radius: 4px;">Download CAD File</a>
