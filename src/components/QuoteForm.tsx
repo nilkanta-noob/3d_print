@@ -362,7 +362,7 @@ export default function QuoteForm() {
           <button
             type="submit"
             disabled={isSubmitDisabled}
-            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-text-primary hover:bg-black text-surface transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-text-primary hover:bg-[#e0e0e0] text-surface transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting || isUploading ? (
               <>

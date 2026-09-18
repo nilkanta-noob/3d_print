@@ -90,8 +90,9 @@ export async function POST(request: NextRequest) {
         <p><strong>Notes:</strong> Infill: ${infill}, Finalize: ${finalize}, Student: ${isStudent ? 'Yes' : 'No'}</p>
         <div style="margin-top: 20px; padding: 15px; background-color: #f3f4f6; border-radius: 5px;">
           <p style="margin-top: 0;"><strong>3D Model File:</strong></p>
-          <a href="${fileUrl}" style="display: inline-block; padding: 10px 15px; background-color: #22d3ee; color: #000; text-decoration: none; font-weight: bold; border-radius: 4px;">Download CAD File</a>
+          <a href="${fileUrl}?download=true" style="display: inline-block; padding: 10px 15px; background-color: #22d3ee; color: #000; text-decoration: none; font-weight: bold; border-radius: 4px;">Download CAD File</a>
           <p style="font-size: 12px; color: #6b7280; margin-bottom: 0; margin-top: 10px;">Link: ${fileUrl}</p>
+          <p style="font-size: 12px; color: #ef4444; margin-top: 5px;"><strong>Note:</strong> If the file opens as unreadable text in your browser, <strong>Right-Click</strong> the button above and select <strong>"Save Link As..."</strong> to download it to your computer.</p>
         </div>
       </div>
     `;

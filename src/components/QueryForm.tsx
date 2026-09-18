@@ -452,7 +452,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           className={`group relative w-full md:w-auto px-10 py-4 rounded-3xl font-bold text-sm tracking-widest uppercase transition-all flex items-center justify-center gap-2 overflow-hidden ${
             !isOtpVerified 
               ? 'bg-background text-text-muted border border-border cursor-not-allowed' 
-              : 'bg-text-primary hover:bg-black text-surface shadow-lg disabled:opacity-50 disabled:cursor-not-allowed'
+              : 'bg-text-primary hover:bg-[#e0e0e0] text-surface shadow-lg disabled:opacity-50 disabled:cursor-not-allowed'
           }`}
         >
           <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"></div>
