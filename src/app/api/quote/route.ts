@@ -107,20 +107,20 @@ export async function POST(request: NextRequest) {
       attachments: attachmentsList.length > 0 ? attachmentsList : undefined
     };
 
-    // Send admin notification in the background (fire and forget) to not block the user response
-    sendEmail(emailPayload).then(async (emailResult) => {
-      if (!emailResult.success) {
-        console.error('Failed to send admin notification email with attachment, attempting fallback without attachment...', emailResult.error);
-        const fallbackResult = await sendEmail({
-          ...emailPayload,
-          html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The file attachment failed (likely due to Resend API timeout).</p>',
-          attachments: undefined
-        });
-        if (!fallbackResult.success) {
-          console.error('Fallback email also failed:', fallbackResult.error);
-        }
+    // Send admin notification (Must use await so Vercel doesn't kill the background process)
+    const emailResult = await sendEmail(emailPayload);
+    
+    if (!emailResult.success) {
+      console.error('Failed to send admin notification email with attachment, attempting fallback without attachment...', emailResult.error);
+      const fallbackResult = await sendEmail({
+        ...emailPayload,
+        html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The file attachment failed (likely due to Resend API timeout).</p>',
+        attachments: undefined
+      });
+      if (!fallbackResult.success) {
+        console.error('Fallback email also failed:', fallbackResult.error);
       }
-    }).catch(err => console.error('Email sending caught error:', err));
+    }
 
     return NextResponse.json({ success: true, orderNumber: order.orderNumber });
 
