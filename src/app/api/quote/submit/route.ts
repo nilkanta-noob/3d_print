@@ -36,20 +36,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired token. Please verify your email again.' }, { status: 401 });
     }
 
-    let fileBuffer: Buffer | null = null;
+    // The file is already uploaded to UploadThing.
+    // We will just send the link in the email to avoid Vercel/Resend latency.
     let fileName = fileUrl.split('/').pop() || '3d_model.stl';
-    
-    try {
-      const fileRes = await fetch(fileUrl);
-      if (fileRes.ok) {
-        const arrayBuffer = await fileRes.arrayBuffer();
-        fileBuffer = Buffer.from(arrayBuffer);
-      } else {
-        console.error("Failed to download file from UploadThing URL:", fileUrl);
-      }
-    } catch (err) {
-      console.error("Error downloading file from UploadThing:", err);
-    }
 
     // Save to Database
     const dbUser = await prisma.user.upsert({
@@ -75,7 +64,7 @@ export async function POST(request: NextRequest) {
           create: {
             fileName: fileName,
             storageKey: fileUrl,
-            fileSize: fileBuffer ? fileBuffer.byteLength : 0,
+            fileSize: 0,
             mimeType: 'application/octet-stream'
           }
         }
@@ -91,20 +80,20 @@ export async function POST(request: NextRequest) {
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Material:</strong> ${material}</p>
         <p><strong>Address:</strong> ${city}, ${state}, ${country} - ${pincode}</p>
-        <p>The uploaded CAD file is attached.</p>
+        <div style="margin-top: 20px; padding: 15px; background-color: #f3f4f6; border-radius: 5px;">
+          <p style="margin-top: 0;"><strong>3D Model File:</strong></p>
+          <a href="${fileUrl}" style="display: inline-block; padding: 10px 15px; background-color: #22d3ee; color: #000; text-decoration: none; font-weight: bold; border-radius: 4px;">Download CAD File</a>
+          <p style="font-size: 12px; color: #6b7280; margin-bottom: 0; margin-top: 10px;">Link: ${fileUrl}</p>
+        </div>
       </div>
     `;
-
-    const isFileTooLarge = fileBuffer ? fileBuffer.byteLength > 35 * 1024 * 1024 : false; // 35 MB limit (Resend max is 40MB)
 
     const emailPayload = {
       to: process.env.ADMIN_EMAIL || 'hello@printwarriors.com',
       subject: `New Quote Request: ${order.orderNumber}`,
-      text: `New quote request received from ${name} (${email}). Phone: ${phone}. Material: ${material}.`,
-      html: isFileTooLarge 
-        ? emailHtml + '<p style="color: #eab308;"><strong>Note:</strong> The 3D file was larger than 35MB so it could not be attached due to Resend API limits.</p>'
-        : emailHtml,
-      attachments: fileBuffer && !isFileTooLarge ? [{ filename: fileName, content: fileBuffer }] : undefined
+      text: `New quote request received from ${name} (${email}). Phone: ${phone}. Material: ${material}. Download Link: ${fileUrl}`,
+      html: emailHtml,
+      attachments: undefined
     };
 
     // Send admin notification in the background using Next.js 'after'
@@ -113,15 +102,7 @@ export async function POST(request: NextRequest) {
       const emailResult = await sendEmail(emailPayload);
       
       if (!emailResult.success) {
-        console.error('Failed to send admin notification email with attachment, attempting fallback without attachment...', emailResult.error);
-        const fallbackResult = await sendEmail({
-          ...emailPayload,
-          html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The file attachment failed (likely due to Resend API timeout).</p>',
-          attachments: undefined
-        });
-        if (!fallbackResult.success) {
-          console.error('Fallback email also failed:', fallbackResult.error);
-        }
+        console.error('Failed to send admin notification email:', emailResult.error);
       }
     });
 
