@@ -169,7 +169,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-8 bg-surface rounded-sm relative overflow-hidden flex flex-col h-full">
+    <form onSubmit={handleSubmit} className="p-4 lg:p-8 bg-surface rounded-sm relative overflow-hidden flex flex-col min-h-full">
       <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary-deep/10 blur-[80px] rounded-full pointer-events-none"></div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 flex-grow">

@@ -36,10 +36,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired token. Please verify your email again.' }, { status: 401 });
     }
 
-    // Save the STL file temporarily to /tmp (since Vercel is serverless)
+    // Save the STL file to public/uploads so it can be downloaded via link
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const uploadDir = tmpdir();
+    
+    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    try {
+      await mkdir(uploadDir, { recursive: true });
+    } catch (e) {} // ignore if exists
 
     // Generate safe filename to avoid path traversal/collisions
     const randomSuffix = crypto.randomUUID();
@@ -88,33 +92,36 @@ export async function POST(request: NextRequest) {
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Material:</strong> ${material}</p>
         <p><strong>Address:</strong> ${city}, ${state}, ${country} - ${pincode}</p>
-        <p>The uploaded CAD file is attached.</p>
+        <p><strong>File Download:</strong> <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/uploads/${safeFileName}">Click here to download ${file.name}</a></p>
       </div>
     `;
 
-    const isFileTooLarge = buffer.byteLength > 25 * 1024 * 1024; // 25 MB
+    const isFileTooLarge = buffer.byteLength > 35 * 1024 * 1024; // 35 MB limit (Resend max is 40MB)
 
     const emailPayload = {
       to: process.env.ADMIN_EMAIL || 'hello@printwarriors.com',
       subject: `New Quote Request: ${order.orderNumber}`,
       text: `New quote request received from ${name} (${email}). Phone: ${phone}. Material: ${material}.`,
       html: isFileTooLarge 
-        ? emailHtml + '<p style="color: red;"><strong>Note:</strong> The uploaded file was too large (over 25MB) to attach to this email. Please check the admin dashboard for the file.</p>'
+        ? emailHtml + '<p style="color: #eab308;"><strong>Note:</strong> The 3D file was larger than 35MB so it was not attached to avoid email bounce. Please use the download link above.</p>'
         : emailHtml,
       attachments: isFileTooLarge ? undefined : [{ filename: file.name, content: buffer }]
     };
 
-    // Send admin notification
-    const emailResult = await sendEmail(emailPayload);
-    
-    if (!emailResult.success) {
-      console.error('Failed to send admin notification email with attachment, attempting fallback without attachment...', emailResult.error);
-      await sendEmail({
-        ...emailPayload,
-        html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The uploaded file could not be attached due to size or API limits. Please check the admin dashboard for the file.</p>',
-        attachments: undefined
-      });
-    }
+    // Send admin notification in the background (fire and forget)
+    sendEmail(emailPayload).then(async (emailResult) => {
+      if (!emailResult.success) {
+        console.error('Failed to send admin notification email with attachment, attempting fallback without attachment...', emailResult.error);
+        const fallbackResult = await sendEmail({
+          ...emailPayload,
+          html: emailHtml + '<p style="color: red;"><strong>Note:</strong> The file attachment failed (likely due to Resend API timeout). Please use the download link above.</p>',
+          attachments: undefined
+        });
+        if (!fallbackResult.success) {
+          console.error('Fallback email also failed:', fallbackResult.error);
+        }
+      }
+    }).catch(err => console.error('Email sending caught error:', err));
 
     return NextResponse.json({ success: true, orderNumber: order.orderNumber });
 
