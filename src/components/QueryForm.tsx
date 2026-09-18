@@ -167,11 +167,12 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       if (response.ok) {
         setIsSuccess(true);
       } else {
+        const text = await response.text();
         try {
-          const errorData = JSON.parse(response.text);
+          const errorData = JSON.parse(text);
           alert(errorData?.error || "Failed to submit request. Please try again.");
         } catch {
-          alert(`Server Error (${response.status} ${response.statusText}):\n\n${response.text.substring(0, 100)}...`);
+          alert(`Server Error (${response.status} ${response.statusText}):\n\n${text.substring(0, 100)}...`);
         }
       }
     } catch (error) {
