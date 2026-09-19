@@ -212,14 +212,14 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       <div className="p-12 flex flex-col items-center justify-center text-center bg-surface border border-accent-primary/20 rounded-md h-full">
         <CheckCircle className="w-16 h-16 text-accent-primary mb-4 animate-pulse" strokeWidth={1.5} />
         <h3 className="text-2xl font-display font-black text-text-primary uppercase tracking-widest mb-2">Request Logged</h3>
-        <p className="text-text-muted font-sans mb-8">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
+        <p className="text-text-secondary font-sans mb-8">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
 
         <button
           onClick={() => {
             setIsSuccess(false);
             if (onSuccess) onSuccess();
           }}
-          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-text-primary rounded-md font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
+          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-md font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
         >
           Go Back
         </button>
@@ -236,10 +236,10 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
         <div className="lg:col-span-6 space-y-6 flex flex-col">
 
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Client Details</h3>
+            <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest border-b border-border pb-2">Client Details</h3>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Full Name</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Full Name</label>
               <input
                 name="name"
                 type="text"
@@ -251,11 +251,11 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
 
             {/* Email & OTP Section */}
             <div className="p-4 border border-border/50 bg-background/30 rounded-md space-y-3">
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted">Email Verification</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary">Email Verification</label>
 
               <div className="flex gap-2">
                 <div className="relative flex-grow">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
                   <input
                     name="email"
                     type="email"
@@ -272,7 +272,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                     type="button"
                     onClick={handleSendOtp}
                     disabled={isSendingOtp || isOtpSent || !email}
-                    className="px-4 py-2.5 bg-card border border-border rounded-md text-xs font-bold uppercase tracking-wider text-text-primary hover:text-accent-primary hover:border-accent-primary transition-colors disabled:opacity-50"
+                    className="px-4 py-2.5 bg-elevated border border-border rounded-md text-xs font-bold uppercase tracking-wider text-text-primary hover:text-accent-primary hover:border-accent-primary transition-colors disabled:opacity-50"
                   >
                     {isSendingOtp ? "Sending..." : isOtpSent ? "Sent" : "Send OTP"}
                   </button>
@@ -293,7 +293,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                     type="button"
                     onClick={handleVerifyOtp}
                     disabled={isVerifyingOtp || otp.length < 5}
-                    className="px-4 py-2 bg-accent-primary text-text-primary rounded-md text-xs font-bold uppercase tracking-wider hover:bg-accent-hover transition-colors disabled:opacity-50 whitespace-nowrap"
+                    className="px-4 py-2 bg-accent-primary text-on-accent rounded-md text-xs font-bold uppercase tracking-wider hover:bg-accent-hover transition-colors disabled:opacity-50 whitespace-nowrap"
                   >
                     {isVerifyingOtp ? "Verifying..." : "Verify"}
                   </button>
@@ -301,14 +301,14 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
               )}
 
               {isOtpVerified && (
-                <div className="flex items-center gap-2 text-green-500 text-xs font-bold uppercase tracking-wider mt-2 animate-in fade-in">
-                  <ShieldCheck className="w-4 h-4" /> Email Verified Successfully
+                <div className="flex items-center gap-2 text-text-primary text-xs font-bold uppercase tracking-wider mt-2 animate-in fade-in">
+                  <ShieldCheck className="w-4 h-4 text-accent-primary" /> Email Verified Successfully
                 </div>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Phone Number</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Phone Number</label>
               <input
                 name="phone"
                 type="tel"
@@ -319,10 +319,10 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           </div>
 
           <div className="space-y-4 pt-2">
-            <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Billing & Shipping</h3>
+            <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest border-b border-border pb-2">Billing & Shipping</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">State/Province</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">State/Province</label>
                 <input
                   name="state" type="text" required
                   className="w-full px-4 py-2.5 bg-background border border-border rounded-md focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans"
@@ -330,7 +330,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">City</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">City</label>
                 <input
                   name="city" type="text" required
                   className="w-full px-4 py-2.5 bg-background border border-border rounded-md focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans"
@@ -338,7 +338,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Pin/Zip Code</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Pin/Zip Code</label>
                 <input
                   name="pincode" type="text" required
                   className="w-full px-4 py-2.5 bg-background border border-border rounded-md focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans"
@@ -349,10 +349,10 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           </div>
 
           <div className="space-y-4 pt-2">
-            <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Printing Configuration</h3>
+            <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest border-b border-border pb-2">Printing Configuration</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Material</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Material</label>
                 <select
                   name="material"
                   required
@@ -368,7 +368,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Infill Density</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Infill Density</label>
                 <select
                   name="infill"
                   required
@@ -382,7 +382,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Finalize (Post-Processing)</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Finalize (Post-Processing)</label>
               <select
                 name="finalize"
                 required
@@ -405,14 +405,14 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 onChange={(e) => setIsStudent(e.target.checked)}
                 className="peer w-4 h-4 text-accent-primary bg-background border border-border rounded focus:ring-accent-primary focus:ring-offset-background appearance-none checked:bg-accent-primary transition-colors"
               />
-              <Check className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-background opacity-0 peer-checked:opacity-100 pointer-events-none" />
+              <Check className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-on-accent opacity-0 peer-checked:opacity-100 pointer-events-none" />
             </div>
             <span className="text-sm font-medium text-text-primary opacity-90 font-sans">Apply Student Discount</span>
           </label>
 
           {isStudent && (
             <div className="animate-in fade-in slide-in-from-top-4 duration-300 pt-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Verification: College ID</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Verification: College ID</label>
               <div className="flex flex-col gap-2">
                 <input
                   name="studentId"
@@ -431,14 +431,14 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                       startStudentIdUpload([file]);
                     }
                   }}
-                  className="w-full text-sm text-text-muted file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-surface file:text-text-primary hover:file:bg-border transition-colors font-sans"
+                  className="w-full text-sm text-text-secondary file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-surface file:text-text-primary hover:file:bg-border transition-colors font-sans"
                 />
                 {isStudentIdUploading && (
-                  <span className="text-xs text-text-muted animate-pulse">Uploading ID...</span>
+                  <span className="text-xs text-text-secondary animate-pulse">Uploading ID...</span>
                 )}
                 {studentIdUrl && (
-                  <span className="text-xs text-green-500 font-bold flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" /> ID Uploaded Successfully
+                  <span className="text-xs text-text-primary font-bold flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3 text-accent-primary" /> ID Uploaded Successfully
                   </span>
                 )}
               </div>
@@ -448,7 +448,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
 
         {/* Right Column: 3D Viewer & Upload (Expanded to 6 cols, increased height) */}
         <div className="lg:col-span-6 space-y-5 flex flex-col h-full min-h-[500px]">
-          <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">3D Model Asset</h3>
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest border-b border-border pb-2">3D Model Asset</h3>
 
           <div className="flex flex-col gap-4 flex-grow">
             <div className={`relative flex items-center justify-center px-6 py-4 border-2 border-dashed rounded-md transition-colors group bg-background/50 ${fileUrl ? 'border-accent-primary/30' : 'border-border hover:border-accent-primary/50'}`}>
@@ -461,15 +461,15 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 onChange={handleFileChange}
               />
               <div className="text-center pointer-events-none relative z-10 flex flex-col items-center gap-2">
-                <File className={`h-6 w-6 transition-colors ${fileUrl ? 'text-accent-primary' : 'text-text-muted group-hover:text-accent-primary'}`} strokeWidth={1.5} />
+                <File className={`h-6 w-6 transition-colors ${fileUrl ? 'text-accent-primary' : 'text-text-secondary group-hover:text-accent-primary'}`} strokeWidth={1.5} />
                 <div className="text-sm">
                   {fileName ? (
                     <span className="font-bold text-accent-primary">{fileName}</span>
                   ) : (
-                    <span className="font-bold text-text-muted uppercase tracking-wide">Select or Drop 3D File</span>
+                    <span className="font-bold text-text-secondary uppercase tracking-wide">Select or Drop 3D File</span>
                   )}
                 </div>
-                <p className="text-xs text-text-muted font-sans mt-1">.stl, .obj, .stp, .iges, .3mf, .zip (Max: 100MB)</p>
+                <p className="text-xs text-text-secondary font-sans mt-1">.stl, .obj, .stp, .iges, .3mf, .zip (Max: 100MB)</p>
               </div>
             </div>
 
@@ -477,7 +477,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
               {fileUrl ? (
                 <ModelViewer fileUrl={fileUrl} fileName={fileName} />
               ) : (
-                <div className="flex items-center justify-center w-full h-full p-8 text-center text-text-muted flex-col">
+                <div className="flex items-center justify-center w-full h-full p-8 text-center text-text-secondary flex-col">
                   <div className="w-16 h-16 rounded-full border border-border/50 flex items-center justify-center mb-4 bg-surface/50">
                     <span className="text-xs font-bold uppercase">3D</span>
                   </div>
@@ -496,8 +496,8 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           disabled={isSubmitting || !isOtpVerified}
           className={`w-full md:w-auto px-10 py-4 rounded-md font-bold text-sm tracking-widest uppercase transition-colors flex items-center justify-center gap-2 ${
             !isOtpVerified
-              ? 'bg-background text-text-muted border border-border cursor-not-allowed'
-              : 'bg-accent-primary hover:bg-accent-hover text-text-primary shadow-lg shadow-background/50 disabled:opacity-50 disabled:cursor-not-allowed'
+              ? 'bg-background text-text-secondary border border-border cursor-not-allowed'
+              : 'bg-accent-primary hover:bg-accent-hover text-on-accent shadow-lg shadow-black/25 disabled:opacity-50 disabled:cursor-not-allowed'
           }`}
         >
           {isSubmitting || isUploading || isStudentIdUploading ? (
@@ -535,17 +535,17 @@ export default function QueryFormModal({ isOpen, onClose }: QueryFormModalProps)
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 lg:p-8 bg-background/80 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className="bg-surface border border-border rounded-2xl w-full max-w-6xl shadow-2xl shadow-background/60 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-[95vh] lg:h-[85vh]"
+        className="bg-surface border border-border rounded-2xl w-full max-w-6xl shadow-2xl shadow-black/40 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-[95vh] lg:h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-6 border-b border-border shrink-0 bg-surface">
           <div>
             <h2 className="text-xl font-display font-bold text-text-primary">Job specifications</h2>
-            <p className="text-sm text-text-muted mt-1">Configure parameters and preview geometry</p>
+            <p className="text-sm text-text-secondary mt-1">Configure parameters and preview geometry</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-text-muted hover:text-text-primary hover:bg-card rounded-md transition-colors"
+            className="p-2 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-md transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

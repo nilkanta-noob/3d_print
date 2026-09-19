@@ -1,40 +1,75 @@
 @import "tailwindcss";
 
 /*
- * Design tokens — Tailwind v4 CSS-first config (this project has no tailwind.config.js).
- * Each --color-* token generates utilities: bg-background, bg-card, text-text-muted, border-accent-primary, …
+ * Theme system — Tailwind v4 CSS-first config (this project has no tailwind.config.js).
+ *
+ * Raw values are CSS variables scoped by [data-theme]. layout.tsx sets it on <html> (dark by default,
+ * or the saved choice from ThemeToggle), and any element can pin a theme with its own data-theme —
+ * the hero is always dark. `@theme inline` below maps the variables to utilities
+ * (bg-background, bg-surface, bg-elevated, text-text-secondary, bg-accent-primary, text-on-accent, …),
+ * and inlining is what lets a nested data-theme take effect.
+ *
+ * Brand: charcoal, copper, warm ivory — no blue, cyan or teal anywhere in the UI.
  *
  * Usage rules:
- * - Three slate steps, darkest to lightest: background (hero base, main sections) → surface
- *   (alternating section bands, large containers) → card (cards). Contrast between sections comes
- *   from these steps, all one hue family.
- * - Red (accent-primary / accent-hover) is only for CTAs, key highlighted words, active states,
- *   small badges and small accents — no large red areas.
+ * - background → surface (section bands, large containers, forms) → elevated (cards inside them).
+ * - Text: primary → secondary (body copy) → muted (labels, units, captions, fine print).
+ * - Accent is only for CTAs, key highlighted words, active/focus states, small badges and small accents.
+ * - Text on an accent fill always uses on-accent.
  */
-@theme {
-  --color-background: #0F172A;     /* page background */
-  --color-card: #1E293B;           /* cards — the lightest surface */
-  /* Section bands and large containers: halfway between background and card, not a new hue */
-  --color-surface: color-mix(in oklab, var(--color-card) 50%, var(--color-background));
-  --color-text-primary: #FFFFFF;
-  --color-text-muted: #CBD5E1;     /* secondary text */
-  --color-accent-primary: #EF4444; /* accent red */
-  /* Hover: the accent, slightly deepened */
-  --color-accent-hover: color-mix(in oklab, var(--color-accent-primary) 88%, black);
-
-  --color-border: rgba(255, 255, 255, 0.08);
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #1B1D21;
+  --surface: #25282D;
+  --elevated: #2D3137;
+  --text: #F6F4F1;
+  --text-secondary: #C9C5BE;
+  --text-muted: #A29D95;
+  --accent: #B56A38;
+  --border: rgba(246, 244, 241, 0.08);
+  /* Derived values are declared per theme so a scoped data-theme recomputes them */
+  --accent-hover: color-mix(in oklab, var(--accent) 88%, white);
+  --on-accent: #1B1D21; /* charcoal on copper — 4.1:1 */
 }
 
-/* next/font declares --font-inter and --font-space-grotesk on <html> (see layout.tsx), so map them inline. */
+[data-theme="light"] {
+  color-scheme: light;
+  --background: #F7F5F2;
+  --surface: #FFFFFF;
+  --elevated: #EEE9E2;
+  --text: #1B1D21;
+  --text-secondary: #66615A;
+  --text-muted: #6E6861; /* only slightly lighter than secondary — anything lighter fails 4.5:1 on elevated */
+  --accent: #B56A38;
+  --border: #D7D0C8;
+  --accent-hover: color-mix(in oklab, var(--accent) 88%, white);
+  --on-accent: #1B1D21; /* charcoal on copper — 4.1:1 */
+}
+
 @theme inline {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-text-primary: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent-primary: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-border: var(--border);
+
+  /* next/font declares --font-outfit and --font-fira-code on <html> (see layout.tsx).
+     Outfit is the original brand typeface for both body text and headings. */
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-fira-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @layer base {
   body {
-    background: var(--color-background);
-    color: var(--color-text-primary);
+    background: var(--background);
+    color: var(--text);
   }
 
   h1, h2, h3, h4, h5, h6 {

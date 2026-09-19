@@ -20,7 +20,7 @@ export default async function AdminLayout({
         <div className="font-display font-bold tracking-widest text-text-primary uppercase">
           PrintWarriors <span className="text-accent-primary">Admin</span>
         </div>
-        <div className="text-sm text-text-muted font-sans">
+        <div className="text-sm text-text-secondary font-sans">
           {session.user?.email}
         </div>
       </header>

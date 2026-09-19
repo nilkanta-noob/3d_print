@@ -70,61 +70,65 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
   return (
     // reducedMotion="user": entrance animations drop their movement when the OS asks for reduced motion
     <MotionConfig reducedMotion="user">
-      <section className="relative min-h-svh w-full flex items-start lg:items-center overflow-hidden bg-background">
+      {/* data-theme="dark": the hero is always dark (light text over footage), whichever theme the site is in */}
+      <section data-theme="dark" className="relative min-h-svh w-full flex items-start lg:items-center overflow-hidden bg-background">
 
         {/* Hero background video — contained to this section only. The print head sits right of
-            centre in the footage, so the crop leans right to keep it in frame on portrait screens. */}
+            centre in the footage, so the crop leans right to keep it in frame on portrait screens.
+            The filter warms the footage's own teal grade so no cyan reads through (blue cast measured ~50% lower). */}
         <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
           <video
             ref={videoRef}
             src="/hero___video.mp4"
             poster={HERO_POSTER}
-            className="w-full h-full object-cover object-[65%_50%]"
+            className="w-full h-full object-cover object-[65%_50%] [filter:saturate(0.8)_sepia(0.2)]"
             autoPlay
             playsInline
             muted
             loop
           />
-          {/* Base tint: linear-gradient(rgba(15,23,42,0.50), rgba(15,23,42,0.30)) via the background token */}
-          <div className="absolute inset-0 bg-linear-to-b from-background/50 to-background/30"></div>
-          {/* Legibility scrim behind the copy only — top band on mobile, left side on desktop. It fades to
-              nothing before the print head, so the machine keeps the base tint alone. */}
-          <div className="absolute inset-0 bg-linear-to-b from-background/70 from-40% to-transparent to-65% lg:bg-linear-to-r lg:from-background/60 lg:from-20% lg:to-transparent lg:to-50%"></div>
-          {/* Short fade behind the navbar — the top of the footage is the brightest part of the frame */}
-          <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-background/50 to-transparent"></div>
+          {/* Charcoal overlay: linear-gradient(rgba(27,29,33,0.65), rgba(27,29,33,0.55)) via the dark background token */}
+          <div className="absolute inset-0 bg-linear-to-b from-background/65 to-background/55"></div>
+          {/* Legibility scrim behind the copy only — top band on mobile, left side on desktop. Charcoal too,
+              and it fades to nothing before the print head, so the machine keeps the base overlay alone. */}
+          <div className="absolute inset-0 bg-linear-to-b from-background/60 from-40% to-transparent to-65% lg:bg-linear-to-r lg:from-background/50 lg:from-20% lg:to-transparent lg:to-50%"></div>
         </div>
 
-        <div className="container relative z-20 mx-auto px-4 pt-32 pb-24 lg:pt-36">
+        {/* pt/pb offset by the 64px navbar, so the content is centred in the visible area below it */}
+        <div className="container relative z-20 mx-auto px-4 pt-32 pb-16">
           <motion.div
             variants={reveal}
             initial="hidden"
             animate="visible"
-            className="w-full max-w-[550px]"
+            className="w-full"
           >
-            {/* Bold (700) is Space Grotesk's heaviest weight — it has no 800 */}
+            {/* Original brand headline: Outfit Black (900), uppercase, tight tracking, always exactly two lines.
+                Phones: 60px (text-6xl) from ~375px wide, scaling down below that so "YOU THINK," never clips.
+                The soft neutral shadow keeps the red line legible over bright spots in the video. */}
             <motion.h1
               variants={rise}
-              className="font-display font-bold uppercase leading-[0.92] tracking-[-0.04em] text-[clamp(3rem,16vw,3.75rem)] lg:text-[clamp(3.75rem,6.5vw,5.5rem)]"
+              className="text-[clamp(2.75rem,16vw,3.75rem)] md:text-7xl xl:text-[6rem] font-black uppercase tracking-[-0.05em] leading-[0.88] text-text-primary whitespace-nowrap [text-shadow:0_2px_24px_rgba(0,0,0,0.45)]"
             >
-              <span className="block text-text-primary">You think,</span>
-              <span className="block text-accent-primary">we print.</span>
+              YOU THINK,
+              <br />
+              <span className="text-accent-primary">WE PRINT.</span>
             </motion.h1>
 
-            {/* At 18px the longer sentence (~28em) fits the 550px column, so it stays on two lines */}
+            {/* 550px reading width; at 18px the longer sentence (~28em) fits, so it stays on two lines */}
             <motion.p
               variants={rise}
-              className="mt-6 lg:mt-7 font-sans font-medium leading-relaxed text-text-muted text-base sm:text-lg"
+              className="mt-8 lg:mt-10 max-w-[550px] font-sans font-medium leading-relaxed text-text-secondary text-base sm:text-lg"
             >
               Turn your CAD files into precision-engineered parts.
               <br className="hidden sm:block" />
               {' '}Fast quotes. Multiple materials. Reliable results.
             </motion.p>
 
-            <motion.div variants={rise} className="mt-8 lg:mt-10 flex flex-wrap gap-3 sm:gap-4">
+            <motion.div variants={rise} className="mt-10 lg:mt-12 flex flex-wrap gap-3 sm:gap-4">
               <button
                 type="button"
                 onClick={onOpenQuery}
-                className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 sm:px-6 py-3.5 rounded-md border border-transparent bg-accent-primary text-text-primary font-semibold text-sm sm:text-base shadow-lg shadow-background/50 transition-[background-color,box-shadow,transform] duration-200 hover:bg-accent-hover hover:shadow-xl hover:shadow-background/70 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 sm:px-6 py-3.5 rounded-md border border-transparent bg-accent-primary text-on-accent font-semibold text-sm sm:text-base shadow-lg shadow-black/30 transition-[background-color,box-shadow,transform] duration-200 hover:bg-accent-hover hover:shadow-xl hover:shadow-black/50 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Get Instant Quote
                 <ArrowRight className="hidden sm:block w-4 h-4 transition-transform duration-200 motion-safe:group-hover:translate-x-0.5" />
@@ -137,27 +141,16 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
               </a>
             </motion.div>
 
-            <motion.ul variants={rise} className="mt-8 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-text-muted">
+            <motion.ul variants={rise} className="mt-10 lg:mt-12 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-text-muted">
               {TRUST_POINTS.map((point) => (
                 <li key={point} className="inline-flex items-center gap-1.5">
-                  <Check className="w-3 h-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                  <Check className="w-3 h-3 shrink-0 opacity-70" strokeWidth={2} aria-hidden="true" />
                   {point}
                 </li>
               ))}
             </motion.ul>
           </motion.div>
         </div>
-
-        {/* Scroll Hint */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center"
-        >
-          <span className="font-display text-[11px] uppercase tracking-[0.2em] text-text-muted mb-2">Scroll To Explore</span>
-          <div className="w-px h-8 bg-linear-to-b from-text-muted to-transparent"></div>
-        </motion.div>
 
       </section>
     </MotionConfig>

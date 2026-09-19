@@ -8,7 +8,7 @@ export default function QuotePage() {
           <h1 className="text-3xl md:text-4xl font-display font-bold uppercase tracking-tight mb-3 text-text-primary drop-shadow-lg">
             Initialize <span className="text-accent-primary">Manufacture</span>
           </h1>
-          <p className="text-text-muted uppercase tracking-widest text-xs font-mono drop-shadow-md">
+          <p className="text-text-secondary uppercase tracking-widest text-xs font-mono drop-shadow-md">
             Submit your geometry for an instant quotation.
           </p>
         </div>

@@ -182,9 +182,9 @@ export default function QuoteForm() {
       <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center bg-surface border border-accent-primary/20 rounded-sm shadow-2xl">
         <CheckCircle className="w-16 h-16 text-accent-primary mb-6" strokeWidth={1.5} />
         <h3 className="text-2xl font-display font-black text-text-primary uppercase tracking-widest mb-4">Request Received</h3>
-        <p className="text-text-muted font-sans text-lg mb-2">Thanks! We've received your request.</p>
+        <p className="text-text-secondary font-sans text-lg mb-2">Thanks! We've received your request.</p>
         <p className="text-accent-primary font-mono text-xl mb-6">Order #{orderNumber}</p>
-        <p className="text-sm text-text-muted opacity-80 mb-8">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
+        <p className="text-sm text-text-secondary opacity-80 mb-8">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
 
         <button
           onClick={() => {
@@ -195,7 +195,7 @@ export default function QuoteForm() {
             setOtpSent(false);
             setOtp('');
           }}
-          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-text-primary rounded-sm font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
+          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-sm font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
         >
           Submit Another Request
         </button>
@@ -217,7 +217,7 @@ export default function QuoteForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Full Name *</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Full Name *</label>
             <input
               name="name" type="text" required value={formData.name} onChange={handleInputChange}
               className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
@@ -227,7 +227,7 @@ export default function QuoteForm() {
 
           {/* Phone */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Phone Number *</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Phone Number *</label>
             <input
               name="phone" type="tel" value={formData.phone} onChange={handleInputChange}
               className="w-full bg-surface border border-border px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-accent-primary transition-colors text-text-primary"
@@ -238,10 +238,10 @@ export default function QuoteForm() {
 
         {/* Billing Address */}
         <div>
-          <h3 className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-3 border-b border-border pb-1">Billing & Shipping Address</h3>
+          <h3 className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-3 border-b border-border pb-1">Billing & Shipping Address</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1.5">State/Prov *</label>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">State/Prov *</label>
               <input
                 name="state" type="text" required value={formData.state} onChange={handleInputChange}
                 className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
@@ -249,7 +249,7 @@ export default function QuoteForm() {
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1.5">City *</label>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">City *</label>
               <input
                 name="city" type="text" required value={formData.city} onChange={handleInputChange}
                 className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
@@ -257,7 +257,7 @@ export default function QuoteForm() {
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1.5">Pin/Zip Code *</label>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-text-secondary mb-1.5">Pin/Zip Code *</label>
               <input
                 name="pincode" type="text" required value={formData.pincode} onChange={handleInputChange}
                 className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans"
@@ -269,7 +269,7 @@ export default function QuoteForm() {
 
         {/* Email & Verification (Inline) */}
         <div className="p-4 bg-background/50 border border-border/50 rounded-sm">
-          <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Email Address *</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Email Address *</label>
           <div className="flex flex-col md:flex-row gap-3">
             <input
               name="email" type="email" required value={formData.email} onChange={handleInputChange}
@@ -283,15 +283,15 @@ export default function QuoteForm() {
                 type="button"
                 onClick={sendOtp}
                 disabled={isVerifying || !formData.email}
-                className="px-6 py-2.5 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-text-primary rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
+                className="px-6 py-2.5 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
               >
                 {isVerifying ? 'Sending...' : 'Verify'}
               </button>
             )}
 
             {verifiedToken && (
-              <div className="px-6 py-2.5 bg-green-500/10 border border-green-500/30 text-green-400 rounded-sm font-bold text-sm uppercase tracking-wider flex items-center gap-2 whitespace-nowrap">
-                <CheckCircle className="w-4 h-4" /> Verified
+              <div className="px-6 py-2.5 bg-elevated border border-border text-text-primary rounded-sm font-bold text-sm uppercase tracking-wider flex items-center gap-2 whitespace-nowrap">
+                <CheckCircle className="w-4 h-4 text-accent-primary" /> Verified
               </div>
             )}
           </div>
@@ -310,14 +310,14 @@ export default function QuoteForm() {
                 type="button"
                 onClick={confirmOtp}
                 disabled={isVerifying || otp.length < 6}
-                className="w-full md:w-auto px-6 py-2.5 bg-accent-primary text-text-primary rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
+                className="w-full md:w-auto px-6 py-2.5 bg-accent-primary text-on-accent rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
               >
                 {isVerifying ? 'Checking...' : 'Confirm OTP'}
               </button>
               <button
                 type="button"
                 onClick={() => { setOtpSent(false); setOtp(''); }}
-                className="text-xs text-text-muted hover:text-text-primary underline mt-2 md:mt-0"
+                className="text-xs text-text-secondary hover:text-text-primary underline mt-2 md:mt-0"
               >
                 Change Email
               </button>
@@ -327,7 +327,7 @@ export default function QuoteForm() {
 
         {/* Material Selection */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Material Specification *</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Material Specification *</label>
           <select
             name="material" required value={formData.material} onChange={handleInputChange}
             className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary appearance-none font-sans"
@@ -340,17 +340,17 @@ export default function QuoteForm() {
 
         {/* File Upload */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">3D Model (.stl, .3mf, .zip) *</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">3D Model (.stl, .3mf, .zip) *</label>
           <div className="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-dashed border-border rounded-sm hover:border-accent-primary/50 transition-colors bg-background/30 group">
             <div className="space-y-2 text-center">
-              <FileIcon className="mx-auto h-8 w-8 text-text-muted group-hover:text-accent-primary transition-colors" strokeWidth={1.5} />
-              <div className="flex text-sm text-text-muted justify-center">
+              <FileIcon className="mx-auto h-8 w-8 text-text-secondary group-hover:text-accent-primary transition-colors" strokeWidth={1.5} />
+              <div className="flex text-sm text-text-secondary justify-center">
                 <label className="relative cursor-pointer rounded-sm font-bold text-accent-primary hover:text-accent-hover uppercase tracking-wide">
                   <span>{file ? file.name : 'Select File'}</span>
                   <input name="file" type="file" className="sr-only" required accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf,.zip" onChange={handleFileChange} />
                 </label>
               </div>
-              <p className="text-xs text-text-muted font-sans">Max size: 100MB (.stl, .obj, .3mf, .zip)</p>
+              <p className="text-xs text-text-secondary font-sans">Max size: 100MB (.stl, .obj, .3mf, .zip)</p>
             </div>
           </div>
         </div>
@@ -360,7 +360,7 @@ export default function QuoteForm() {
           <button
             type="submit"
             disabled={isSubmitDisabled}
-            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-accent-primary hover:bg-accent-hover text-text-primary transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-accent-primary hover:bg-accent-hover text-on-accent transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting || isUploading ? (
               <>
@@ -376,7 +376,7 @@ export default function QuoteForm() {
           </button>
 
           {!verifiedToken && (
-            <p className="text-center text-xs text-text-muted mt-3">* Please verify your email before submitting.</p>
+            <p className="text-center text-xs text-text-secondary mt-3">* Please verify your email before submitting.</p>
           )}
         </div>
 

@@ -76,7 +76,7 @@ export default function FAQSection() {
               return (
                 <div
                   key={index}
-                  className={`rounded-xl border bg-card overflow-hidden transition-colors duration-300 ${isOpen ? 'border-accent-primary/40' : 'border-border hover:border-text-primary/20'}`}
+                  className={`rounded-xl border bg-elevated overflow-hidden transition-colors duration-300 ${isOpen ? 'border-accent-primary/40' : 'border-border hover:border-text-primary/20'}`}
                 >
                   <button
                     onClick={() => toggleFaq(index)}
@@ -86,13 +86,13 @@ export default function FAQSection() {
                     <span className="text-base font-medium text-text-primary">
                       {faq.question}
                     </span>
-                    <ChevronDown className={`w-5 h-5 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-accent-primary' : 'text-text-muted'}`} />
+                    <ChevronDown className={`w-5 h-5 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-accent-primary' : 'text-text-secondary'}`} />
                   </button>
 
                   <div
                     className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
                   >
-                    <div className="border-t border-border pt-4 text-[15px] leading-relaxed text-text-muted whitespace-pre-line">
+                    <div className="border-t border-border pt-4 text-[15px] leading-relaxed text-text-secondary whitespace-pre-line">
                       {faq.answer}
                     </div>
                   </div>

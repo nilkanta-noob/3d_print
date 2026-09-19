@@ -69,7 +69,7 @@ export default function Home() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-surface text-text-muted pt-20 pb-10 border-t border-border">
+        <footer className="bg-surface text-text-secondary pt-20 pb-10 border-t border-border">
           <div className="container mx-auto px-4">
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
@@ -85,7 +85,7 @@ export default function Home() {
                   </span>
                 </div>
                 <p className="uppercase tracking-[0.18em] text-xs font-semibold text-text-primary mb-4">Precision. Speed. Reliability.</p>
-                <p className="text-sm font-sans opacity-80 max-w-xs leading-relaxed">
+                <p className="text-sm font-sans text-text-muted max-w-xs leading-relaxed">
                   Closing the cost gap for students and engineers to rapidly iterate from CAD to physical parts.
                 </p>
               </div>
@@ -109,18 +109,18 @@ export default function Home() {
                   <a href="mailto:hello@printwarriors.com" className="hover:text-text-primary transition-colors flex items-center gap-2">
                     <Mail className="w-4 h-4" /> hello@printwarriors.com
                   </a>
-                  <span className="flex items-center gap-2 opacity-80">
+                  <span className="flex items-center gap-2 text-text-muted">
                     Kolkata, West Bengal
                   </span>
                 </div>
                 <div className="flex gap-4">
-                  <a href="#" className="p-2 bg-card border border-border rounded-md text-text-muted hover:text-text-primary transition-colors">
+                  <a href="#" className="p-2 bg-elevated border border-border rounded-md text-text-secondary hover:text-text-primary transition-colors">
                     <InstagramIcon className="w-4 h-4" />
                   </a>
-                  <a href="#" className="p-2 bg-card border border-border rounded-md text-text-muted hover:text-text-primary transition-colors">
+                  <a href="#" className="p-2 bg-elevated border border-border rounded-md text-text-secondary hover:text-text-primary transition-colors">
                     <LinkedinIcon className="w-4 h-4" />
                   </a>
-                  <a href="#" className="p-2 bg-card border border-border rounded-md text-text-muted hover:text-text-primary transition-colors">
+                  <a href="#" className="p-2 bg-elevated border border-border rounded-md text-text-secondary hover:text-text-primary transition-colors">
                     <YoutubeIcon className="w-4 h-4" />
                   </a>
                 </div>
@@ -130,7 +130,7 @@ export default function Home() {
 
             {/* Bottom Bar */}
             <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-xs text-text-muted font-sans opacity-80 uppercase tracking-widest">
+              <p className="text-xs text-text-muted font-sans uppercase tracking-widest">
                 © {new Date().getFullYear()} PrintWarriors. All rights reserved.
               </p>
               <div className="flex gap-6 text-xs uppercase tracking-widest">

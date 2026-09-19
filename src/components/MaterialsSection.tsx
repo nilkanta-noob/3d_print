@@ -36,7 +36,7 @@ export default function MaterialsSection() {
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8">
           {MATERIALS.map((material) => (
-            <article key={material.name} className="flex flex-col rounded-xl border border-border bg-card p-8 lg:p-10">
+            <article key={material.name} className="flex flex-col rounded-xl border border-border bg-elevated p-8 lg:p-10">
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-2xl font-display font-bold text-text-primary">{material.name}</h3>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-text-muted">
@@ -45,7 +45,7 @@ export default function MaterialsSection() {
                 </span>
               </div>
 
-              <p className="mt-4 flex-1 text-[15px] leading-relaxed text-text-muted">
+              <p className="mt-4 flex-1 text-[15px] leading-relaxed text-text-secondary">
                 {material.description}
               </p>
 

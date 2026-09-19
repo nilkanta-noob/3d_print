@@ -22,7 +22,7 @@ export default function PricingSection() {
                 title="Transparent pricing"
                 description="Priced by material, per gram. No hidden setup fees."
               />
-              <div className="mt-8 flex items-start gap-3 text-sm leading-relaxed text-text-muted">
+              <div className="mt-8 flex items-start gap-3 text-sm leading-relaxed text-text-secondary">
                 <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <p>
                   <strong className="font-semibold text-text-primary">Student eligibility:</strong> Student rate requires a valid college ID or referral at checkout. Simply check the &quot;Apply Student Discount&quot; box and upload your ID when requesting a quote.
@@ -30,7 +30,7 @@ export default function PricingSection() {
               </div>
             </div>
 
-            <div className="lg:col-span-7 overflow-hidden rounded-xl border border-border bg-card">
+            <div className="lg:col-span-7 overflow-hidden rounded-xl border border-border bg-elevated">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-border text-xs uppercase tracking-[0.14em] text-text-muted">
@@ -60,7 +60,7 @@ export default function PricingSection() {
                       <td className="px-3 sm:px-6 py-5 tabular-nums">
                         {rate.student ? (
                           <>
-                            {/* The one highlighted value: red at 20px bold counts as large text for contrast */}
+                            {/* The one highlighted value: accent at 20px bold counts as large text for contrast */}
                             <span className="font-display text-xl font-bold text-accent-primary">{rate.student}</span>
                             <span className="text-sm text-text-muted"> /g</span>
                           </>

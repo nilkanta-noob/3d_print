@@ -56,7 +56,7 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Email Address</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Email Address</label>
               <input 
                 type="email" 
                 required 
@@ -66,7 +66,7 @@ export default function AdminLogin() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Password</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1.5">Password</label>
               <input 
                 type="password" 
                 required 
@@ -79,7 +79,7 @@ export default function AdminLogin() {
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full mt-4 px-4 py-3 bg-accent-primary text-text-primary font-bold text-sm tracking-widest uppercase rounded-sm hover:bg-accent-hover transition-colors disabled:opacity-50"
+              className="w-full mt-4 px-4 py-3 bg-accent-primary text-on-accent font-bold text-sm tracking-widest uppercase rounded-sm hover:bg-accent-hover transition-colors disabled:opacity-50"
             >
               {isLoading ? "Authenticating..." : "Login"}
             </button>
