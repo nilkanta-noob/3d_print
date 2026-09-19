@@ -62,10 +62,43 @@ export const INSPIRATION: InspirationCategory[] = [
   },
 ];
 
-// The four large cards in the home page Explore section
-export const HOME_EXPLORE: { title: string; description: string; illustration: PartVariant; image?: string }[] = [
-  { title: 'Functional Parts', description: 'Brackets, clips and replacement parts that do a job.', illustration: 'bracket' },
-  { title: 'Desk Accessories', description: 'Stands, organisers and cable management for your setup.', illustration: 'organizer' },
-  { title: 'Home Decor', description: 'Planters, vases and wall pieces.', illustration: 'planter' },
-  { title: 'Engineering Prototypes', description: 'Enclosures and test parts for checking a design.', illustration: 'enclosure' },
+// The four image cards in the home page Explore section ("What You Can Do with 3D Printing").
+// Add `image` — a photo in /public, e.g. '/explore/student-projects.jpg', landscape around 1600×1200 with the
+// subject in the upper two-thirds (the title sits over the bottom) — to replace the placeholder drawings.
+export interface ExploreHighlight {
+  title: string;
+  description: string;
+  href: string; // the whole card links here
+  illustrations: PartVariant[]; // placeholder drawings, shown side by side until there's a photo
+  iterations?: boolean; // draw the illustrations as growing versions of one part (v1 → v3)
+  image?: string;
+  alt?: string;
+}
+
+export const HOME_EXPLORE: ExploreHighlight[] = [
+  {
+    title: 'Student Projects',
+    description: 'Robotics, IoT builds, final-year projects and hackathon prototypes.',
+    href: '/explore#education',
+    illustrations: ['standoffs', 'enclosure'],
+  },
+  {
+    title: 'Product Development',
+    description: 'Validate concepts, test designs and iterate before manufacturing.',
+    href: '/explore',
+    illustrations: ['stepped', 'stepped', 'stepped'],
+    iterations: true,
+  },
+  {
+    title: 'Functional Parts',
+    description: 'Brackets, mounts, enclosures and replacement components built to solve problems.',
+    href: '/explore#functional-parts',
+    illustrations: ['bracket', 'stand'],
+  },
+  {
+    title: 'Hobby & DIY',
+    description: 'Desk accessories, gaming upgrades, organizers and personal creations.',
+    href: '/explore#desk-setup',
+    illustrations: ['organizer', 'tower'],
+  },
 ];

@@ -1,6 +1,5 @@
 import React from 'react';
 import HomeHero from '@/components/HomeHero';
-import TrustStrip from '@/components/TrustStrip';
 import ServicesSection from '@/components/ServicesSection';
 import MaterialsSection from '@/components/MaterialsSection';
 import ExplorePreview from '@/components/ExplorePreview';
@@ -12,7 +11,6 @@ export default function HomePage() {
   return (
     <>
       <HomeHero />
-      <TrustStrip />
       <ServicesSection />
       <MaterialsSection />
       <ExplorePreview />

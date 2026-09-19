@@ -27,16 +27,6 @@ export const NAV_LINKS: { href: string; label: string }[] = [
   { href: '/contact', label: 'Contact' },
 ];
 
-// Slim strip under the hero
-export const TRUST_ITEMS: string[] = [
-  'Student Friendly',
-  'Fast Turnaround',
-  'PLA • PLA+ • PETG',
-  'Pan India Delivery',
-  'Custom Prototypes',
-  'Quality Checked',
-];
-
 export interface ProcessStep {
   title: string;
   body: string;

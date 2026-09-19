@@ -87,7 +87,7 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
           {/* Cinematic grade: black layers, not a charcoal wash. A flat charcoal overlay lifts the footage's shadows
               to grey (the "faded" look); black keeps them deep while the print head's metal still catches the light.
               Measured on the footage: the frame averages ~45% darker than the old 0.76/0.66 charcoal overlay
-              (~60% on phones), copper "WE BUILD." goes from 2.8:1 to 4.4:1 against the footage behind it and the
+              (~60% on phones), copper "WE PRINT." goes from 2.8:1 to 4.4:1 against the footage behind it and the
               paragraph from 6.2:1 to 10:1. Effective darkening: ~55% on the printer, ~90% behind the copy. */}
           {/* 1. Base: 55% black over the whole frame */}
           <div className="absolute inset-0 bg-black/55"></div>
@@ -120,7 +120,7 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
             >
               YOU THINK,
               <br />
-              <span className="text-accent-primary">WE BUILD.</span>
+              <span className="text-accent-primary">WE PRINT.</span>
             </motion.h1>
 
             {/* 550px reading width; at 18px the longer sentence (~28em) fits, so it stays on two lines */}

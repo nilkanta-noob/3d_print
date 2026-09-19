@@ -17,11 +17,10 @@ export const RATING_ATTRIBUTES: { key: RatingKey; label: string }[] = [
 export interface Material {
   slug: string;
   name: string;
-  tag: string;
-  highlighted?: boolean;
-  summary: string;
-  bestFor: string;
-  surfaceFinish: string;
+  tag: string; // tier, shown as a capsule on the home page card
+  highlighted?: boolean; // picks the tier capsule out in copper
+  summary: string; // one line on the home page card
+  useCases: string[]; // "Best for" on the home page card — short, outcome-focused
   description: string;
   advantages: string[];
   limitations: string[];
@@ -38,9 +37,8 @@ export const MATERIALS: Material[] = [
     slug: 'pla',
     name: 'PLA',
     tag: 'Standard',
-    summary: 'Sharp detail at the lowest cost per gram.',
-    bestFor: 'Visual prototypes and display models',
-    surfaceFinish: 'Smooth, with crisp detail',
+    summary: 'Visual prototypes and display models.',
+    useCases: ['Concept models', 'Props and décor', 'Student projects'],
     description: 'The industry standard for high-detail visual models and rapid non-functional prototyping. Excellent dimensional accuracy.',
     advantages: ['Crisp detail and clean surfaces', 'Good dimensional accuracy', 'Lowest cost — student rate available'],
     limitations: ['Brittle under impact or bending', 'Softens at relatively low temperatures, e.g. in a hot car', 'Not suited to load-bearing parts'],
@@ -59,9 +57,8 @@ export const MATERIALS: Material[] = [
     name: 'PLA+',
     tag: 'Engineering',
     highlighted: true,
-    summary: 'Tougher than PLA, just as easy to print.',
-    bestFor: 'Functional prototypes, brackets and jigs',
-    surfaceFinish: 'Smooth, with fine detail',
+    summary: 'Functional prototypes and engineering parts.',
+    useCases: ['Brackets and mounts', 'Jigs', 'Light-load parts'],
     description: 'A step up in toughness and layer adhesion from standard PLA, while staying easy to print — the middle ground before PETG.',
     advantages: ['Tougher and less brittle than standard PLA', 'Stronger layer adhesion', 'Keeps PLA’s fine detail'],
     limitations: ['Heat resistance similar to standard PLA', 'Costs more per gram than PLA', 'Student rate not available yet'],
@@ -79,9 +76,8 @@ export const MATERIALS: Material[] = [
     slug: 'petg',
     name: 'PETG',
     tag: 'Durable',
-    summary: 'Impact- and water-resistant, with some flex.',
-    bestFor: 'Mechanical parts, snap-fits and containers',
-    surfaceFinish: 'Glossy; fine stringing possible on small details',
+    summary: 'Durable mechanical parts and enclosures.',
+    useCases: ['Snap-fits', 'Water-resistant parts', 'Outdoor use'],
     description: 'More impact-resistant and flexible than PLA, better dimensional stability than ABS. Ideal for parts needing real durability.',
     advantages: ['Impact-resistant, with some flex', 'Water- and moisture-resistant', 'Handles more heat than PLA'],
     limitations: ['Slightly less crisp detail than PLA', 'Can show fine stringing on detailed parts', 'Highest cost per gram of the three'],
