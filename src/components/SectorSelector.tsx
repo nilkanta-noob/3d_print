@@ -29,7 +29,7 @@ const SECTORS = [
     icon: Component,
     tagline: 'Rapid prototyping and form-testing.',
     material: 'Recommended: PLA / Tough Resin',
-    imageBg: 'from-slate-800 to-slate-900',
+    imageBg: 'from-neutral-700 to-neutral-900',
     description: 'Accelerate your hardware development cycle with overnight form and fit prototypes.'
   },
   {
@@ -58,14 +58,14 @@ export default function SectorSelector() {
   const activeSector = SECTORS.find(s => s.id === activeSectorId) || SECTORS[0];
 
   return (
-    <section className="py-24 bg-transparent border-t border-border/50" id="services">
+    <section className="py-24 bg-background border-t border-border/50" id="services">
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-display font-black text-text-primary uppercase tracking-tight mb-4">
             Solutions by <span className="text-accent-primary">Industry</span>
           </h2>
-          <p className="text-text-muted text-lg font-sans">
+          <p className="text-text-secondary text-lg font-sans">
             Select your sector to view capabilities and recommended materials.
           </p>
         </div>
@@ -83,12 +83,12 @@ export default function SectorSelector() {
                   onClick={() => setActiveSectorId(sector.id)}
                   className={`flex items-center gap-4 px-6 py-4 rounded-sm transition-all duration-300 border text-left
                     ${isActive 
-                      ? 'bg-accent-primary-deep/20 border-accent-primary/50 text-accent-primary shadow-[0_0_15px_rgba(34,211,238,0.1)]' 
-                      : 'bg-surface border-border text-text-muted hover:bg-surface/80 hover:text-text-primary'
+                      ? 'bg-accent-primary/10 border-accent-primary/50 text-accent-primary' 
+                      : 'bg-surface border-border text-text-secondary hover:bg-surface/80 hover:text-text-primary'
                     }
                   `}
                 >
-                  <Icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? 'text-accent-primary' : 'text-text-muted'}`} strokeWidth={1.5} />
+                  <Icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? 'text-accent-primary' : 'text-text-secondary'}`} strokeWidth={1.5} />
                   <div>
                     <div className={`font-display font-bold uppercase tracking-widest text-sm ${isActive ? 'text-accent-primary' : 'text-text-primary'}`}>
                       {sector.name}
@@ -113,9 +113,8 @@ export default function SectorSelector() {
               >
                 {/* Visual Placeholder for the Sector */}
                 <div className={`w-full md:w-1/2 h-48 md:h-full bg-gradient-to-br ${activeSector.imageBg} relative flex items-center justify-center border-b md:border-b-0 md:border-r border-border`}>
-                  <Hexagon className="w-32 h-32 text-accent-primary/20 absolute" strokeWidth={0.5} />
-                  <activeSector.icon className="w-16 h-16 text-text-muted relative z-10" strokeWidth={1} />
-                  <div className="absolute inset-0 bg-accent-primary-deep/20 mix-blend-overlay"></div>
+                  <Hexagon className="w-32 h-32 text-text-secondary/20 absolute" strokeWidth={0.5} />
+                  <activeSector.icon className="w-16 h-16 text-text-secondary relative z-10" strokeWidth={1} />
                 </div>
 
                 {/* Text Content */}
@@ -123,7 +122,7 @@ export default function SectorSelector() {
                   <h3 className="text-2xl font-display font-black text-text-primary uppercase tracking-widest mb-2">
                     {activeSector.name}
                   </h3>
-                  <p className="text-text-muted text-sm font-sans mb-6">
+                  <p className="text-text-secondary text-sm font-sans mb-6">
                     {activeSector.tagline}
                   </p>
                   

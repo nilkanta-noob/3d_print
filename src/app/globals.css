@@ -1,32 +1,84 @@
 @import "tailwindcss";
 
+/*
+ * Theme — Tailwind v4 CSS-first config (this project has no tailwind.config.js).
+ *
+ * The site is permanently dark. Raw values live on :root and `@theme inline` below maps them to utilities
+ * (bg-background, bg-surface, bg-elevated, text-text-secondary, bg-accent-primary, text-on-accent, …).
+ *
+ * Brand: charcoal, copper, warm ivory — no blue, cyan or teal anywhere in the UI.
+ *
+ * Usage rules:
+ * - background → surface (section bands, large containers, forms) → elevated (cards inside them).
+ * - Text: primary → secondary (body copy) → muted (labels, units, captions, fine print).
+ * - Accent is only for CTAs, key highlighted words, active/focus states, small badges and small accents.
+ * - Text on an accent fill uses on-accent (the navbar's Get Quote button is the one white-on-copper exception).
+ */
 :root {
-  --background: #0A0E0F;
-  --surface: #12181A;
-  --accent-primary: #E11D48;
-  --accent-primary-deep: #BE123C;
-  --accent-secondary: #F43F5E;
-  --text-primary: #F5F5F0;
-  --text-muted: #8A9296;
-  --border: #1F2729;
+  color-scheme: dark;
+  --background: #1B1D21;
+  --surface: #25282D;
+  --elevated: #2D3137;
+  --text: #F6F4F1;
+  --text-secondary: #C9C5BE;
+  --text-muted: #A29D95;
+  --accent: #B87333;
+  --border: rgba(246, 244, 241, 0.08);
+  --accent-hover: color-mix(in oklab, var(--accent) 88%, white); /* slightly brighter copper */
+  --on-accent: #1B1D21; /* charcoal on copper — 4.45:1 */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
-  --color-accent-primary: var(--accent-primary);
-  --color-accent-primary-deep: var(--accent-primary-deep);
-  --color-accent-secondary: var(--accent-secondary);
-  --color-text-primary: var(--text-primary);
+  --color-elevated: var(--elevated);
+  --color-text-primary: var(--text);
+  --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
+  --color-accent-primary: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
   --color-border: var(--border);
 
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  /* next/font declares --font-outfit and --font-fira-code on <html> (see layout.tsx).
+     Outfit is the original brand typeface for both body text and headings. */
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-fira-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-body {
-  background: var(--background);
-  color: var(--text-primary);
+/*
+ * Full-width frame shared by the navbar and the hero, so the wordmark and the headline start on the same
+ * line near the screen edge. Page sections below keep the narrower `container`.
+ * Side gutters: 16px phones → 24px → 32px → 40px desktop → 48px wide screens; capped at 1920px.
+ */
+@utility site-frame {
+  width: 100%;
+  max-width: 120rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 2.5rem;
+  }
+  @media (width >= 96rem) {
+    padding-inline: 3rem;
+  }
+}
+
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--text);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
 }

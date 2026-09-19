@@ -2,14 +2,18 @@ import type { Metadata } from "next";
 import { Outfit, Fira_Code } from "next/font/google";
 import "./globals.css";
 
+// The original PrintWarriors typeface: a geometric sans (variable, weights 100–900) for body and headings
 const outfit = Outfit({
-  variable: "--font-sans",
+  variable: "--font-outfit",
   subsets: ["latin"],
+  display: "swap",
 });
 
+// Monospace labels (order numbers, OTP input)
 const firaCode = Fira_Code({
-  variable: "--font-mono",
+  variable: "--font-fira-code",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -19,10 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${outfit.variable} ${firaCode.variable} font-sans h-full antialiased`}
-    >
+    <html lang="en" className={`${outfit.variable} ${firaCode.variable} font-sans h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-text-primary">{children}</body>
     </html>
   );
