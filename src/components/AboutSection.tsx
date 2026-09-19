@@ -1,5 +1,7 @@
 import React from 'react';
+import Section from './Section';
 import SectionHeading from './SectionHeading';
+import { AUDIENCES } from './content/site';
 
 const FACTS = [
   { label: 'Based in', value: 'Kolkata' },
@@ -7,27 +9,28 @@ const FACTS = [
   { label: 'Student rate from', value: '₹2.5/g' },
 ];
 
+// "Our story" on the About page: founder story and mission, key facts, and who we print for.
 export default function AboutSection() {
   return (
-    <section className="py-24 md:py-32 bg-background" id="about">
-      <div className="container mx-auto px-4 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+    <Section id="story" tone="band">
+      <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
 
         {/* Company story */}
         <div>
-          <SectionHeading eyebrow="About us" title="Built to bring your ideas to life." />
+          <SectionHeading eyebrow="Our story" title="Built to bring your ideas to life." />
           <div className="mt-6 max-w-xl space-y-5 text-base md:text-lg leading-relaxed text-text-secondary">
             <p>
               PrintWarriors was started to make 3D printing more accessible for anyone with an idea worth building. Founded by an engineering student at Heritage Institute of Technology, Kolkata, we understand the challenges of turning digital designs into physical prototypes without spending a fortune.
             </p>
             <p>
-              Whether you&apos;re working on a college project, developing a prototype, creating a custom part, or simply bringing an idea to life, we provide affordable and reliable 3D printing to help you build, test, and iterate with confidence.
+              Our mission is to make prototyping accessible. Whether you&apos;re working on a college project, developing a prototype, creating a custom part, or simply bringing an idea to life, we provide affordable and reliable 3D printing to help you build, test, and iterate with confidence.
             </p>
           </div>
 
           <dl className="mt-10 grid max-w-xl grid-cols-3 gap-6 border-t border-border pt-8">
             {FACTS.map((fact) => (
               <div key={fact.label}>
-                <dt className="text-xs sm:text-sm text-text-secondary">{fact.label}</dt>
+                <dt className="text-xs sm:text-sm text-text-muted">{fact.label}</dt>
                 <dd className="mt-1 font-display text-xl sm:text-2xl font-bold text-text-primary">{fact.value}</dd>
               </div>
             ))}
@@ -50,8 +53,20 @@ export default function AboutSection() {
           {/* Neutral photo vignette — not the theme background, which would wash the image out in light mode */}
           <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent"></div>
         </div>
-
       </div>
-    </section>
+
+      {/* Who we print for */}
+      <div className="mt-20">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">Who we print for</h3>
+        <ul className="mt-6 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+          {AUDIENCES.map((audience) => (
+            <li key={audience.title} className="bg-surface p-6">
+              <p className="font-display text-lg font-bold text-text-primary">{audience.title}</p>
+              <p className="mt-2 text-sm leading-relaxed text-text-secondary">{audience.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
   );
 }

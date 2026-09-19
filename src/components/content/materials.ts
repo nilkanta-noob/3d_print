@@ -1,0 +1,104 @@
+// Single source for material facts and per-gram prices — the Materials, Pricing and Home pages all read from here.
+
+export interface Rating {
+  level: 1 | 2 | 3 | 4 | 5;
+  label: string;
+}
+
+export type RatingKey = 'strength' | 'printQuality' | 'heatResistance' | 'flexibility';
+
+export const RATING_ATTRIBUTES: { key: RatingKey; label: string }[] = [
+  { key: 'strength', label: 'Strength' },
+  { key: 'printQuality', label: 'Print quality' },
+  { key: 'heatResistance', label: 'Heat resistance' },
+  { key: 'flexibility', label: 'Flexibility' },
+];
+
+export interface Material {
+  slug: string;
+  name: string;
+  tag: string;
+  highlighted?: boolean;
+  summary: string;
+  bestFor: string;
+  description: string;
+  advantages: string[];
+  limitations: string[];
+  applications: string[];
+  ratings: Record<RatingKey, Rating>;
+  recommendedUse: string;
+  pricePerGram: { standard: number; student: number | null };
+}
+
+// Ratings compare these three filaments relative to each other, not absolute lab values.
+export const MATERIALS: Material[] = [
+  {
+    slug: 'pla',
+    name: 'PLA',
+    tag: 'Standard',
+    summary: 'Sharp detail at the lowest cost per gram.',
+    bestFor: 'Visual prototypes and display models',
+    description: 'The industry standard for high-detail visual models and rapid non-functional prototyping. Excellent dimensional accuracy.',
+    advantages: ['Crisp detail and clean surfaces', 'Good dimensional accuracy', 'Lowest cost — student rate available'],
+    limitations: ['Brittle under impact or bending', 'Softens at relatively low temperatures, e.g. in a hot car', 'Not suited to load-bearing parts'],
+    applications: ['Visual prototypes and display models', 'Low-stress, easy-to-print parts', 'Best entry point — fast, cheap'],
+    ratings: {
+      strength: { level: 2, label: 'Moderate' },
+      printQuality: { level: 5, label: 'Excellent' },
+      heatResistance: { level: 1, label: 'Low' },
+      flexibility: { level: 1, label: 'Stiff' },
+    },
+    recommendedUse: 'Visual prototypes, display models',
+    pricePerGram: { standard: 3.5, student: 2.5 },
+  },
+  {
+    slug: 'pla-pro',
+    name: 'PLA Pro+',
+    tag: 'Engineering',
+    highlighted: true,
+    summary: 'Tougher than PLA, just as easy to print.',
+    bestFor: 'Functional prototypes, brackets and jigs',
+    description: 'A step up in toughness and layer adhesion from standard PLA, while staying easy to print — the middle ground before PETG.',
+    advantages: ['Tougher and less brittle than standard PLA', 'Stronger layer adhesion', 'Keeps PLA’s fine detail'],
+    limitations: ['Heat resistance similar to standard PLA', 'Costs more per gram than PLA', 'Student rate not available yet'],
+    applications: ['Functional prototypes (durability)', 'Brackets, enclosures, jigs', 'Light-mechanical-stress parts'],
+    ratings: {
+      strength: { level: 3, label: 'Good' },
+      printQuality: { level: 4, label: 'Very good' },
+      heatResistance: { level: 1, label: 'Low' },
+      flexibility: { level: 2, label: 'Slight' },
+    },
+    recommendedUse: 'Functional prototypes, brackets, jigs',
+    pricePerGram: { standard: 4, student: null },
+  },
+  {
+    slug: 'petg',
+    name: 'PETG',
+    tag: 'Durable',
+    summary: 'Impact- and water-resistant, with some flex.',
+    bestFor: 'Mechanical parts, snap-fits and containers',
+    description: 'More impact-resistant and flexible than PLA, better dimensional stability than ABS. Ideal for parts needing real durability.',
+    advantages: ['Impact-resistant, with some flex', 'Water- and moisture-resistant', 'Handles more heat than PLA'],
+    limitations: ['Slightly less crisp detail than PLA', 'Can show fine stringing on detailed parts', 'Highest cost per gram of the three'],
+    applications: ['Water-resistant containers', 'Snap-fit joints', 'Mechanical parts (moderate stress)'],
+    ratings: {
+      strength: { level: 4, label: 'High' },
+      printQuality: { level: 3, label: 'Good' },
+      heatResistance: { level: 3, label: 'Moderate' },
+      flexibility: { level: 3, label: 'Moderate' },
+    },
+    recommendedUse: 'Mechanical parts, containers, snap-fits',
+    pricePerGram: { standard: 5.5, student: null },
+  },
+];
+
+export const PRINT_SPECS: { label: string; value: string }[] = [
+  { label: 'Process', value: 'FDM' },
+  { label: 'Default layer height', value: '0.2 mm' },
+  { label: 'Fine detail', value: '0.12 mm on request' },
+  { label: 'Finishing', value: 'Sanding, priming, painting' },
+];
+
+export function formatRate(rupeesPerGram: number): string {
+  return `₹${rupeesPerGram}`;
+}
