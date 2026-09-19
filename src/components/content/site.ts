@@ -7,22 +7,34 @@ export const SITE = {
   name: 'PrintWarriors',
   email: 'hello@printwarriors.com',
   // PLACEHOLDER: no WhatsApp number is published anywhere yet. Add it here as digits with the country code
-  // (e.g. '919876543210') and the Contact page and footer show a wa.me link automatically.
+  // (e.g. '919876543210') and the Contact page button and footer link appear automatically.
   whatsappNumber: null as string | null,
+  // PLACEHOLDER: add opening hours (e.g. 'Mon–Sat, 10:00–19:00') and the Contact page shows a Business hours card.
+  businessHours: null as string | null,
   location: 'Kolkata, West Bengal',
 };
 
 export const QUOTE_HREF = '/get-quote';
 
+// Services and Pricing live on the home page (/#services, /#pricing); the rest are pages. The logo links home.
 export const NAV_LINKS: { href: string; label: string }[] = [
-  { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/materials', label: 'Materials' },
-  { href: '/services', label: 'Services' },
-  { href: '/pricing', label: 'Pricing' },
+  { href: '/#services', label: 'Services' },
+  { href: '/#pricing', label: 'Pricing' },
   { href: '/explore', label: 'Explore' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/contact', label: 'Contact' },
+];
+
+// Slim strip under the hero
+export const TRUST_ITEMS: string[] = [
+  'Student Friendly',
+  'Fast Turnaround',
+  'PLA • PLA+ • PETG',
+  'Pan India Delivery',
+  'Custom Prototypes',
+  'Quality Checked',
 ];
 
 export interface ProcessStep {
@@ -54,27 +66,19 @@ export const PROCESS_STEPS: ProcessStep[] = [
   },
 ];
 
-export interface TrustPoint {
+export interface TitledText {
   title: string;
   body: string;
 }
 
-export const TRUST_POINTS: TrustPoint[] = [
-  { title: 'Student-friendly pricing', body: 'PLA at ₹2.5/g with a valid college ID.' },
-  { title: 'Engineering-grade materials', body: 'PLA, PLA Pro+ and PETG, matched to what the part has to do.' },
-  { title: 'Fast turnaround', body: 'Quotes within the hour; delivery in 3–4 business days.' },
-  { title: 'Pan-India delivery', body: 'Courier anywhere in India, plus Porter and pickup in Kolkata.' },
-  { title: 'Human review of every file', body: 'A person checks each model before it is quoted or printed.' },
-];
-
-export const AUDIENCES: TrustPoint[] = [
+export const AUDIENCES: TitledText[] = [
   { title: 'Students', body: 'Final-year projects, robotics teams and coursework, at student rates.' },
   { title: 'Makers', body: 'Replacement parts, mods and personal projects — no minimum order.' },
-  { title: 'Engineers', body: 'Functional prototypes, brackets and fixtures in PLA Pro+ and PETG.' },
+  { title: 'Engineers', body: 'Functional prototypes, brackets and fixtures in PLA+ and PETG.' },
   { title: 'Startups', body: 'Design revisions printed while you are still refining the product.' },
 ];
 
-export const VALUES: TrustPoint[] = [
+export const VALUES: TitledText[] = [
   { title: 'Accessibility', body: 'Student pricing, no minimum order and no setup fees — a one-off part costs what it weighs.' },
   { title: 'Reliability', body: 'Every print is quality-checked, and anything that fails on our side is reprinted at no cost before dispatch.' },
   { title: 'Transparency', body: 'Published per-gram rates and an exact quote by email before you pay. No hidden fees.' },

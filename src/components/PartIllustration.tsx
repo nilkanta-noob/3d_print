@@ -3,7 +3,7 @@ import React from 'react';
 // Isometric line-art "CAD renders" used as placeholders until real photos of printed parts exist.
 // Faces and edges use currentColor (set text colour on the parent); holes and dimension lines use the accent.
 
-export type PartVariant = 'bracket' | 'enclosure' | 'stepped' | 'standoffs';
+export type PartVariant = 'bracket' | 'enclosure' | 'stepped' | 'standoffs' | 'planter' | 'organizer' | 'stand' | 'tower';
 
 type Vec3 = [number, number, number];
 type Point = [number, number];
@@ -75,6 +75,54 @@ const PARTS: Record<PartVariant, PartModel> = {
     holes: [10, 74].flatMap((cx) => [10, 46].map((cy) => ({ cx, cy, z: 21, r: 1.8 }))),
     dimension: [[0, 68, 0], [84, 68, 0]],
   },
+  planter: {
+    label: 'Planter on a saucer',
+    boxes: [],
+    cylinders: [
+      { cx: 0, cy: 0, z: 0, r: 30, h: 5 },
+      { cx: 0, cy: 0, z: 5, r: 25, h: 40 },
+    ],
+    holes: [{ cx: 0, cy: 0, z: 45, r: 21 }],
+    dimension: [[-30, 42, 0], [30, 42, 0]],
+  },
+  organizer: {
+    label: 'Desk organiser tray with compartments',
+    boxes: [
+      { x: 0, y: 0, z: 0, w: 80, d: 50, h: 4 },
+      { x: 0, y: 0, z: 4, w: 80, d: 3, h: 20 },
+      { x: 0, y: 3, z: 4, w: 3, d: 47, h: 20 },
+      { x: 30, y: 3, z: 4, w: 2, d: 44, h: 15 },
+      { x: 54, y: 3, z: 4, w: 2, d: 44, h: 15 },
+      { x: 77, y: 3, z: 4, w: 3, d: 47, h: 20 },
+      { x: 3, y: 47, z: 4, w: 74, d: 3, h: 20 },
+    ],
+    dimension: [[0, 62, 0], [80, 62, 0]],
+  },
+  stand: {
+    label: 'Phone stand',
+    boxes: [
+      { x: 0, y: 0, z: 0, w: 64, d: 44, h: 6 },
+      { x: 0, y: 0, z: 6, w: 8, d: 44, h: 46 },
+      { x: 52, y: 0, z: 6, w: 6, d: 44, h: 8 },
+    ],
+    holes: [{ cx: 30, cy: 22, z: 6, r: 4 }],
+    dimension: [[0, 56, 0], [64, 56, 0]],
+  },
+  tower: {
+    label: 'Dice tower with tray',
+    boxes: [
+      { x: 0, y: 0, z: 0, w: 34, d: 34, h: 72 },
+      { x: 34, y: 0, z: 0, w: 30, d: 34, h: 6 },
+      { x: 64, y: 0, z: 0, w: 4, d: 34, h: 12 },
+    ],
+    holes: [{ cx: 17, cy: 17, z: 72, r: 8 }],
+    details: [
+      [[34, 8, 6], [34, 8, 24]],
+      [[34, 8, 24], [34, 26, 24]],
+      [[34, 26, 24], [34, 26, 6]],
+    ],
+    dimension: [[0, 46, 0], [68, 46, 0]],
+  },
 };
 
 const pts = (points: Point[]) => points.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
@@ -91,7 +139,8 @@ const STROKE = { stroke: 'currentColor', strokeWidth: 1.25, strokeLinejoin: 'rou
 
 export default function PartIllustration({ variant, className = '' }: { variant: PartVariant; className?: string }) {
   const part = PARTS[variant];
-  const cylinders = [...(part.cylinders ?? [])].sort((a, b) => a.cx + a.cy - (b.cx + b.cy));
+  // Painter's order: back to front, then bottom to top (e.g. a pot drawn after the saucer it sits on)
+  const cylinders = [...(part.cylinders ?? [])].sort((a, b) => a.cx + a.cy - (b.cx + b.cy) || a.z - b.z);
 
   // Fit the viewBox to everything drawn
   const all: Point[] = [

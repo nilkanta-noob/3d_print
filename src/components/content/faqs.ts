@@ -18,11 +18,11 @@ export const FAQS: Faq[] = [
   },
   {
     question: "Can students get a discount?",
-    answer: "Yes. PLA is ₹2.5/g instead of ₹3.5/g with a valid college ID or referral. Tick \"Apply Student Discount\" in the quote form and upload your ID. Student rates for PLA Pro+ and PETG are coming soon."
+    answer: "Yes. PLA is ₹2.5/g instead of ₹3.5/g with a valid college ID or referral. Tick \"Apply Student Discount\" in the quote form and upload your ID. Student rates for PLA+ and PETG are coming soon."
   },
   {
     question: "What materials do you offer?",
-    answer: "PLA, PLA Pro+ and PETG. The Materials guide compares their strength, heat resistance and best uses."
+    answer: "PLA, PLA+ and PETG. The Materials guide compares their strength, heat resistance and best uses."
   },
   {
     question: "What printer and settings do you use?",
@@ -30,7 +30,7 @@ export const FAQS: Faq[] = [
   },
   {
     question: "How is pricing calculated?",
-    answer: "Pricing is per gram of material used, based on your part's weight after slicing — not a flat fee. See our Pricing page for standard and student rates."
+    answer: "Pricing is per gram of material used, based on your part's weight after slicing — not a flat fee. The Pricing section on our home page lists standard and student rates."
   },
   {
     question: "Do I need to be a student to order?",

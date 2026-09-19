@@ -1,4 +1,4 @@
-// Single source for material facts and per-gram prices — the Materials, Pricing and Home pages all read from here.
+// Single source for material facts and per-gram prices — the Materials page and the home page read from here.
 
 export interface Rating {
   level: 1 | 2 | 3 | 4 | 5;
@@ -21,6 +21,7 @@ export interface Material {
   highlighted?: boolean;
   summary: string;
   bestFor: string;
+  surfaceFinish: string;
   description: string;
   advantages: string[];
   limitations: string[];
@@ -31,6 +32,7 @@ export interface Material {
 }
 
 // Ratings compare these three filaments relative to each other, not absolute lab values.
+// Display name "PLA+" — the quote form still submits the value "PLA Pro+" so existing orders stay consistent.
 export const MATERIALS: Material[] = [
   {
     slug: 'pla',
@@ -38,6 +40,7 @@ export const MATERIALS: Material[] = [
     tag: 'Standard',
     summary: 'Sharp detail at the lowest cost per gram.',
     bestFor: 'Visual prototypes and display models',
+    surfaceFinish: 'Smooth, with crisp detail',
     description: 'The industry standard for high-detail visual models and rapid non-functional prototyping. Excellent dimensional accuracy.',
     advantages: ['Crisp detail and clean surfaces', 'Good dimensional accuracy', 'Lowest cost — student rate available'],
     limitations: ['Brittle under impact or bending', 'Softens at relatively low temperatures, e.g. in a hot car', 'Not suited to load-bearing parts'],
@@ -52,12 +55,13 @@ export const MATERIALS: Material[] = [
     pricePerGram: { standard: 3.5, student: 2.5 },
   },
   {
-    slug: 'pla-pro',
-    name: 'PLA Pro+',
+    slug: 'pla-plus',
+    name: 'PLA+',
     tag: 'Engineering',
     highlighted: true,
     summary: 'Tougher than PLA, just as easy to print.',
     bestFor: 'Functional prototypes, brackets and jigs',
+    surfaceFinish: 'Smooth, with fine detail',
     description: 'A step up in toughness and layer adhesion from standard PLA, while staying easy to print — the middle ground before PETG.',
     advantages: ['Tougher and less brittle than standard PLA', 'Stronger layer adhesion', 'Keeps PLA’s fine detail'],
     limitations: ['Heat resistance similar to standard PLA', 'Costs more per gram than PLA', 'Student rate not available yet'],
@@ -77,6 +81,7 @@ export const MATERIALS: Material[] = [
     tag: 'Durable',
     summary: 'Impact- and water-resistant, with some flex.',
     bestFor: 'Mechanical parts, snap-fits and containers',
+    surfaceFinish: 'Glossy; fine stringing possible on small details',
     description: 'More impact-resistant and flexible than PLA, better dimensional stability than ABS. Ideal for parts needing real durability.',
     advantages: ['Impact-resistant, with some flex', 'Water- and moisture-resistant', 'Handles more heat than PLA'],
     limitations: ['Slightly less crisp detail than PLA', 'Can show fine stringing on detailed parts', 'Highest cost per gram of the three'],
@@ -98,6 +103,21 @@ export const PRINT_SPECS: { label: string; value: string }[] = [
   { label: 'Fine detail', value: '0.12 mm on request' },
   { label: 'Finishing', value: 'Sanding, priming, painting' },
 ];
+
+// "Which should I choose?" on the Materials page
+export const RECOMMENDATIONS: { need: string; pick: string; why: string }[] = [
+  { need: 'Display models, visual prototypes, props', pick: 'PLA', why: 'Best detail at the lowest price.' },
+  { need: 'Brackets, jigs and parts that take some load', pick: 'PLA+', why: 'Tougher than PLA without losing detail.' },
+  { need: 'Snap-fits and parts that get knocked about', pick: 'PETG', why: 'Flexes instead of cracking.' },
+  { need: 'Anything wet, outdoors or near warmth', pick: 'PETG', why: 'Water-resistant and handles more heat than PLA.' },
+  { need: 'A student project on a budget', pick: 'PLA', why: 'Student rate with a valid college ID.' },
+];
+
+export function getMaterial(slug: string): Material {
+  const material = MATERIALS.find((m) => m.slug === slug);
+  if (!material) throw new Error(`Unknown material: ${slug}`);
+  return material;
+}
 
 export function formatRate(rupeesPerGram: number): string {
   return `₹${rupeesPerGram}`;

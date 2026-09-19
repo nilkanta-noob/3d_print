@@ -358,9 +358,10 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                   required
                   className="w-full px-4 py-2.5 bg-background border border-border rounded-md focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors appearance-none font-sans"
                 >
-                  {/* The materials we print and price — same values as the /quote form */}
+                  {/* The materials we print and price — same values as the /quote form. "PLA+" is shown to
+                      customers, but the submitted value stays "PLA Pro+" so existing orders remain consistent. */}
                   <option value="PLA">PLA (Standard)</option>
-                  <option value="PLA Pro+">PLA Pro+ (Engineering-grade)</option>
+                  <option value="PLA Pro+">PLA+ (Engineering-grade)</option>
                   <option value="PETG">PETG (Durable / Water-resistant)</option>
                 </select>
               </div>

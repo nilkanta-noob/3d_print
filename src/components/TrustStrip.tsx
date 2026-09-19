@@ -1,26 +1,21 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import Section from './Section';
-import Eyebrow from './Eyebrow';
-import { TRUST_POINTS } from './content/site';
+import { TRUST_ITEMS } from './content/site';
 
-// Horizontal strip of what customers can rely on — plain facts, no invented numbers.
+// Slim strip of plain facts directly under the hero.
 export default function TrustStrip() {
   return (
-    <Section tone="band" compact>
-      <Eyebrow>Why PrintWarriors</Eyebrow>
-      <ul className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-5">
-        {TRUST_POINTS.map((point, index) => (
-          <li
-            key={point.title}
-            className={`bg-surface p-6 ${index === TRUST_POINTS.length - 1 ? 'sm:col-span-2 lg:col-span-1' : ''}`}
-          >
-            <Check className="size-5 text-accent-primary" strokeWidth={2} aria-hidden="true" />
-            <h3 className="mt-4 text-base font-display font-bold text-text-primary">{point.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-text-secondary">{point.body}</p>
-          </li>
-        ))}
-      </ul>
-    </Section>
+    <section aria-label="Why PrintWarriors" className="border-b border-border bg-surface">
+      <div className="container mx-auto px-4">
+        <ul className="grid grid-cols-2 gap-x-6 gap-y-3 py-6 sm:grid-cols-3 xl:flex xl:items-center xl:justify-between xl:py-5">
+          {TRUST_ITEMS.map((item) => (
+            <li key={item} className="flex items-center gap-2.5 text-sm font-medium text-text-primary">
+              <Check className="size-4 shrink-0 text-accent-primary" strokeWidth={2.5} aria-hidden="true" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }

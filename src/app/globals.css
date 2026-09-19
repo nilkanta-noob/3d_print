@@ -1,13 +1,10 @@
 @import "tailwindcss";
 
 /*
- * Theme system — Tailwind v4 CSS-first config (this project has no tailwind.config.js).
+ * Theme — Tailwind v4 CSS-first config (this project has no tailwind.config.js).
  *
- * Raw values are CSS variables scoped by [data-theme]. layout.tsx sets it on <html> (dark by default,
- * or the saved choice from ThemeToggle), and any element can pin a theme with its own data-theme —
- * the hero is always dark. `@theme inline` below maps the variables to utilities
- * (bg-background, bg-surface, bg-elevated, text-text-secondary, bg-accent-primary, text-on-accent, …),
- * and inlining is what lets a nested data-theme take effect.
+ * The site is permanently dark. Raw values live on :root and `@theme inline` below maps them to utilities
+ * (bg-background, bg-surface, bg-elevated, text-text-secondary, bg-accent-primary, text-on-accent, …).
  *
  * Brand: charcoal, copper, warm ivory — no blue, cyan or teal anywhere in the UI.
  *
@@ -15,10 +12,9 @@
  * - background → surface (section bands, large containers, forms) → elevated (cards inside them).
  * - Text: primary → secondary (body copy) → muted (labels, units, captions, fine print).
  * - Accent is only for CTAs, key highlighted words, active/focus states, small badges and small accents.
- * - Text on an accent fill always uses on-accent.
+ * - Text on an accent fill uses on-accent (the navbar's Get Quote button is the one white-on-copper exception).
  */
-:root,
-[data-theme="dark"] {
+:root {
   color-scheme: dark;
   --background: #1B1D21;
   --surface: #25282D;
@@ -26,25 +22,10 @@
   --text: #F6F4F1;
   --text-secondary: #C9C5BE;
   --text-muted: #A29D95;
-  --accent: #B56A38;
+  --accent: #B87333;
   --border: rgba(246, 244, 241, 0.08);
-  /* Derived values are declared per theme so a scoped data-theme recomputes them */
-  --accent-hover: color-mix(in oklab, var(--accent) 88%, white);
-  --on-accent: #1B1D21; /* charcoal on copper — 4.1:1 */
-}
-
-[data-theme="light"] {
-  color-scheme: light;
-  --background: #F7F5F2;
-  --surface: #FFFFFF;
-  --elevated: #EEE9E2;
-  --text: #1B1D21;
-  --text-secondary: #66615A;
-  --text-muted: #6E6861; /* only slightly lighter than secondary — anything lighter fails 4.5:1 on elevated */
-  --accent: #B56A38;
-  --border: #D7D0C8;
-  --accent-hover: color-mix(in oklab, var(--accent) 88%, white);
-  --on-accent: #1B1D21; /* charcoal on copper — 4.1:1 */
+  --accent-hover: color-mix(in oklab, var(--accent) 88%, white); /* slightly brighter copper */
+  --on-accent: #1B1D21; /* charcoal on copper — 4.45:1 */
 }
 
 @theme inline {
@@ -64,6 +45,31 @@
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-fira-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/*
+ * Full-width frame shared by the navbar and the hero, so the wordmark and the headline start on the same
+ * line near the screen edge. Page sections below keep the narrower `container`.
+ * Side gutters: 16px phones → 24px → 32px → 40px desktop → 48px wide screens; capped at 1920px.
+ */
+@utility site-frame {
+  width: 100%;
+  max-width: 120rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 2.5rem;
+  }
+  @media (width >= 96rem) {
+    padding-inline: 3rem;
+  }
 }
 
 @layer base {

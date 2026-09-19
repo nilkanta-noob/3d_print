@@ -50,7 +50,7 @@ export default function AboutSection() {
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover object-[70%_60%] scale-[1.35] origin-[70%_60%]"
           />
-          {/* Neutral photo vignette — not the theme background, which would wash the image out in light mode */}
+          {/* Neutral photo vignette */}
           <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent"></div>
         </div>
       </div>

@@ -31,10 +31,10 @@ const COLUMNS = [
     title: 'Explore',
     links: [
       { href: '/materials', label: 'Materials guide' },
-      { href: '/services', label: 'Services' },
-      { href: '/pricing', label: 'Pricing' },
+      { href: '/#services', label: 'Services' },
+      { href: '/#pricing', label: 'Pricing' },
+      { href: '/explore', label: 'Explore ideas' },
       { href: '/gallery', label: 'Gallery' },
-      { href: '/explore', label: 'Guides & articles' },
     ],
   },
   {

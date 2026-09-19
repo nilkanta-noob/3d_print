@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Outfit, Fira_Code } from "next/font/google";
-import { DEFAULT_THEME, THEME_INIT_SCRIPT } from "@/components/theme";
-import InlineScript from "@/components/InlineScript";
 import "./globals.css";
 
 // The original PrintWarriors typeface: a geometric sans (variable, weights 100–900) for body and headings
@@ -25,17 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // data-theme is the server default; the inline script swaps in the saved theme before first paint,
-    // so the DOM can differ from the server output here (hence suppressHydrationWarning).
-    <html
-      lang="en"
-      data-theme={DEFAULT_THEME}
-      suppressHydrationWarning
-      className={`${outfit.variable} ${firaCode.variable} font-sans h-full antialiased`}
-    >
-      <head>
-        <InlineScript html={THEME_INIT_SCRIPT} />
-      </head>
+    <html lang="en" className={`${outfit.variable} ${firaCode.variable} font-sans h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-text-primary">{children}</body>
     </html>
   );

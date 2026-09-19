@@ -333,7 +333,7 @@ export default function QuoteForm() {
             className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary appearance-none font-sans"
           >
             <option value="PLA">PLA (Standard)</option>
-            <option value="PLA Pro+">PLA Pro+ (Engineering-grade)</option>
+            <option value="PLA Pro+">PLA+ (Engineering-grade)</option>
             <option value="PETG">PETG (Durable / Water-resistant)</option>
           </select>
         </div>
