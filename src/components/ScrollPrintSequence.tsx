@@ -109,43 +109,54 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
             animate="visible"
             className="w-full"
           >
-            {/* Brand headline: Outfit Black (900), uppercase, tight tracking, always exactly two lines.
-                104px on tablets, 112px from 1024px, 128px on laptops/desktops, 152px from 1536px, 168px on 1800px+
-                screens — the first line ends a little past the middle of the screen. Leading 0.84 closes the two
-                lines up into one block (the comma clears line two, which is shorter). Phones scale with the screen
+            {/* Micro-label: the studio's discipline, stated flatly above the headline. The copper rule
+                anchors the whole column to the left edge of the frame, which is where every heading on
+                the page below also starts. */}
+            <motion.p variants={rise} className="label-micro flex items-center gap-4 text-text-secondary">
+              <span className="h-px w-7 shrink-0 bg-accent-primary" aria-hidden="true" />
+              Precision 3D Printing · Kolkata
+            </motion.p>
+
+            {/* Brand headline: uppercase at weight 500, not black. At this scale the size and the -0.04em
+                tracking carry the weight on their own, and the lighter cut is what makes it read as a
+                studio masthead rather than a poster. Always exactly two lines: 104px on tablets, 112px
+                from 1024px, 128px on laptops/desktops, 152px from 1536px, 168px on 1800px+ screens — the
+                first line ends a little past the middle of the screen. Leading 0.9 closes the two lines up
+                into one block (the comma clears line two, which is shorter). Phones scale with the screen
                 (~62px at 375px) so "YOU THINK," never clips. The soft shadow separates it from bright spots. */}
             <motion.h1
               variants={rise}
-              className="text-[clamp(2.75rem,16.5vw,4rem)] md:text-[6.5rem] lg:text-[7rem] xl:text-[8rem] 2xl:text-[9.5rem] min-[112.5rem]:text-[10.5rem] font-black uppercase tracking-[-0.05em] leading-[0.84] text-text-primary whitespace-nowrap [text-shadow:0_2px_24px_rgba(0,0,0,0.45)]"
+              className="mt-10 md:mt-12 text-[clamp(2.75rem,16.5vw,4rem)] md:text-[6.5rem] lg:text-[7rem] xl:text-[8rem] 2xl:text-[9.5rem] min-[112.5rem]:text-[10.5rem] font-medium uppercase tracking-[-0.04em] leading-[0.9] text-text-primary whitespace-nowrap [text-shadow:0_2px_24px_rgba(0,0,0,0.45)]"
             >
               YOU THINK,
               <br />
               <span className="text-accent-primary">WE PRINT.</span>
             </motion.h1>
 
-            {/* 550px reading width; at 18px the longer sentence (~28em) fits, so it stays on two lines */}
+            {/* 520px reading width, small against the headline — the gap between the two sizes is the
+                hierarchy, so the paragraph never grows to meet it. */}
             <motion.p
               variants={rise}
-              className="mt-12 md:mt-14 xl:mt-16 max-w-[550px] font-sans font-medium leading-relaxed text-text-secondary text-base sm:text-lg"
+              className="mt-12 md:mt-14 xl:mt-16 max-w-[520px] font-sans leading-[1.75] text-text-secondary text-base md:text-[17px]"
             >
               Turn your CAD files into precision-engineered parts.
               <br className="hidden sm:block" />
               {' '}Fast quotes. Multiple materials. Reliable results.
             </motion.p>
 
-            {/* Vertical rhythm: headline → 48/56/64px → paragraph → 56/64/72px → buttons (phone / tablet / desktop) */}
-            <motion.div variants={rise} className="mt-14 md:mt-16 xl:mt-18 flex flex-wrap gap-4 sm:gap-6">
+            {/* Vertical rhythm: label → 40/48px → headline → 48/56/64px → paragraph → 56/64/72px → buttons */}
+            <motion.div variants={rise} className="mt-14 md:mt-16 xl:mt-18 flex flex-wrap gap-4 sm:gap-5">
               <button
                 type="button"
                 onClick={onOpenQuery}
-                className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 sm:px-6 py-3.5 rounded-full border border-transparent bg-accent-primary text-on-accent font-semibold text-sm sm:text-base shadow-lg shadow-black/30 transition-[background-color,box-shadow,transform] duration-200 hover:bg-accent-hover hover:shadow-xl hover:shadow-black/50 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                className="hover-lift group flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 whitespace-nowrap px-6 sm:px-8 py-4 rounded-control bg-accent-primary text-on-accent font-semibold text-[13px] uppercase tracking-[0.12em] [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Get Instant Quote
-                <ArrowRight className="hidden sm:block w-4 h-4 transition-transform duration-200 motion-safe:group-hover:translate-x-0.5" />
+                <ArrowRight className="hidden sm:block w-4 h-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" />
               </button>
               <a
                 href="#materials"
-                className="flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap px-4 sm:px-6 py-3.5 rounded-full border border-text-primary/30 bg-transparent text-text-primary font-semibold text-sm sm:text-base transition-colors duration-200 hover:border-text-primary/70 hover:bg-text-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                className="hover-lift flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap px-6 sm:px-8 py-4 rounded-control border border-text-primary/25 bg-transparent text-text-primary font-semibold text-[13px] uppercase tracking-[0.12em] [transition-property:transform,border-color,background-color] hover:border-text-primary/60 hover:bg-text-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Explore Materials
               </a>

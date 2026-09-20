@@ -6,46 +6,45 @@ interface SectionHeadingProps {
   title: React.ReactNode; // a node allows a deliberate <br /> in a two-line title
   description?: React.ReactNode;
   align?: 'left' | 'center';
-  // display: larger editorial header for a section that should read as a major block (Services) —
-  // still clearly below the hero headline, so it introduces the content instead of competing with the hero
+  // display: the largest editorial header, for a section that opens a page (Services). Still clearly below
+  // the hero headline, so it introduces the content instead of competing with the hero.
   size?: 'default' | 'display';
-  // accent: the Services look (copper label, extra-bold tight heading) at the standard size, with room for a
-  // one-line title on desktop (Materials). Implied by size="display".
+  // accent: copper eyebrow, for the sections that carry the page's main argument (Materials, Pricing,
+  // Explore). Implied by size="display". It changes the label's colour only — the heading is the same.
   accent?: boolean;
   className?: string;
 }
 
-// Shared header for every section: the accent-ruled label, the title, and an optional description —
+// Shared header for every section: the copper micro-label, the title, and an optional standfirst —
 // so all sections read as one system.
+//
+// The headings are set in the display face at weight 500, not bold. Weight is not what makes a heading
+// feel premium here — size, tight tracking (-0.035em) and leading just under 1 are. A heavier weight at
+// these sizes reads as a marketing banner; this reads as a masthead.
 export default function SectionHeading({ eyebrow, title, description, align = 'left', size = 'default', accent = false, className = '' }: SectionHeadingProps) {
   const centered = align === 'center';
   const display = size === 'display';
 
   return (
-    <div className={`${display ? 'max-w-3xl' : accent ? 'max-w-4xl' : 'max-w-2xl'} ${centered ? 'mx-auto text-center' : ''} ${className}`}>
+    <div className={`${display ? 'max-w-4xl' : 'max-w-3xl'} ${centered ? 'mx-auto text-center' : ''} ${className}`}>
       <Eyebrow centered={centered} accent={display || accent}>{eyebrow}</Eyebrow>
       {display ? (
-        // Phones 36–42px (scales with the screen) → clamp(3rem, 5vw, 4.5rem) from 640px:
-        // 48px on tablets, ~51px at 1024px, 64px at 1280px, 72px from 1440px
-        <h2 className="mt-4 lg:mt-5 text-[clamp(2.25rem,11vw,2.625rem)] sm:text-[clamp(3rem,5vw,4.5rem)] font-display font-extrabold leading-[1.05] tracking-[-0.03em] text-text-primary text-balance">
+        // Phones ~40px, 56px on tablets, 72px at 1280px, 88px from 1536px
+        <h2 className="mt-6 lg:mt-8 text-[clamp(2.5rem,9vw,2.75rem)] sm:text-[clamp(3.5rem,5.6vw,5.5rem)] font-display font-medium leading-[0.94] tracking-[-0.04em] text-text-primary text-balance">
           {title}
         </h2>
       ) : (
-        <h2
-          className={`mt-4 text-3xl md:text-5xl font-display text-text-primary text-balance ${
-            accent ? 'font-extrabold leading-[1.05] tracking-[-0.03em]' : 'font-bold tracking-tight'
-          }`}
-        >
+        <h2 className="mt-6 text-[clamp(2rem,6vw,2.25rem)] sm:text-[clamp(2.5rem,4vw,3.5rem)] font-display font-medium leading-[0.98] tracking-[-0.035em] text-text-primary text-balance">
           {title}
         </h2>
       )}
       {description && (
+        // The standfirst stays small against the heading — the contrast between the two is the hierarchy.
+        // 60 characters is the measure; wider than that and the eye loses the line.
         <p
-          className={
-            display || accent
-              ? `mt-5 lg:mt-6 max-w-[550px] text-lg md:text-[1.3125rem] leading-[1.7] text-pretty text-text-secondary ${centered ? 'mx-auto' : ''}`
-              : 'mt-4 text-base md:text-lg leading-relaxed text-text-secondary'
-          }
+          className={`mt-6 lg:mt-8 max-w-[60ch] text-base leading-[1.75] text-pretty text-text-secondary md:text-[17px] ${
+            centered ? 'mx-auto' : ''
+          }`}
         >
           {description}
         </p>

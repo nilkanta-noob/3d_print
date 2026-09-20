@@ -26,38 +26,38 @@ export default function FAQSection({ items = FAQS, initialCount, tone = 'band' }
 
   return (
     <Section id="faq" tone={tone}>
-      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
         <SectionHeading
-          className="lg:col-span-4 lg:sticky lg:top-28 lg:self-start"
+          className="lg:col-span-5 lg:sticky lg:top-32 lg:self-start"
           eyebrow="FAQ"
           title="Frequently asked questions"
           description="Everything you need to know about our services, pricing, and process."
         />
 
-        <div className="lg:col-span-8">
-          <div className="space-y-3">
+        <div className="lg:col-span-7">
+          <div className="border-t border-border">
             {visible.map((faq, index) => {
               const isOpen = openIndex === index;
               return (
                 <div
                   key={faq.question}
-                  className={`rounded-xl border bg-elevated overflow-hidden transition-colors duration-300 ${isOpen ? 'border-accent-primary/40' : 'border-border hover:border-text-primary/20'}`}
+                  className="border-b border-border"
                 >
                   <button
                     onClick={() => toggleFaq(index)}
                     aria-expanded={isOpen}
-                    className="w-full px-6 py-5 flex items-center justify-between gap-6 text-left rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-primary"
+                    className="flex w-full items-center justify-between gap-8 py-7 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-primary"
                   >
-                    <span className="text-base font-medium text-text-primary">
+                    <span className={`font-display text-[1.125rem] font-medium tracking-[-0.02em] transition-colors duration-300 md:text-[1.25rem] ${isOpen ? 'text-accent-primary' : 'text-text-primary'}`}>
                       {faq.question}
                     </span>
                     <ChevronDown className={`w-5 h-5 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-accent-primary' : 'text-text-secondary'}`} />
                   </button>
 
                   <div
-                    className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-8 opacity-100' : 'max-h-0 opacity-0'}`}
                   >
-                    <div className="border-t border-border pt-4 text-[15px] leading-relaxed text-text-secondary whitespace-pre-line">
+                    <div className="max-w-[62ch] whitespace-pre-line text-[15px] leading-[1.75] text-text-secondary">
                       {faq.answer}
                     </div>
                   </div>
@@ -69,7 +69,7 @@ export default function FAQSection({ items = FAQS, initialCount, tone = 'band' }
           {collapsible && (
             <button
               onClick={() => setShowAll(!showAll)}
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-text-primary transition-colors hover:border-text-primary/40"
+              className="hover-lift mt-10 inline-flex items-center gap-2.5 rounded-control border border-border px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-text-primary [transition-property:transform,border-color] hover:border-text-primary/40"
             >
               {showAll ? 'Show less' : 'View all FAQs'}
               <ChevronDown className={`w-4 h-4 transition-transform ${showAll ? 'rotate-180' : ''}`} />

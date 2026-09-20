@@ -1,67 +1,75 @@
 import React from 'react';
-import { Info } from 'lucide-react';
 import Section from './Section';
 import SectionHeading from './SectionHeading';
 
+// Per-gram rates. Kept as data so the table below is pure layout.
+const ROWS = [
+  { material: 'PLA', note: null, standard: '₹3.5', student: '₹2.5', studentIsPrice: true },
+  { material: 'PLA+', note: 'Engineering', standard: '₹4', student: 'Coming soon', studentIsPrice: false },
+  { material: 'PETG', note: null, standard: '₹5.5', student: 'Coming soon', studentIsPrice: false },
+] as const;
+
+// Pricing as a rate card, not a set of plan cards: one rectangular table, hairline rules, and the
+// numbers set large enough to be read as the content rather than as table cells.
 export default function PricingSection() {
   // Page background: Materials above it is the raised band, so this sits back and the two stay apart
   return (
     <Section id="pricing">
-      <SectionHeading
-        accent
-        eyebrow="Pricing"
-        title="Simple, per-gram pricing"
-      />
+      <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
+        <SectionHeading
+          className="lg:col-span-5"
+          accent
+          eyebrow="Pricing"
+          title="Simple, per-gram pricing"
+          description="You pay for the material your part actually uses. No setup fee, no minimum order, no per-file charge."
+        />
 
-      <div className="mx-auto mt-12 max-w-3xl">
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#17191D]">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-white/5 bg-black/20">
-                  <th className="whitespace-nowrap px-6 py-5 text-sm font-semibold tracking-wider text-text-primary">Material</th>
-                  <th className="whitespace-nowrap px-6 py-5 text-sm font-semibold tracking-wider text-text-primary">Standard Rate</th>
-                  <th className="whitespace-nowrap px-6 py-5 text-sm font-semibold tracking-wider text-text-primary">Student Rate</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5 text-sm md:text-base">
-                <tr className="transition-colors hover:bg-white/[0.02]">
-                  <td className="whitespace-nowrap px-6 py-5 font-display text-lg font-bold text-text-primary">PLA</td>
-                  <td className="whitespace-nowrap px-6 py-5 text-text-muted">₹3.5/g</td>
-                  <td className="whitespace-nowrap px-6 py-5 font-medium text-accent-primary">₹2.5/g</td>
-                </tr>
-                <tr className="transition-colors hover:bg-white/[0.02]">
-                  <td className="whitespace-nowrap px-6 py-5">
-                    <div className="flex items-center gap-3">
-                      <span className="font-display text-lg font-bold text-text-primary">PLA+</span>
-                      <span className="inline-flex items-center rounded-bl-lg rounded-tr-lg border border-accent-primary/50 bg-accent-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-accent-primary">
-                        Engineering
-                      </span>
-                    </div>
+        <div className="lg:col-span-7">
+          {/* The rate card. Column heads are micro-labels; the rates are display type. */}
+          <table className="w-full border-collapse text-left">
+            <caption className="sr-only">Per-gram printing rates by material</caption>
+            <thead>
+              <tr className="border-y border-border">
+                <th scope="col" className="label-micro py-5 pr-6 text-text-muted">Material</th>
+                <th scope="col" className="label-micro py-5 pr-6 text-text-muted">Standard</th>
+                <th scope="col" className="label-micro py-5 text-text-muted">Student</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ROWS.map((row) => (
+                <tr key={row.material} className="border-b border-border align-baseline">
+                  <th scope="row" className="py-8 pr-6 font-display text-2xl font-medium tracking-[-0.03em] text-text-primary">
+                    {row.material}
+                    {row.note && <span className="label-micro mt-2 block text-text-muted">{row.note}</span>}
+                  </th>
+                  <td className="py-8 pr-6 font-display text-2xl font-medium tracking-[-0.03em] text-text-secondary">
+                    {row.standard}
+                    <span className="text-base text-text-muted">/g</span>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-5 text-text-muted">₹4/g</td>
-                  <td className="whitespace-nowrap px-6 py-5 text-sm italic text-text-muted">Coming Soon</td>
+                  <td
+                    className={
+                      row.studentIsPrice
+                        ? 'py-8 font-display text-2xl font-medium tracking-[-0.03em] text-accent-primary'
+                        : 'py-8 text-sm text-text-muted'
+                    }
+                  >
+                    {row.student}
+                    {row.studentIsPrice && <span className="text-base text-accent-primary/70">/g</span>}
+                  </td>
                 </tr>
-                <tr className="transition-colors hover:bg-white/[0.02]">
-                  <td className="whitespace-nowrap px-6 py-5 font-display text-lg font-bold text-text-primary">PETG</td>
-                  <td className="whitespace-nowrap px-6 py-5 text-text-muted">₹5.5/g</td>
-                  <td className="whitespace-nowrap px-6 py-5 text-sm italic text-text-muted">Coming Soon</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+              ))}
+            </tbody>
+          </table>
 
-        <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-white/10 bg-[#17191D] p-5 sm:flex-row sm:items-start sm:gap-4 sm:p-6">
-          <Info className="mt-0.5 size-5 shrink-0 text-accent-primary" aria-hidden="true" />
-          <div>
-            <h4 className="font-semibold text-text-primary">Student Eligibility</h4>
-            <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-              Student pricing requires a valid college ID or referral at checkout. Student discount currently applies only to PLA. PLA+ and PETG student pricing will be added later.
+          {/* Footnote, set as fine print under the rule rather than boxed into an alert panel */}
+          <div className="mt-10 grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8">
+            <h3 className="label-micro text-text-muted sm:pt-1">Student rate</h3>
+            <p className="max-w-[60ch] text-[15px] leading-[1.75] text-text-secondary">
+              Requires a valid college ID or referral at checkout. The student rate currently applies to PLA only —
+              PLA+ and PETG student pricing will be added later.
             </p>
           </div>
         </div>
-
       </div>
     </Section>
   );

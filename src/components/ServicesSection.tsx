@@ -20,7 +20,7 @@ export default function ServicesSection() {
         }
       />
 
-      <div className="mt-12 md:mt-14 lg:mt-16">
+      <div className="mt-16 md:mt-20 lg:mt-24">
         <ServicesList />
       </div>
     </Section>

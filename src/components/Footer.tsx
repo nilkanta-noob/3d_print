@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Layers, Mail, MessageCircle, MapPin } from 'lucide-react';
+import { Mail, MessageCircle, MapPin } from 'lucide-react';
 import { SITE, QUOTE_HREF, whatsappHref } from './content/site';
 
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -52,33 +52,38 @@ export default function Footer() {
   const whatsapp = whatsappHref(SITE.whatsappNumber);
 
   return (
-    <footer className="bg-surface text-text-secondary pt-20 pb-10 border-t border-border">
+    // The page's quietest surface: charcoal rather than the raised band, so the site closes by fading out
+    // rather than by putting up one more panel. A single hairline separates it from the page.
+    <footer className="border-t border-border bg-background pb-12 pt-24 text-text-secondary md:pt-32">
       <div className="container mx-auto px-4">
 
-        <div className="grid grid-cols-1 gap-12 mb-16 sm:grid-cols-2 lg:grid-cols-5">
-
-          {/* Brand Column */}
-          <div className="flex flex-col items-start text-left sm:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center justify-center w-8 h-8 border border-border rounded-md">
-                <Layers className="w-4 h-4 text-text-primary" strokeWidth={1.5} />
-              </div>
-              <span className="font-display font-bold tracking-widest text-text-primary uppercase text-lg">
-                PrintWarriors
-              </span>
-            </div>
-            <p className="uppercase tracking-[0.18em] text-xs font-semibold text-text-primary mb-4">Precision. Speed. Reliability.</p>
-            <p className="text-sm font-sans text-text-muted max-w-xs leading-relaxed">
-              Closing the cost gap for students and engineers to rapidly iterate from CAD to physical parts.
+        {/* The wordmark and the statement sit alone across the top — the footer's own masthead. */}
+        <div className="grid gap-12 border-b border-border pb-16 lg:grid-cols-12 lg:gap-20 lg:pb-20">
+          <div className="lg:col-span-5">
+            <p className="font-display text-[15px] font-semibold uppercase tracking-[0.26em] text-text-primary">
+              Print<span className="text-accent-primary">Warriors</span>
+            </p>
+            <p className="mt-8 max-w-[34ch] font-display text-[1.75rem] font-medium leading-[1.15] tracking-[-0.035em] text-text-primary">
+              We help turn ideas into real products.
             </p>
           </div>
 
+          <div className="lg:col-span-4 lg:col-start-9">
+            <p className="label-micro text-text-muted">Precision · Speed · Reliability</p>
+            <p className="mt-5 max-w-[42ch] text-[15px] leading-[1.75] text-text-secondary">
+              Closing the cost gap for students and engineers to rapidly iterate from CAD to physical parts.
+            </p>
+          </div>
+        </div>
+
+        {/* Three link columns and contact, on one editorial grid */}
+        <div className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8 lg:py-20">
           {COLUMNS.map((column) => (
-            <div key={column.title} className="flex flex-col items-start">
-              <h4 className="font-bold text-xs uppercase tracking-widest text-text-primary mb-6">{column.title}</h4>
-              <nav aria-label={column.title} className="flex flex-col gap-4 text-sm">
+            <div key={column.title} className="lg:col-span-3">
+              <h2 className="label-micro text-text-muted">{column.title}</h2>
+              <nav aria-label={column.title} className="mt-8 flex flex-col items-start gap-4 text-[15px]">
                 {column.links.map((link) => (
-                  <Link key={link.href} href={link.href} className="hover:text-text-primary transition-colors">
+                  <Link key={link.href} href={link.href} className="transition-colors duration-200 hover:text-text-primary">
                     {link.label}
                   </Link>
                 ))}
@@ -86,49 +91,55 @@ export default function Footer() {
             </div>
           ))}
 
-          {/* Contact & Social. min-w-0 lets this column shrink: grid items refuse to go below their content's
+          {/* Contact. min-w-0 lets this column shrink: grid items refuse to go below their content's
               width by default, and at 1024px the email address is wider than its column, which pushed the
               whole page 3px sideways. With the column free to shrink, the address wraps instead. */}
-          <div className="flex min-w-0 flex-col items-start">
-            <h4 className="font-bold text-xs uppercase tracking-widest text-text-primary mb-6">Contact</h4>
-            <div className="flex min-w-0 max-w-full flex-col gap-4 text-sm mb-8">
+          <div className="flex min-w-0 flex-col items-start lg:col-span-3">
+            <h2 className="label-micro text-text-muted">Contact</h2>
+            <div className="mt-8 flex min-w-0 max-w-full flex-col gap-4 text-[15px]">
               {/* break-all, not break-words: an address is one unbroken word, and break-words still holds the
                   box open to its width. min-w-0 lets the flex item itself shrink. */}
-              <a href={`mailto:${SITE.email}`} className="hover:text-text-primary transition-colors flex min-w-0 items-start gap-2 break-all">
-                <Mail className="w-4 h-4 shrink-0 mt-0.5" /> {SITE.email}
+              <a href={`mailto:${SITE.email}`} className="flex min-w-0 items-start gap-2.5 break-all transition-colors duration-200 hover:text-text-primary">
+                <Mail className="mt-1 size-4 shrink-0" strokeWidth={1.5} /> {SITE.email}
               </a>
               {whatsapp && (
-                <a href={whatsapp} className="hover:text-text-primary transition-colors flex items-center gap-2">
-                  <MessageCircle className="w-4 h-4 shrink-0" /> WhatsApp
+                <a href={whatsapp} className="flex items-center gap-2.5 transition-colors duration-200 hover:text-text-primary">
+                  <MessageCircle className="size-4 shrink-0" strokeWidth={1.5} /> WhatsApp
                 </a>
               )}
-              <span className="flex items-center gap-2 text-text-muted">
-                <MapPin className="w-4 h-4 shrink-0" /> {SITE.location}
+              <span className="flex items-center gap-2.5 text-text-muted">
+                <MapPin className="size-4 shrink-0" strokeWidth={1.5} /> {SITE.location}
               </span>
-            </div>
-            <div className="flex gap-4">
-              <a href="#" aria-label="Instagram" className="p-2 bg-elevated border border-border rounded-full text-text-secondary hover:text-text-primary transition-colors">
-                <InstagramIcon className="w-4 h-4" />
-              </a>
-              <a href="#" aria-label="LinkedIn" className="p-2 bg-elevated border border-border rounded-full text-text-secondary hover:text-text-primary transition-colors">
-                <LinkedinIcon className="w-4 h-4" />
-              </a>
-              <a href="#" aria-label="YouTube" className="p-2 bg-elevated border border-border rounded-full text-text-secondary hover:text-text-primary transition-colors">
-                <YoutubeIcon className="w-4 h-4" />
-              </a>
             </div>
           </div>
 
+          {/* Social — square hairline tiles, matching the site's geometry */}
+          <div className="flex gap-3 sm:col-span-2 lg:col-span-3 lg:justify-end">
+            {[
+              { label: 'Instagram', Icon: InstagramIcon },
+              { label: 'LinkedIn', Icon: LinkedinIcon },
+              { label: 'YouTube', Icon: YoutubeIcon },
+            ].map(({ label, Icon }) => (
+              <a
+                key={label}
+                href="#"
+                aria-label={label}
+                className="hover-lift grid size-10 place-items-center rounded-chip border border-border text-text-secondary [transition-property:transform,color,border-color] hover:border-text-primary/30 hover:text-text-primary"
+              >
+                <Icon className="size-4" />
+              </a>
+            ))}
+          </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-text-muted font-sans uppercase tracking-widest">
-            © {new Date().getFullYear()} PrintWarriors. All rights reserved.
+        {/* Bottom bar */}
+        <div className="flex flex-col items-start justify-between gap-4 border-t border-border pt-10 md:flex-row md:items-center">
+          <p className="label-micro text-text-muted">
+            © {new Date().getFullYear()} PrintWarriors
           </p>
-          <div className="flex gap-6 text-xs uppercase tracking-widest">
-            <a href="#" className="hover:text-text-primary transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-text-primary transition-colors">Terms of Service</a>
+          <div className="label-micro flex gap-8">
+            <a href="#" className="text-text-muted transition-colors duration-200 hover:text-text-primary">Privacy Policy</a>
+            <a href="#" className="text-text-muted transition-colors duration-200 hover:text-text-primary">Terms of Service</a>
           </div>
         </div>
 

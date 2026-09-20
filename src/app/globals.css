@@ -40,6 +40,16 @@
   --color-on-accent: var(--on-accent);
   --color-border: var(--border);
 
+  /* Shape language — architectural, not app-like.
+     Content containers (cards, images, tables, panels, the quote modal) carry no radius at all: they are
+     rectangles, and their edges come from hairline borders and whitespace instead.
+     The only curvature on the site is on controls, where a square corner reads as unfinished:
+       rounded-control (5px) — buttons, inputs, selects, textareas, file pickers
+       rounded-chip    (3px) — small badges, tags and icon squares
+     Anything rounder than this belongs to a genuinely circular object (an avatar, a progress dot). */
+  --radius-control: 5px;
+  --radius-chip: 3px;
+
   /* next/font declares --font-outfit and --font-fira-code on <html> (see layout.tsx).
      Outfit is the original brand typeface for both body text and headings. */
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
@@ -86,13 +96,45 @@
   }
 }
 
+/*
+ * The site's one movement on hover: a 2px rise. Used on buttons and on cards that are a single link.
+ * Deliberately restrained — no scale, no shadow bloom — and it carries its own easing so every lift
+ * on the page travels at the same speed. Colour transitions are left to the element itself.
+ */
+@utility hover-lift {
+  transition-property: transform;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+
+  @media (prefers-reduced-motion: no-preference) {
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+/*
+ * Editorial micro-label: the uppercase line above a heading, or a spec label inside a card.
+ * One definition so every label on the site sits at the same size, weight and tracking.
+ */
+@utility label-micro {
+  font-size: 0.6875rem; /* 11px */
+  line-height: 1.2;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
 @layer base {
   body {
     background: var(--background);
     color: var(--text);
   }
 
+  /* Headings are the site's primary design element: display face, and tighter than the body copy at
+     every size. Individual headings still set their own weight and leading. */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    letter-spacing: -0.03em;
   }
 }

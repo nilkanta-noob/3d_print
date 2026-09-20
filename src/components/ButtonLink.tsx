@@ -2,12 +2,16 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
+// The site's button. Architectural rather than app-like: a 5px radius (never a pill), no shadow, a
+// 13px uppercase label at wide tracking, and a single 2px rise on hover. Both variants share the shape
+// and the motion, so primary and secondary read as the same object in two weights.
 export const BUTTON_BASE =
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 py-3.5 text-base font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary';
+  'hover-lift inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-control px-7 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary';
 
 export const BUTTON_VARIANTS = {
-  primary: 'bg-accent-primary text-on-accent shadow-lg shadow-black/20 hover:bg-accent-hover',
-  secondary: 'border border-text-primary/30 text-text-primary hover:border-text-primary/70 hover:bg-text-primary/5',
+  primary: 'bg-accent-primary text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover',
+  secondary:
+    'border border-text-primary/25 text-text-primary [transition-property:transform,border-color,background-color] hover:border-text-primary/60 hover:bg-text-primary/5',
 } as const;
 
 interface ButtonLinkProps {
@@ -25,15 +29,16 @@ export default function ButtonLink({ href, variant = 'primary', className = '', 
   );
 }
 
-// Inline text link with an accent underline and arrow — ivory text keeps it readable at small sizes.
+// Inline text link: the copper rule sits under the words rather than around them, so it reads as a
+// continuation of the copy instead of a second button.
 export function ArrowLink({ href, className = '', children }: { href: string; className?: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}
-      className={`group inline-flex items-center gap-2 text-sm font-semibold text-text-primary underline decoration-accent-primary decoration-2 underline-offset-[6px] transition-colors hover:decoration-text-primary ${className}`}
+      className={`group inline-flex items-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-text-primary underline decoration-accent-primary decoration-1 underline-offset-[8px] transition-colors duration-200 hover:decoration-text-primary ${className}`}
     >
       {children}
-      <ArrowRight className="size-4 text-accent-primary transition-transform duration-200 motion-safe:group-hover:translate-x-0.5" aria-hidden="true" />
+      <ArrowRight className="size-4 text-accent-primary transition-transform duration-300 motion-safe:group-hover:translate-x-1" aria-hidden="true" />
     </Link>
   );
 }

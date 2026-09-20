@@ -1,33 +1,21 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
 import type { ProcessStep } from './content/site';
 
-// Numbered process steps: a row of four on desktop with connectors, stacked on mobile.
+// How it works: four numbered steps, set as columns of one continuous hairline grid rather than as four
+// separate cards. The number is the largest thing in each column — the sequence is the point — and the
+// rule above it carries the eye across the row. No boxes, no connectors, no icons competing with the copy.
 export default function StepTimeline({ steps, className = '' }: { steps: ProcessStep[]; className?: string }) {
   return (
-    <ol className={`grid gap-4 md:grid-cols-2 lg:grid-cols-4 ${className}`}>
-      {steps.map((step, index) => {
-        const Icon = step.icon;
-        return (
-          <li key={step.title} className="relative flex flex-col rounded-xl border border-border bg-elevated p-7">
-            <div className="flex items-start justify-between">
-              {/* 36px bold — large text, so the accent meets contrast on the card */}
-              <span className="font-display text-4xl font-bold leading-none tabular-nums text-accent-primary">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <Icon className="size-5 text-text-muted" strokeWidth={1.5} aria-hidden="true" />
-            </div>
-            <h3 className="mt-8 text-lg font-display font-bold text-text-primary">{step.title}</h3>
-            <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">{step.body}</p>
-            {index < steps.length - 1 && (
-              <ChevronRight
-                aria-hidden="true"
-                className="absolute -right-3 top-1/2 z-10 hidden size-6 -translate-y-1/2 rounded-full border border-border bg-background p-1 text-text-muted lg:block"
-              />
-            )}
-          </li>
-        );
-      })}
+    <ol className={`grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10 ${className}`}>
+      {steps.map((step, index) => (
+        <li key={step.title} className="border-t border-border pt-8">
+          <span className="label-micro block text-accent-primary">Step {String(index + 1).padStart(2, '0')}</span>
+          <h3 className="mt-6 font-display text-[1.5rem] font-medium leading-[1.1] tracking-[-0.035em] text-text-primary">
+            {step.title}
+          </h3>
+          <p className="mt-4 text-[15px] leading-[1.75] text-text-secondary">{step.body}</p>
+        </li>
+      ))}
     </ol>
   );
 }

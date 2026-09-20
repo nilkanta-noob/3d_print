@@ -84,7 +84,7 @@ export default function ServicesList() {
                   Each size is taller than that breakpoint's open row, so it overhangs the band. */}
               <div
                 aria-hidden="true"
-                className={`pointer-events-none absolute left-[34%] top-1/2 z-20 ml-[10px] hidden h-[200px] w-[170px] -translate-y-1/2 overflow-hidden rounded-lg border border-border shadow-2xl shadow-black/50 will-change-transform md:block lg:left-[36%] lg:h-[300px] lg:w-[260px] xl:h-[275px] xl:w-[280px] motion-safe:transition-[opacity,transform] motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`pointer-events-none absolute left-[34%] top-1/2 z-20 ml-[10px] hidden h-[200px] w-[170px] -translate-y-1/2 overflow-hidden border border-border will-change-transform md:block lg:left-[36%] lg:h-[300px] lg:w-[260px] xl:h-[275px] xl:w-[280px] motion-safe:transition-[opacity,transform] motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   active ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
                 }`}
               >
@@ -111,19 +111,19 @@ export default function ServicesList() {
                 aria-expanded={active}
                 aria-controls={detailId}
                 onClick={() => handleSelect(service.slug)}
-                className={`relative z-10 flex min-h-14 w-full items-center justify-between gap-4 py-5 text-left scroll-mt-20 focus-visible:outline-2 focus-visible:outline-offset-[-4px] md:col-start-1 md:col-end-5 md:row-start-1 md:grid md:grid-cols-subgrid md:items-start md:gap-0 md:py-8 xl:py-10 ${
+                className={`relative z-10 flex min-h-14 w-full items-center justify-between gap-4 py-5 text-left scroll-mt-20 focus-visible:outline-2 focus-visible:outline-offset-[-4px] md:col-start-1 md:col-end-5 md:row-start-1 md:grid md:grid-cols-subgrid md:items-start md:gap-0 md:py-10 xl:py-14 ${
                   active ? 'focus-visible:outline-on-accent' : 'focus-visible:outline-accent-primary'
                 }`}
               >
                 <span className="flex min-w-0 items-baseline gap-3 pr-2 md:gap-4 md:pr-6">
-                  <span className={`font-mono text-xs tabular-nums ${active ? 'text-on-accent' : 'text-text-muted'}`}>
+                  <span className={`font-mono text-[11px] tabular-nums tracking-[0.1em] ${active ? 'text-on-accent' : 'text-text-muted'}`}>
                     {service.index}
                   </span>
                   <span
                     /* Each word gets its own line from tablets up. Every title is two words, so every row
                        has a two-line title and they all end up the same height — and a single word is
                        narrow enough for the type to be much larger than a one-line title allowed. */
-                    className={`font-display text-xl font-bold uppercase leading-[1.05] tracking-[-0.02em] md:text-[1.375rem] lg:text-[1.875rem] xl:text-[2.5rem] 2xl:text-[2.75rem] ${
+                    className={`font-display text-2xl font-medium uppercase leading-[1] tracking-[-0.035em] md:text-[1.5rem] lg:text-[2rem] xl:text-[2.75rem] 2xl:text-[3rem] ${
                       active ? 'text-on-accent' : 'text-text-primary'
                     }`}
                   >
@@ -152,7 +152,7 @@ export default function ServicesList() {
               <p
                 aria-hidden={active}
                 inert={active}
-                className={`hidden text-[15px] leading-relaxed text-text-secondary md:col-start-3 md:row-start-1 md:block md:py-8 md:pr-6 xl:py-10 motion-safe:transition-opacity motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`hidden text-[15px] leading-relaxed text-text-secondary md:col-start-3 md:row-start-1 md:block md:py-10 md:pr-8 xl:py-14 motion-safe:transition-opacity motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   active ? 'opacity-0' : 'opacity-100'
                 }`}
               >
@@ -168,7 +168,7 @@ export default function ServicesList() {
               <div
                 id={detailId}
                 inert={!active}
-                className={`pointer-events-none relative z-10 grid md:col-start-3 md:row-start-1 md:py-8 md:pr-6 xl:py-10 motion-safe:transition-[grid-template-rows,opacity] motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`pointer-events-none relative z-10 grid md:col-start-3 md:row-start-1 md:py-10 md:pr-8 xl:py-14 motion-safe:transition-[grid-template-rows,opacity] motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   active ? 'grid-rows-[1fr] md:opacity-100' : 'grid-rows-[0fr] md:opacity-0'
                 }`}
               >
@@ -193,7 +193,7 @@ export default function ServicesList() {
                   {/* Facts above the button on tablets, beside it on wide screens. Never wrapping means a
                       long facts line can't push the button onto its own row and make that row taller. */}
                   <div className="mt-3 md:mt-4 md:flex md:flex-col md:items-start md:gap-4 xl:flex-row xl:flex-nowrap xl:items-center xl:gap-6">
-                    <ul className="flex min-w-0 flex-wrap items-center gap-x-2 font-mono text-[11px] uppercase leading-[1.5] tracking-[0.12em] text-on-accent md:min-h-[3lh]">
+                    <ul className="flex min-w-0 flex-wrap items-center gap-x-2.5 font-mono text-[11px] uppercase leading-[1.5] tracking-[0.14em] text-on-accent md:min-h-[3lh]">
                       {service.meta.map((fact, i) => (
                         <li key={fact} className="flex items-center gap-2">
                           {i > 0 && <span aria-hidden="true">·</span>}
@@ -204,7 +204,7 @@ export default function ServicesList() {
 
                     {/* Phones get the drawing inside the panel. The fixed ratio keeps the panel from
                         jumping while the image loads. */}
-                    <div aria-hidden="true" className="mt-5 aspect-[16/9] w-full overflow-hidden rounded-lg border border-border md:hidden">
+                    <div aria-hidden="true" className="mt-5 aspect-[16/9] w-full overflow-hidden border border-border md:hidden">
                       <ImageSlot
                         image={service.image}
                         alt=""
@@ -221,7 +221,7 @@ export default function ServicesList() {
                     <Link
                     href={`${QUOTE_HREF}?service=${service.slug}`}
                     tabIndex={active ? undefined : -1}
-                      className="pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-on-accent px-5 py-3 text-sm font-semibold text-text-primary transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-accent md:mt-0"
+                      className="hover-lift pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-control bg-on-accent px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-text-primary [transition-property:transform,opacity] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-accent md:mt-0"
                     >
                       Get a quote for this
                       <ArrowRight aria-hidden="true" className="size-4" />

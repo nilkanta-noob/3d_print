@@ -81,6 +81,7 @@ export const HOME_EXPLORE: ExploreHighlight[] = [
     description: 'Robotics, IoT builds, final-year projects and hackathon prototypes.',
     href: '/explore#education',
     illustrations: ['standoffs', 'enclosure'],
+    image: '/heroSection/droneframe-studentproject.webp',
   },
   {
     title: 'Product Development',
@@ -88,17 +89,20 @@ export const HOME_EXPLORE: ExploreHighlight[] = [
     href: '/explore',
     illustrations: ['stepped', 'stepped', 'stepped'],
     iterations: true,
+    image: '/heroSection/product deveploment.webp',
   },
   {
     title: 'Functional Parts',
     description: 'Brackets, mounts, enclosures and replacement components built to solve problems.',
     href: '/explore#functional-parts',
     illustrations: ['bracket', 'stand'],
+    image: '/heroSection/rapidprototyping.webp',
   },
   {
     title: 'Hobby & DIY',
     description: 'Desk accessories, gaming upgrades, organizers and personal creations.',
     href: '/explore#desk-setup',
     illustrations: ['organizer', 'tower'],
+    image: '/heroSection/hobbydiy.webp',
   },
 ];
