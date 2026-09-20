@@ -1,64 +1,88 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, Info } from 'lucide-react';
 import Section from './Section';
 import SectionHeading from './SectionHeading';
 import ButtonLink from './ButtonLink';
-import { PRICING_NOTES, PRICING_PLANS } from './content/pricing';
 import { QUOTE_HREF } from './content/site';
 
-// Home page pricing: three simple plans instead of a rate table. id="pricing" is the navbar's Pricing target.
 export default function PricingSection() {
   return (
     <Section id="pricing" tone="band">
       <SectionHeading
+        accent
         eyebrow="Pricing"
         title="Simple, per-gram pricing"
-        description="You pay for the material your part uses. We email the exact price after reviewing your file."
       />
 
-      <ul className="mt-14 grid gap-6 lg:grid-cols-3">
-        {PRICING_PLANS.map((plan) => (
-          <li
-            key={plan.title}
-            className={`flex flex-col rounded-2xl border bg-elevated p-8 lg:p-10 ${plan.tag ? 'border-accent-primary/50' : 'border-border'}`}
-          >
-            <div className="flex items-center justify-between gap-4">
-              <h3 className="text-xl font-display font-bold text-text-primary">{plan.title}</h3>
-              {plan.tag && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-text-muted">
-                  <span className="size-1.5 rounded-full bg-accent-primary" aria-hidden="true" />
-                  {plan.tag}
-                </span>
-              )}
-            </div>
+      <div className="mx-auto mt-12 max-w-3xl">
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#17191D]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/5 bg-black/20">
+                  <th className="whitespace-nowrap px-6 py-5 text-sm font-semibold tracking-wider text-text-primary">Material</th>
+                  <th className="whitespace-nowrap px-6 py-5 text-sm font-semibold tracking-wider text-text-primary">Standard Rate</th>
+                  <th className="whitespace-nowrap px-6 py-5 text-sm font-semibold tracking-wider text-text-primary">Student Rate</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-sm md:text-base">
+                <tr className="transition-colors hover:bg-white/[0.02]">
+                  <td className="whitespace-nowrap px-6 py-5 font-display text-lg font-bold text-text-primary">PLA</td>
+                  <td className="whitespace-nowrap px-6 py-5 text-text-muted">₹3.5/g</td>
+                  <td className="whitespace-nowrap px-6 py-5 font-medium text-accent-primary">₹2.5/g</td>
+                </tr>
+                <tr className="transition-colors hover:bg-white/[0.02]">
+                  <td className="whitespace-nowrap px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <span className="font-display text-lg font-bold text-text-primary">PLA+</span>
+                      <span className="inline-flex items-center rounded-bl-lg rounded-tr-lg border border-accent-primary/50 bg-accent-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-accent-primary">
+                        Engineering
+                      </span>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-5 text-text-muted">₹4/g</td>
+                  <td className="whitespace-nowrap px-6 py-5 text-sm italic text-text-muted">Coming Soon</td>
+                </tr>
+                <tr className="transition-colors hover:bg-white/[0.02]">
+                  <td className="whitespace-nowrap px-6 py-5 font-display text-lg font-bold text-text-primary">PETG</td>
+                  <td className="whitespace-nowrap px-6 py-5 text-text-muted">₹5.5/g</td>
+                  <td className="whitespace-nowrap px-6 py-5 text-sm italic text-text-muted">Coming Soon</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-            <p className="mt-8 flex items-baseline gap-2">
-              <span className="font-display text-5xl font-bold tabular-nums tracking-tight text-text-primary">{plan.rate}</span>
-              <span className="text-sm text-text-muted">{plan.rateLabel}</span>
+        <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-white/10 bg-[#17191D] p-5 sm:flex-row sm:items-start sm:gap-4 sm:p-6">
+          <Info className="mt-0.5 size-5 shrink-0 text-accent-primary" aria-hidden="true" />
+          <div>
+            <h4 className="font-semibold text-text-primary">Student Eligibility</h4>
+            <p className="mt-1 text-sm leading-relaxed text-text-secondary">
+              Student pricing requires a valid college ID or referral at checkout. Student discount currently applies only to PLA. PLA+ and PETG student pricing will be added later.
             </p>
-            <p className="mt-4 text-[15px] leading-relaxed text-text-secondary">{plan.description}</p>
+          </div>
+        </div>
 
-            <ul className="mt-8 flex-1 space-y-3 border-t border-border pt-6 text-sm text-text-primary">
-              {plan.points.map((point) => (
-                <li key={point} className="flex gap-3">
-                  <Check className="mt-0.5 size-4 shrink-0 text-accent-primary" strokeWidth={2.5} aria-hidden="true" />
-                  {point}
-                </li>
-              ))}
-            </ul>
+        <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-text-secondary">
+          {[
+            'No setup fees',
+            'Human file review before printing',
+            'Quote usually within 1 hour',
+            'Student discount available with valid college ID'
+          ].map((point) => (
+            <div key={point} className="flex items-center gap-2.5">
+              <Check className="size-4 shrink-0 text-accent-primary" strokeWidth={2.5} aria-hidden="true" />
+              <span>{point}</span>
+            </div>
+          ))}
+        </div>
 
-            <ButtonLink href={QUOTE_HREF} variant={plan.tag ? 'primary' : 'secondary'} className="mt-10">
-              Get a quote
-            </ButtonLink>
-          </li>
-        ))}
-      </ul>
-
-      <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-2 text-sm text-text-muted">
-        {PRICING_NOTES.map((note) => (
-          <li key={note}>{note}</li>
-        ))}
-      </ul>
+        <div className="mt-10 flex justify-center">
+          <ButtonLink href={QUOTE_HREF} variant="primary">
+            Get a quote
+          </ButtonLink>
+        </div>
+      </div>
     </Section>
   );
 }

@@ -1,4 +1,6 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import Section from './Section';
@@ -9,25 +11,62 @@ import { MATERIALS, type Material } from './content/materials';
 // One material as a compact showcase card: name, one line on what it's for, best uses, and a link to its full
 // write-up on the Materials page (MaterialDetail's id). The link's ::after stretches over the card, so the whole
 // card is clickable — the same pattern as ServiceCard's page link.
-function MaterialCard({ material }: { material: Material }) {
+function MaterialCard({ 
+  material, 
+  activeMaterial, 
+  setActiveMaterial 
+}: { 
+  material: Material;
+  activeMaterial: string;
+  setActiveMaterial: (slug: string) => void;
+}) {
+  const isActive = activeMaterial === material.slug;
+
   return (
-    // The highlighted material (PLA+) gets a thin copper outline to match its copper tier capsule
     <article
-      className={`group relative flex h-full flex-col rounded-2xl border bg-elevated p-7 transition-colors duration-300 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-accent-primary ${
-        material.highlighted ? 'border-accent-primary/60 hover:border-accent-primary' : 'border-border hover:border-text-primary/20'
-      }`}
+      onMouseEnter={() => setActiveMaterial(material.slug)}
+      className={`
+        group relative flex h-full flex-col
+        rounded-2xl border
+        bg-[#1B1D21]
+        p-7
+        transition-colors duration-300
+        ${isActive ? 'border-accent-primary' : 'border-white/5'}
+      `}
     >
-      <div className="flex items-center justify-between gap-4">
-        <h3 className="text-4xl leading-none font-display font-extrabold tracking-[-0.03em] text-text-primary lg:text-[2.5rem]">{material.name}</h3>
-        {/* Tier capsule — copper for the highlighted material (PLA+), a quiet outline for the others */}
-        <span
-          className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${
-            material.highlighted ? 'border-accent-primary/60 bg-accent-primary/10 text-accent-hover' : 'border-border text-text-muted'
-          }`}
-        >
-          {material.tag}
-        </span>
-      </div>
+      <span
+        className={`
+          absolute right-0 top-0
+          rounded-bl-xl rounded-tr-2xl border-b border-l
+          px-4 py-2
+          text-[10px]
+          font-bold
+          uppercase
+          tracking-[0.18em]
+          transition-colors duration-300
+          ${
+            isActive
+              ? 'border-accent-primary/50 bg-accent-primary/10 text-accent-primary'
+              : 'border-white/10 bg-white/[0.03] text-text-muted'
+          }
+        `}
+      >
+        {material.tag}
+      </span>
+
+      <h3
+        className="
+        mt-6
+        text-4xl
+        leading-none
+        font-display
+        font-extrabold
+        tracking-[-0.03em]
+        text-text-primary
+        lg:text-[2.5rem]"
+      >
+        {material.name}
+      </h3>
       {/* On phones the stacked cards reserve two lines so they stay the same height; wider stacked cards (tablets)
           fit everything on one line, and side by side (1024px+) the grid row equalises them */}
       <p className="mt-3 min-h-[2lh] text-base leading-relaxed text-text-secondary md:min-h-0">{material.summary}</p>
@@ -52,14 +91,23 @@ function MaterialCard({ material }: { material: Material }) {
 
 // Home page materials preview. id="materials" is the target of the hero's "Explore Materials" button.
 export default function MaterialsSection() {
+  const [activeMaterial, setActiveMaterial] = useState("pla-plus");
+
   return (
     <Section id="materials" tone="band">
       <SectionHeading accent eyebrow="Materials" title="Three materials, chosen for real parts" />
 
-      <ul className="mt-12 grid gap-6 lg:mt-14 lg:grid-cols-3 lg:gap-8">
+      <ul 
+        className="mt-12 grid gap-6 lg:mt-14 lg:grid-cols-3 lg:gap-8"
+        onMouseLeave={() => setActiveMaterial("pla-plus")}
+      >
         {MATERIALS.map((material) => (
           <li key={material.slug}>
-            <MaterialCard material={material} />
+            <MaterialCard 
+              material={material} 
+              activeMaterial={activeMaterial}
+              setActiveMaterial={setActiveMaterial}
+            />
           </li>
         ))}
       </ul>
