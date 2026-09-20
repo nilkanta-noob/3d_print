@@ -310,7 +310,7 @@ export default function QuoteForm() {
                 type="button"
                 onClick={confirmOtp}
                 disabled={isVerifying || otp.length < 6}
-                className="w-full md:w-auto px-6 py-2.5 bg-accent-primary text-on-accent rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
+                className="w-full md:w-auto px-6 py-2.5 bg-accent-primary text-on-accent rounded-full font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
               >
                 {isVerifying ? 'Checking...' : 'Confirm OTP'}
               </button>

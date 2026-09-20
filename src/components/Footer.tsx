@@ -86,12 +86,16 @@ export default function Footer() {
             </div>
           ))}
 
-          {/* Contact & Social */}
-          <div className="flex flex-col items-start">
+          {/* Contact & Social. min-w-0 lets this column shrink: grid items refuse to go below their content's
+              width by default, and at 1024px the email address is wider than its column, which pushed the
+              whole page 3px sideways. With the column free to shrink, the address wraps instead. */}
+          <div className="flex min-w-0 flex-col items-start">
             <h4 className="font-bold text-xs uppercase tracking-widest text-text-primary mb-6">Contact</h4>
-            <div className="flex flex-col gap-4 text-sm mb-8">
-              <a href={`mailto:${SITE.email}`} className="hover:text-text-primary transition-colors flex items-center gap-2">
-                <Mail className="w-4 h-4 shrink-0" /> {SITE.email}
+            <div className="flex min-w-0 max-w-full flex-col gap-4 text-sm mb-8">
+              {/* break-all, not break-words: an address is one unbroken word, and break-words still holds the
+                  box open to its width. min-w-0 lets the flex item itself shrink. */}
+              <a href={`mailto:${SITE.email}`} className="hover:text-text-primary transition-colors flex min-w-0 items-start gap-2 break-all">
+                <Mail className="w-4 h-4 shrink-0 mt-0.5" /> {SITE.email}
               </a>
               {whatsapp && (
                 <a href={whatsapp} className="hover:text-text-primary transition-colors flex items-center gap-2">
