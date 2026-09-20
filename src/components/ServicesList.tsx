@@ -221,7 +221,7 @@ export default function ServicesList() {
                     <Link
                     href={`${QUOTE_HREF}?service=${service.slug}`}
                     tabIndex={active ? undefined : -1}
-                      className="pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md bg-on-accent px-5 py-3 text-sm font-semibold text-text-primary transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-accent md:mt-0"
+                      className="pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-on-accent px-5 py-3 text-sm font-semibold text-text-primary transition-opacity duration-200 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-accent md:mt-0"
                     >
                       Get a quote for this
                       <ArrowRight aria-hidden="true" className="size-4" />

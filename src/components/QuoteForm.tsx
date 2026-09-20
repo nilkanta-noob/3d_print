@@ -195,7 +195,7 @@ export default function QuoteForm() {
             setOtpSent(false);
             setOtp('');
           }}
-          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-sm font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
+          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-full font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
         >
           Submit Another Request
         </button>
@@ -283,7 +283,7 @@ export default function QuoteForm() {
                 type="button"
                 onClick={sendOtp}
                 disabled={isVerifying || !formData.email}
-                className="px-6 py-2.5 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-sm font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
+                className="px-6 py-2.5 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-full font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-50 whitespace-nowrap"
               >
                 {isVerifying ? 'Sending...' : 'Verify'}
               </button>
@@ -360,7 +360,7 @@ export default function QuoteForm() {
           <button
             type="submit"
             disabled={isSubmitDisabled}
-            className="w-full px-8 py-4 rounded-sm font-bold text-sm tracking-widest uppercase bg-accent-primary hover:bg-accent-hover text-on-accent transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-8 py-4 rounded-full font-bold text-sm tracking-widest uppercase bg-accent-primary hover:bg-accent-hover text-on-accent transition-all disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting || isUploading ? (
               <>

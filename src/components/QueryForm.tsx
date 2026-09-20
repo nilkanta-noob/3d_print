@@ -219,7 +219,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
             setIsSuccess(false);
             if (onSuccess) onSuccess();
           }}
-          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-md font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
+          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-on-accent rounded-full font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
         >
           Go Back
         </button>
@@ -272,7 +272,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                     type="button"
                     onClick={handleSendOtp}
                     disabled={isSendingOtp || isOtpSent || !email}
-                    className="px-4 py-2.5 bg-elevated border border-border rounded-md text-xs font-bold uppercase tracking-wider text-text-primary hover:text-accent-primary hover:border-accent-primary transition-colors disabled:opacity-50"
+                    className="px-4 py-2.5 bg-elevated border border-border rounded-full text-xs font-bold uppercase tracking-wider text-text-primary hover:text-accent-primary hover:border-accent-primary transition-colors disabled:opacity-50"
                   >
                     {isSendingOtp ? "Sending..." : isOtpSent ? "Sent" : "Send OTP"}
                   </button>
@@ -293,7 +293,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                     type="button"
                     onClick={handleVerifyOtp}
                     disabled={isVerifyingOtp || otp.length < 5}
-                    className="px-4 py-2 bg-accent-primary text-on-accent rounded-md text-xs font-bold uppercase tracking-wider hover:bg-accent-hover transition-colors disabled:opacity-50 whitespace-nowrap"
+                    className="px-4 py-2 bg-accent-primary text-on-accent rounded-full text-xs font-bold uppercase tracking-wider hover:bg-accent-hover transition-colors disabled:opacity-50 whitespace-nowrap"
                   >
                     {isVerifyingOtp ? "Verifying..." : "Verify"}
                   </button>
@@ -430,7 +430,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                       startStudentIdUpload([file]);
                     }
                   }}
-                  className="w-full text-sm text-text-secondary file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-surface file:text-text-primary hover:file:bg-border transition-colors font-sans"
+                  className="w-full text-sm text-text-secondary file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-surface file:text-text-primary hover:file:bg-border transition-colors font-sans"
                 />
                 {isStudentIdUploading && (
                   <span className="text-xs text-text-secondary animate-pulse">Uploading ID...</span>
@@ -493,7 +493,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
         <button
           type="submit"
           disabled={isSubmitting || !isOtpVerified}
-          className={`w-full md:w-auto px-10 py-4 rounded-md font-bold text-sm tracking-widest uppercase transition-colors flex items-center justify-center gap-2 ${
+          className={`w-full md:w-auto px-10 py-4 rounded-full font-bold text-sm tracking-widest uppercase transition-colors flex items-center justify-center gap-2 ${
             !isOtpVerified
               ? 'bg-background text-text-secondary border border-border cursor-not-allowed'
               : 'bg-accent-primary hover:bg-accent-hover text-on-accent shadow-lg shadow-black/25 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -544,7 +544,7 @@ export default function QueryFormModal({ isOpen, onClose }: QueryFormModalProps)
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-md transition-colors"
+            className="p-2 text-text-secondary hover:text-text-primary hover:bg-elevated rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

@@ -16,6 +16,16 @@ export const SITE = {
 
 export const QUOTE_HREF = '/get-quote';
 
+// The copper ticker between Pricing and Explore runs these after the service names.
+export const TRUST_ITEMS: string[] = [
+  'Pan-India Delivery',
+  '3–4 Day Turnaround',
+  'Student Discounts',
+  'No Minimum Order',
+  'Upload STL',
+  'Transparent Per-Gram Pricing',
+];
+
 // Services and Pricing live on the home page (/#services, /#pricing); the rest are pages. The logo links home.
 export const NAV_LINKS: { href: string; label: string }[] = [
   { href: '/about', label: 'About' },

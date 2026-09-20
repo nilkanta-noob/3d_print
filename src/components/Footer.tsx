@@ -103,13 +103,13 @@ export default function Footer() {
               </span>
             </div>
             <div className="flex gap-4">
-              <a href="#" aria-label="Instagram" className="p-2 bg-elevated border border-border rounded-md text-text-secondary hover:text-text-primary transition-colors">
+              <a href="#" aria-label="Instagram" className="p-2 bg-elevated border border-border rounded-full text-text-secondary hover:text-text-primary transition-colors">
                 <InstagramIcon className="w-4 h-4" />
               </a>
-              <a href="#" aria-label="LinkedIn" className="p-2 bg-elevated border border-border rounded-md text-text-secondary hover:text-text-primary transition-colors">
+              <a href="#" aria-label="LinkedIn" className="p-2 bg-elevated border border-border rounded-full text-text-secondary hover:text-text-primary transition-colors">
                 <LinkedinIcon className="w-4 h-4" />
               </a>
-              <a href="#" aria-label="YouTube" className="p-2 bg-elevated border border-border rounded-md text-text-secondary hover:text-text-primary transition-colors">
+              <a href="#" aria-label="YouTube" className="p-2 bg-elevated border border-border rounded-full text-text-secondary hover:text-text-primary transition-colors">
                 <YoutubeIcon className="w-4 h-4" />
               </a>
             </div>

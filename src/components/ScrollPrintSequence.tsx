@@ -138,14 +138,14 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
               <button
                 type="button"
                 onClick={onOpenQuery}
-                className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 sm:px-6 py-3.5 rounded-md border border-transparent bg-accent-primary text-on-accent font-semibold text-sm sm:text-base shadow-lg shadow-black/30 transition-[background-color,box-shadow,transform] duration-200 hover:bg-accent-hover hover:shadow-xl hover:shadow-black/50 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-2 whitespace-nowrap px-4 sm:px-6 py-3.5 rounded-full border border-transparent bg-accent-primary text-on-accent font-semibold text-sm sm:text-base shadow-lg shadow-black/30 transition-[background-color,box-shadow,transform] duration-200 hover:bg-accent-hover hover:shadow-xl hover:shadow-black/50 motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Get Instant Quote
                 <ArrowRight className="hidden sm:block w-4 h-4 transition-transform duration-200 motion-safe:group-hover:translate-x-0.5" />
               </button>
               <a
                 href="#materials"
-                className="flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap px-4 sm:px-6 py-3.5 rounded-md border border-text-primary/30 bg-transparent text-text-primary font-semibold text-sm sm:text-base transition-colors duration-200 hover:border-text-primary/70 hover:bg-text-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                className="flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap px-4 sm:px-6 py-3.5 rounded-full border border-text-primary/30 bg-transparent text-text-primary font-semibold text-sm sm:text-base transition-colors duration-200 hover:border-text-primary/70 hover:bg-text-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Explore Materials
               </a>

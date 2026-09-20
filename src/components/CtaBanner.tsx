@@ -19,15 +19,15 @@ interface CtaBannerProps {
 export default function CtaBanner({ title, description, primary, secondary, tone = 'base' }: CtaBannerProps) {
   return (
     <Section tone={tone}>
-      <div className="rounded-2xl border border-border bg-elevated px-6 py-16 text-center sm:px-12 md:py-24">
-        <span className="mx-auto mb-8 block h-px w-10 bg-accent-primary" aria-hidden="true" />
+      <div className="rounded-2xl border border-border bg-elevated px-6 py-10 text-center sm:px-12 md:py-14">
+        <span className="mx-auto mb-6 block h-px w-10 bg-accent-primary" aria-hidden="true" />
         <h2 className="mx-auto max-w-3xl text-3xl md:text-5xl font-display font-bold tracking-tight text-text-primary text-balance">
           {title}
         </h2>
         {description && (
-          <p className="mx-auto mt-5 max-w-xl text-base md:text-lg leading-relaxed text-text-secondary">{description}</p>
+          <p className="mx-auto mt-4 max-w-xl text-base md:text-lg leading-relaxed text-text-secondary">{description}</p>
         )}
-        <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
+        <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
           <ButtonLink href={primary.href}>{primary.label}</ButtonLink>
           {secondary && (
             <ButtonLink href={secondary.href} variant="secondary">

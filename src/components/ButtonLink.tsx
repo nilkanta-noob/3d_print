@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 export const BUTTON_BASE =
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-3.5 text-base font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary';
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 py-3.5 text-base font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary';
 
 export const BUTTON_VARIANTS = {
   primary: 'bg-accent-primary text-on-accent shadow-lg shadow-black/20 hover:bg-accent-hover',

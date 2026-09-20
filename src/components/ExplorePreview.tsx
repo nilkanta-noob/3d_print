@@ -87,8 +87,9 @@ function ExploreCard({ item }: { item: ExploreHighlight }) {
 
 // Home page Explore: real-world uses of 3D printing as four image cards, each linking into the Explore page.
 export default function ExplorePreview() {
+  // Raised band, keeping the page alternating: Materials band → Pricing base → Explore band → CTA base
   return (
-    <Section id="explore">
+    <Section id="explore" tone="band">
       <SectionHeading accent eyebrow="Explore" title="What You Can Do with 3D Printing?" />
 
       <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:mt-14 lg:gap-8">

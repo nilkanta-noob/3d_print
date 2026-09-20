@@ -1,13 +1,12 @@
 import React from 'react';
-import { Check, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 import Section from './Section';
 import SectionHeading from './SectionHeading';
-import ButtonLink from './ButtonLink';
-import { QUOTE_HREF } from './content/site';
 
 export default function PricingSection() {
+  // Page background: Materials above it is the raised band, so this sits back and the two stay apart
   return (
-    <Section id="pricing" tone="band">
+    <Section id="pricing">
       <SectionHeading
         accent
         eyebrow="Pricing"
@@ -63,25 +62,6 @@ export default function PricingSection() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-text-secondary">
-          {[
-            'No setup fees',
-            'Human file review before printing',
-            'Quote usually within 1 hour',
-            'Student discount available with valid college ID'
-          ].map((point) => (
-            <div key={point} className="flex items-center gap-2.5">
-              <Check className="size-4 shrink-0 text-accent-primary" strokeWidth={2.5} aria-hidden="true" />
-              <span>{point}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-10 flex justify-center">
-          <ButtonLink href={QUOTE_HREF} variant="primary">
-            Get a quote
-          </ButtonLink>
-        </div>
       </div>
     </Section>
   );

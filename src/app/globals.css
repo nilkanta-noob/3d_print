@@ -45,6 +45,20 @@
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-fira-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* The copper ticker between Pricing and Explore. Its track holds the list twice and slides exactly
+     half its width, so the loop repeats without a visible seam. It starts half-way along and travels
+     back to the start, which carries the wording rightwards across the screen. */
+  --animate-ticker: ticker 66s linear infinite;
+
+  @keyframes ticker {
+    from {
+      transform: translate3d(-50%, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
 }
 
 /*

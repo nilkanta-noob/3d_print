@@ -69,7 +69,7 @@ export default function FAQSection({ items = FAQS, initialCount, tone = 'band' }
           {collapsible && (
             <button
               onClick={() => setShowAll(!showAll)}
-              className="mt-6 inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium text-text-primary transition-colors hover:border-text-primary/40"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-text-primary transition-colors hover:border-text-primary/40"
             >
               {showAll ? 'Show less' : 'View all FAQs'}
               <ChevronDown className={`w-4 h-4 transition-transform ${showAll ? 'rotate-180' : ''}`} />
