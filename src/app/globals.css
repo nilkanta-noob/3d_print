@@ -72,28 +72,22 @@
 }
 
 /*
- * Full-width frame shared by the navbar and the hero, so the wordmark and the headline start on the same
- * line near the screen edge. Page sections below keep the narrower `container`.
- * Side gutters: 16px phones → 24px → 32px → 40px desktop → 48px wide screens; capped at 1920px.
+ * The page's one frame. Everything on the site sits in it — the navbar, the hero, every section and the
+ * footer — so the wordmark, the headline and every section heading start on the same line.
+ *
+ * The gutter is a proportion of the screen rather than a set of breakpoint steps: 5.6% of the width, with
+ * a 24px floor so phones keep a usable measure. That works out at 24px on a phone, 43px at 768px, 71px at
+ * 1260px and 108px at 1920px — the margin reads the same at every size instead of jumping at each
+ * breakpoint, which is the proportion the architecture sites this design follows use.
+ *
+ * A percentage, not vw: percentages resolve against the containing block, so the vertical scrollbar can't
+ * make the left and right gutters disagree. Capped at 1920px, centred beyond that.
  */
 @utility site-frame {
   width: 100%;
   max-width: 120rem;
   margin-inline: auto;
-  padding-inline: 1rem;
-
-  @media (width >= 40rem) {
-    padding-inline: 1.5rem;
-  }
-  @media (width >= 64rem) {
-    padding-inline: 2rem;
-  }
-  @media (width >= 80rem) {
-    padding-inline: 2.5rem;
-  }
-  @media (width >= 96rem) {
-    padding-inline: 3rem;
-  }
+  padding-inline: max(1.5rem, 5.6%);
 }
 
 /*

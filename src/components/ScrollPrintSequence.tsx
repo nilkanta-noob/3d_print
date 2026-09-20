@@ -9,6 +9,7 @@ import { ArrowRight } from 'lucide-react';
 // poster request 404s and the browser falls back to the video's first frame.
 const HERO_POSTER = '/hero-poster.jpg';
 
+
 const reveal: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
@@ -26,6 +27,7 @@ interface ScrollPrintSequenceProps {
 
 export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequenceProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const parallaxRef = useRef<HTMLDivElement>(null);
 
   // autoPlay starts the loop as soon as the page loads, like the original hero. This effect then pauses it
   // for users who ask for reduced motion, and restarts it whenever the hero is back on screen — browsers
@@ -65,15 +67,67 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
     };
   }, []);
 
+  // The footage is pinned by `position: fixed` (see the JSX below), which the browser composites
+  // itself — it cannot fall behind the scroll the way a JS transform does, so the frame is genuinely
+  // motionless rather than merely slow.
+  //
+  // This effect is a performance optimisation only, and nothing about the layout depends on it. Once
+  // the hero is a screen behind us the layer is already covered — the z-0/z-10 split does that in CSS —
+  // so this just drops it out of the paint. An earlier version leaned on it to *hide* the video, which
+  // meant any moment the callback had not run yet (a restored scroll position on reload, a throttled
+  // frame, the tab in the background) painted the footage straight over the page.
+  useEffect(() => {
+    const layer = parallaxRef.current;
+    if (!layer) return;
+
+    let frame = 0;
+    let hidden = false;
+
+    const apply = () => {
+      frame = 0;
+      const past = window.scrollY > window.innerHeight;
+      if (past === hidden) return;
+      hidden = past;
+      layer.style.visibility = past ? 'hidden' : '';
+    };
+
+    // The scroll handler only ever schedules a frame, so a fast wheel can't queue up work.
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(apply);
+    };
+
+    apply(); // catch a reload that restored a scroll position further down the page
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
   return (
     // reducedMotion="user": entrance animations drop their movement when the OS asks for reduced motion
     <MotionConfig reducedMotion="user">
-      <section className="relative min-h-svh w-full flex items-start lg:items-center overflow-hidden bg-background">
+      {/* The hero is the page's z-0 layer, and everything after it sits at z-10 (the wrapper in
+          page.tsx, and the footer). That rule is what keeps the pinned video behind the page.
+          It is needed because the footage below is `position: fixed` — it escapes this section's box and
+          covers the viewport, and a positioned z-0 element outranks the background of any *unpositioned*
+          element however late that element comes in the document. Without the rule the video painted
+          straight through the sections and the footer instead of behind them.
+          `isolate` additionally confines the layer to this section's stacking context, so no z-index
+          inside the hero can hoist it out. Neither property changes what `fixed` is positioned against
+          (only transform, filter, perspective, contain and will-change do that), so the video stays
+          pinned to the viewport. */}
+      <section className="relative isolate z-0 min-h-svh w-full flex items-start lg:items-center overflow-hidden bg-background">
 
         {/* Hero background video — contained to this section only. The print head sits right of
             centre in the footage, so the crop leans right to keep it in frame on portrait screens.
             The filter warms the footage's own teal grade so no cyan reads through (blue cast measured ~50% lower). */}
-        <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+        {/* The pinned frame: the footage and its whole grade, fixed to the viewport so none of it moves
+            while the page travels over it. The sections wipe it away from the bottom edge upwards as
+            they climb — the video itself never shifts by a pixel. z-0 keeps it under the copy while
+            staying above the section's own background. */}
+        <div ref={parallaxRef} className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
           <video
             ref={videoRef}
             src="/hero___video.mp4"
