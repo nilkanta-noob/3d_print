@@ -32,12 +32,12 @@ export default function AboutPage() {
           title="Make prototyping accessible"
           description="Anyone with an idea worth building should be able to hold it in their hands without spending a fortune. These are the standards we hold ourselves to."
         />
-        <ul className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-16 grid gap-px border border-border bg-border md:mt-20 md:grid-cols-2 lg:mt-24 lg:grid-cols-4">
           {VALUES.map((value) => (
-            <li key={value.title} className="rounded-xl border border-border bg-elevated p-7">
-              <span className="block h-px w-8 bg-accent-primary" aria-hidden="true" />
-              <h3 className="mt-6 text-xl font-display font-bold text-text-primary">{value.title}</h3>
-              <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">{value.body}</p>
+            <li key={value.title} className="bg-elevated p-8">
+              <span className="block h-px w-7 bg-accent-primary" aria-hidden="true" />
+              <h3 className="mt-8 font-display text-xl font-medium tracking-[-0.03em] text-text-primary">{value.title}</h3>
+              <p className="mt-4 text-[15px] leading-[1.75] text-text-secondary">{value.body}</p>
             </li>
           ))}
         </ul>
@@ -50,7 +50,7 @@ export default function AboutPage() {
           title="From CAD file to finished part"
           description="Four steps, with a person checking your file before anything is printed."
         />
-        <StepTimeline steps={PROCESS_STEPS} className="mt-14" />
+        <StepTimeline steps={PROCESS_STEPS} className="mt-16 md:mt-20 lg:mt-24" />
       </Section>
 
       <FAQSection tone="base" />

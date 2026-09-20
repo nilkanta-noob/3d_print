@@ -129,7 +129,7 @@ export default function Header() {
       {/* Full-screen mobile menu, beneath the bar so the close button stays reachable */}
       {menuOpen && (
         <nav id="mobile-nav" aria-label="Main" className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-background pt-16 lg:hidden">
-          <ul className="container mx-auto px-4 py-8">
+          <ul className="site-frame py-8">
             {NAV_LINKS.map((link, index) => {
               const active = isActive(pathname, link.href);
               return (
@@ -149,7 +149,7 @@ export default function Header() {
               );
             })}
           </ul>
-          <div className="container mx-auto mt-auto px-4 pb-8 pt-4">
+          <div className="site-frame mt-auto pb-8 pt-4">
             <Link
               href={QUOTE_HREF}
               onClick={closeMenu}

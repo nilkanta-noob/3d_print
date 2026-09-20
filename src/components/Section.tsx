@@ -29,7 +29,11 @@ export default function Section({ id, tone = 'base', afterHero = false, classNam
       id={id}
       className={`scroll-mt-16 lg:scroll-mt-20 ${afterHero ? 'border-t border-border' : ''} ${spacing} ${toneClass} ${className}`}
     >
-      <div className="container mx-auto px-4">{children}</div>
+      {/* site-frame, not the Tailwind `container`: the container caps at 1024px all the way up to a
+          1279px screen, which parked ~118px of dead margin on each side of a laptop and left every
+          section heading indented well inside the navbar's wordmark. Sharing the navbar's frame puts
+          the whole page — bar, hero, sections, footer — on one left edge. */}
+      <div className="site-frame">{children}</div>
     </section>
   );
 }

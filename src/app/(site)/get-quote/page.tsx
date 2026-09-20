@@ -43,15 +43,15 @@ export default function GetQuotePage() {
       <Section>
         <div className="mx-auto max-w-6xl">
           {/* The existing quote form: upload + 3D preview, contact details with email verification, material and finish, student ID */}
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+          <div className="overflow-hidden border border-border bg-surface">
             <QuoteFormCore />
           </div>
 
-          <ul className="mt-8 grid gap-6 md:grid-cols-3">
+          <ul className="mt-12 grid gap-px border border-border bg-border md:grid-cols-3">
             {notes.map((note) => (
-              <li key={note.title} className="rounded-xl border border-border bg-elevated p-6">
-                <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-text-muted">{note.title}</h2>
-                <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">{note.body}</p>
+              <li key={note.title} className="bg-elevated p-8">
+                <h2 className="label-micro text-text-muted">{note.title}</h2>
+                <p className="mt-5 text-[15px] leading-[1.75] text-text-secondary">{note.body}</p>
               </li>
             ))}
           </ul>

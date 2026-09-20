@@ -123,7 +123,7 @@ export default function ServicesList() {
                     /* Each word gets its own line from tablets up. Every title is two words, so every row
                        has a two-line title and they all end up the same height — and a single word is
                        narrow enough for the type to be much larger than a one-line title allowed. */
-                    className={`font-display text-2xl font-medium uppercase leading-[1] tracking-[-0.035em] md:text-[1.5rem] lg:text-[2rem] xl:text-[2.75rem] 2xl:text-[3rem] ${
+                    className={`font-display text-xl font-medium uppercase leading-[1] tracking-[-0.035em] md:text-[1.5rem] lg:text-[2rem] xl:text-[2.75rem] 2xl:text-[3rem] ${
                       active ? 'text-on-accent' : 'text-text-primary'
                     }`}
                   >

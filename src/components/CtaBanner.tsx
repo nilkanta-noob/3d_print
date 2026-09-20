@@ -32,11 +32,11 @@ export default function CtaBanner({ title, description, primary, secondary, tone
 
         {/* On desktop the actions sit in their own column, aligned to the bottom of the heading block */}
         <div className="mt-12 flex flex-col gap-4 sm:flex-row lg:col-span-5 lg:mt-0 lg:flex-col lg:items-start lg:justify-end lg:gap-5">
-          <ButtonLink href={primary.href} className="w-full justify-center sm:w-auto lg:w-full">
+          <ButtonLink href={primary.href} className="w-full justify-center sm:w-auto">
             {primary.label}
           </ButtonLink>
           {secondary && (
-            <ButtonLink href={secondary.href} variant="secondary" className="w-full justify-center sm:w-auto lg:w-full">
+            <ButtonLink href={secondary.href} variant="secondary" className="w-full justify-center sm:w-auto">
               {secondary.label}
             </ButtonLink>
           )}

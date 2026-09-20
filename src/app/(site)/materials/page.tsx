@@ -25,18 +25,18 @@ export default function MaterialsPage() {
       />
 
       <Section id="overview" tone="band">
-        <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
+        <div className="grid gap-16 lg:grid-cols-12 lg:items-center lg:gap-20">
           <SectionHeading
             className="lg:col-span-5"
             eyebrow="Overview"
             title="Three filaments, one process"
             description="Every part is printed by FDM on our Creality CR-10 SE. Choose the filament by what the part has to handle — fine detail, impact, heat or water."
           />
-          <dl className="grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:col-span-7">
+          <dl className="grid gap-px border border-border bg-border sm:grid-cols-2 lg:col-span-7">
             {PRINT_SPECS.map((spec) => (
-              <div key={spec.label} className="bg-elevated p-6">
-                <dt className="text-xs uppercase tracking-[0.14em] text-text-muted">{spec.label}</dt>
-                <dd className="mt-2 font-display text-xl font-bold text-text-primary">{spec.value}</dd>
+              <div key={spec.label} className="bg-elevated p-8">
+                <dt className="label-micro text-text-muted">{spec.label}</dt>
+                <dd className="mt-4 font-display text-2xl font-medium tracking-[-0.03em] text-text-primary">{spec.value}</dd>
               </div>
             ))}
           </dl>
@@ -45,36 +45,36 @@ export default function MaterialsPage() {
 
       <Section id="compare">
         <SectionHeading eyebrow="Comparison" title="How they compare" />
-        <div className="mt-14">
+        <div className="mt-16 md:mt-20 lg:mt-24">
           <MaterialComparison />
         </div>
-        <p className="mt-6 max-w-3xl text-sm text-text-muted">
+        <p className="mt-10 max-w-[62ch] text-sm leading-[1.75] text-text-muted">
           Ratings compare these three materials against each other. Exact properties vary with the filament brand and print settings such as infill.
         </p>
       </Section>
 
       <Section id="choose" tone="band">
-        <div className="grid gap-16 lg:grid-cols-2 lg:gap-20">
+        <div className="grid gap-20 lg:grid-cols-2 lg:gap-24">
           <div>
             <SectionHeading eyebrow="Strength" title="Strength comparison" />
-            <div className="mt-12">
+            <div className="mt-16">
               <StrengthComparison />
             </div>
-            <p className="mt-8 max-w-md text-[15px] leading-relaxed text-text-secondary">
+            <p className="mt-10 max-w-[52ch] text-[15px] leading-[1.75] text-text-secondary">
               PLA is stiff but brittle. PLA+ adds toughness and layer adhesion. PETG absorbs impact and flexes before it breaks.
             </p>
           </div>
 
           <div>
             <SectionHeading eyebrow="Recommendations" title="Which should I choose?" />
-            <ul className="mt-12 divide-y divide-border border-y border-border">
+            <ul className="mt-16 divide-y divide-border border-y border-border">
               {RECOMMENDATIONS.map((item) => (
-                <li key={item.need} className="grid gap-2 py-5 sm:grid-cols-[1fr_auto] sm:items-baseline sm:gap-8">
+                <li key={item.need} className="grid gap-2 py-7 sm:grid-cols-[1fr_auto] sm:items-baseline sm:gap-8">
                   <div>
-                    <p className="text-[15px] font-medium text-text-primary">{item.need}</p>
-                    <p className="mt-1 text-sm text-text-muted">{item.why}</p>
+                    <p className="text-[15px] text-text-primary">{item.need}</p>
+                    <p className="mt-2 text-sm leading-[1.7] text-text-muted">{item.why}</p>
                   </div>
-                  <p className="font-display text-xl font-bold text-text-primary">{item.pick}</p>
+                  <p className="font-display text-xl font-medium tracking-[-0.03em] text-text-primary">{item.pick}</p>
                 </li>
               ))}
             </ul>
@@ -84,7 +84,7 @@ export default function MaterialsPage() {
 
       <Section id="details">
         <SectionHeading eyebrow="Use cases" title="Material details" />
-        <div className="mt-14 space-y-6">
+        <div className="mt-16 space-y-8 md:mt-20 lg:mt-24">
           {MATERIALS.map((material) => (
             <MaterialDetail key={material.slug} material={material} />
           ))}

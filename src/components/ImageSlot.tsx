@@ -34,7 +34,7 @@ export default function ImageSlot({ image, alt, variant, className = '', sizes =
             <PartIllustration variant={variant} className={`h-full w-auto max-w-full ${large ? '' : 'max-h-60'}`} />
           </div>
           {badge && (
-            <span className="absolute left-3 top-3 rounded-full border border-border bg-elevated px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-text-muted">
+            <span className="label-micro absolute left-4 top-4 rounded-chip border border-border bg-elevated px-2.5 py-1 text-[10px] text-text-muted">
               Render
             </span>
           )}

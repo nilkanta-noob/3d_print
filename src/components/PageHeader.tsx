@@ -12,7 +12,7 @@ interface PageHeaderProps {
 export default function PageHeader({ eyebrow, title, description, children }: PageHeaderProps) {
   return (
     <section className="border-b border-border bg-background pb-20 pt-36 md:pb-28 md:pt-48">
-      <div className="container mx-auto px-4">
+      <div className="site-frame">
         <div className="max-w-4xl">
           <Eyebrow>{eyebrow}</Eyebrow>
           {/* The page's largest type: weight 500, tracking -0.04em, leading just under 1 — the same

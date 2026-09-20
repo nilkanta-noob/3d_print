@@ -55,7 +55,7 @@ export default function Footer() {
     // The page's quietest surface: charcoal rather than the raised band, so the site closes by fading out
     // rather than by putting up one more panel. A single hairline separates it from the page.
     <footer className="border-t border-border bg-background pb-12 pt-24 text-text-secondary md:pt-32">
-      <div className="container mx-auto px-4">
+      <div className="site-frame">
 
         {/* The wordmark and the statement sit alone across the top — the footer's own masthead. */}
         <div className="grid gap-12 border-b border-border pb-16 lg:grid-cols-12 lg:gap-20 lg:pb-20">

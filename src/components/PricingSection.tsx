@@ -20,7 +20,9 @@ export default function PricingSection() {
           className="lg:col-span-5"
           accent
           eyebrow="Pricing"
-          title="Simple, per-gram pricing"
+          /* nowrap on "per-gram": in the narrow heading column the line would otherwise break at the
+             hyphen, leaving "per-" hanging at the end of a line */
+          title={<>Simple, <span className="whitespace-nowrap">per-gram</span> pricing</>}
           description="You pay for the material your part actually uses. No setup fee, no minimum order, no per-file charge."
         />
 
