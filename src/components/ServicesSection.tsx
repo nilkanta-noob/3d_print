@@ -1,11 +1,9 @@
 import React from 'react';
 import Section from './Section';
 import SectionHeading from './SectionHeading';
-import ServiceCard from './ServiceCard';
-import { SERVICES } from './content/services';
+import ServicesList from './ServicesList';
 
-// Home page Services: four cards in a 2×2 grid (one column on phones), read left-to-right, top-to-bottom as
-// a progression — Student Projects → Rapid Prototyping → Custom Parts → Product Development.
+// Home page Services. There are no service pages, so each row opens in place and links to the quote form.
 export default function ServicesSection() {
   return (
     <Section id="services" afterHero>
@@ -13,7 +11,7 @@ export default function ServicesSection() {
         size="display"
         eyebrow="Services"
         title="What We Print"
-        // The no-break space keeps the dash on the line it closes; "per-gram" never splits at its hyphen
+        /* The no-break space keeps the dash on the line it closes; "per-gram" never splits at its hyphen */
         description={
           <>
             From a single college part to repeated design revisions&nbsp;— the same{' '}
@@ -22,14 +20,9 @@ export default function ServicesSection() {
         }
       />
 
-      {/* items-start: opening one card's details grows only that card — its row-mate keeps its own height */}
-      <ul className="mt-12 md:mt-14 lg:mt-16 grid items-start gap-6 md:grid-cols-2 lg:gap-8">
-        {SERVICES.map((service, index) => (
-          <li key={service.slug}>
-            <ServiceCard service={service} step={index + 1} />
-          </li>
-        ))}
-      </ul>
+      <div className="mt-12 md:mt-14 lg:mt-16">
+        <ServicesList />
+      </div>
     </Section>
   );
 }

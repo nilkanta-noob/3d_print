@@ -25,7 +25,7 @@
   --accent: #B87333;
   --border: rgba(246, 244, 241, 0.08);
   --accent-hover: color-mix(in oklab, var(--accent) 88%, white); /* slightly brighter copper */
-  --on-accent: #1B1D21; /* charcoal on copper — 4.45:1 */
+  --on-accent: #121417; /* near-black on copper — 4.86:1, clears AA (the charcoal background only made 4.45:1) */
 }
 
 @theme inline {
