@@ -10,7 +10,7 @@ export default async function AdminLayout({
   const session = await getServerSession(authOptions);
 
   // If there is no session or role is not ADMIN, redirect to login
-  if (!session || (session.user as any)?.role !== "ADMIN") {
+  if (!session || (session.user as { role?: string })?.role !== "ADMIN") {
     redirect("/admin/login");
   }
 

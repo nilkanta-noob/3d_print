@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     // The file is already uploaded to UploadThing.
     // We will just send the link in the email to avoid Vercel/Resend latency.
-    let fileName = fileUrl.split('/').pop() || '3d_model.stl';
+    const fileName = fileUrl.split('/').pop() || '3d_model.stl';
 
     // Save to Database
     const dbUser = await prisma.user.upsert({
@@ -109,8 +109,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, orderNumber: order.orderNumber });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error handling quote request:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 });
   }
 }

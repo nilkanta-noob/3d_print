@@ -28,6 +28,7 @@ export default function ServicesList() {
   // than from the hook's value, because during hydration the hook still reports the server's "no match".
   useEffect(() => {
     const touch = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveSlug((current) => (touch ? current ?? SERVICES[0].slug : null));
   }, [canHover]);
 
