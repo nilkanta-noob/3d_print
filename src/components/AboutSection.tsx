@@ -43,7 +43,7 @@ export default function AboutSection() {
             via next/image) — that is what will make this section feel human. */}
         <div className="relative aspect-[4/3] overflow-hidden border border-border bg-elevated">
           <video
-            src="/hero___video.mp4#t=6"
+            src="/hero/hero___video.mp4#t=6"
             muted
             playsInline
             preload="metadata"

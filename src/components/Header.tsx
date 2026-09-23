@@ -1,21 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, MotionConfig } from 'framer-motion';
+import { MotionConfig } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { NAV_LINKS, QUOTE_HREF } from './content/site';
-
-// The charcoal bar appears once the page has scrolled this far, and disappears again back at the very top
-const SOLID_AFTER_PX = 24;
-
-function subscribeToScroll(onChange: () => void) {
-  window.addEventListener('scroll', onChange, { passive: true });
-  return () => window.removeEventListener('scroll', onChange);
-}
-
-const isScrolledPastTop = () => window.scrollY > SOLID_AFTER_PX;
 
 function isActive(pathname: string, href: string) {
   if (href.includes('#')) return false; // home page sections, not pages
@@ -24,7 +14,6 @@ function isActive(pathname: string, href: string) {
 
 export default function Header() {
   const pathname = usePathname();
-  const scrolled = useSyncExternalStore(subscribeToScroll, isScrolledPastTop, () => false);
 
   // The mobile menu belongs to the page it was opened on, so navigating anywhere closes it
   const [menuOpenOn, setMenuOpenOn] = useState<string | null>(null);
@@ -47,20 +36,16 @@ export default function Header() {
     };
   }, [menuOpen]);
 
-  const solid = scrolled || menuOpen;
-
   return (
     <MotionConfig reducedMotion="user">
       <header className="fixed top-0 z-50 w-full">
-        {/* The charcoal bar: out of view at the top of the page, slides down once the page scrolls.
-            rgba(27,29,33,0.95), 16px backdrop blur, 8% warm-ivory hairline. */}
-        <motion.div
-          aria-hidden="true"
-          className="absolute inset-0 -z-10 border-b border-border bg-background/95 backdrop-blur-lg"
-          initial={false}
-          animate={{ y: solid ? '0%' : '-100%', opacity: solid ? 1 : 0 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        />
+        {/* The charcoal bar, solid from the top of the page with an 8% warm-ivory hairline under it.
+            It used to stay transparent until the page scrolled, but the hero footage's top edge is bright
+            orange and lime bokeh: over it the links fell to 1.5–2.8:1 and the copper "WARRIORS" to
+            2.3–3.8:1. A solid bar is the clean fix — a crisp edge, not a gradient fading into the video —
+            and it frames the footage as a rectangle below the navigation. Opaque rather than 95%, so no
+            colour from the video tints through behind the links. No backdrop blur. */}
+        <div aria-hidden="true" className="absolute inset-0 -z-10 border-b border-border bg-background" />
 
         {/* site-frame: full-width with narrow gutters, so the wordmark and Get Quote sit near the screen edges.
             Desktop and laptops (lg, 1024px+): three columns — wordmark left, links centred, Get Quote right.

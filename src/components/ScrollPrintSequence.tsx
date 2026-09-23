@@ -1,14 +1,22 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion, MotionConfig, type Variants } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import HeroModel from './hero/HeroModel';
 
-// PLACEHOLDER: public/hero-poster.jpg does not exist yet. Export a still frame
-// from public/hero___video.mp4 and save it at exactly this path. Until then the
-// poster request 404s and the browser falls back to the video's first frame.
-const HERO_POSTER = '/hero-poster.jpg';
-
+/*
+ * The hero: headline left, the printed object right.
+ *
+ * (The file name is historical — this was the scrolling video hero. The background footage and its
+ * whole grade are gone; the object is the hero's only image now.)
+ *
+ * Three layouts, and the middle one exists because of the headline. "YOU THINK," is set on one line at
+ * ~5.1em wide, so between 760px and 1099px it needs most of the left column: there the canvas stays
+ * inside its own column and the object is centred in it. Only from 1100px is the canvas widened past
+ * the right edge of the viewport, where there is room for the object to run off the page without ever
+ * reaching the text.
+ */
 
 const reveal: Variants = {
   hidden: {},
@@ -26,198 +34,76 @@ interface ScrollPrintSequenceProps {
 }
 
 export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequenceProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const parallaxRef = useRef<HTMLDivElement>(null);
-
-  // autoPlay starts the loop as soon as the page loads, like the original hero. This effect then pauses it
-  // for users who ask for reduced motion, and restarts it whenever the hero is back on screen — browsers
-  // can pause muted video that was scrolled away or loaded in a hidden window, and not resume it.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    // Browsers only allow unprompted play() on muted video; set the property
-    // explicitly since React doesn't always reflect `muted` as an attribute.
-    video.muted = true;
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let inView = true;
-
-    const syncPlayback = () => {
-      if (reducedMotion.matches || !inView || document.hidden) {
-        video.pause();
-      } else {
-        // Rejects if the browser still blocks autoplay (e.g. iOS Low Power Mode) — the current frame stays up.
-        video.play().catch(() => {});
-      }
-    };
-
-    const observer = new IntersectionObserver(([entry]) => {
-      inView = entry.isIntersecting;
-      syncPlayback();
-    });
-    observer.observe(video);
-
-    syncPlayback();
-    reducedMotion.addEventListener('change', syncPlayback);
-    document.addEventListener('visibilitychange', syncPlayback);
-    return () => {
-      observer.disconnect();
-      reducedMotion.removeEventListener('change', syncPlayback);
-      document.removeEventListener('visibilitychange', syncPlayback);
-    };
-  }, []);
-
-  // The footage is pinned by `position: fixed` (see the JSX below), which the browser composites
-  // itself — it cannot fall behind the scroll the way a JS transform does, so the frame is genuinely
-  // motionless rather than merely slow.
-  //
-  // This effect is a performance optimisation only, and nothing about the layout depends on it. Once
-  // the hero is a screen behind us the layer is already covered — the z-0/z-10 split does that in CSS —
-  // so this just drops it out of the paint. An earlier version leaned on it to *hide* the video, which
-  // meant any moment the callback had not run yet (a restored scroll position on reload, a throttled
-  // frame, the tab in the background) painted the footage straight over the page.
-  useEffect(() => {
-    const layer = parallaxRef.current;
-    if (!layer) return;
-
-    let frame = 0;
-    let hidden = false;
-
-    const apply = () => {
-      frame = 0;
-      const past = window.scrollY > window.innerHeight;
-      if (past === hidden) return;
-      hidden = past;
-      layer.style.visibility = past ? 'hidden' : '';
-    };
-
-    // The scroll handler only ever schedules a frame, so a fast wheel can't queue up work.
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(apply);
-    };
-
-    apply(); // catch a reload that restored a scroll position further down the page
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll);
-    };
-  }, []);
-
   return (
     // reducedMotion="user": entrance animations drop their movement when the OS asks for reduced motion
     <MotionConfig reducedMotion="user">
-      {/* The hero is the page's z-0 layer, and everything after it sits at z-10 (the wrapper in
-          page.tsx, and the footer). That rule is what keeps the pinned video behind the page.
-          It is needed because the footage below is `position: fixed` — it escapes this section's box and
-          covers the viewport, and a positioned z-0 element outranks the background of any *unpositioned*
-          element however late that element comes in the document. Without the rule the video painted
-          straight through the sections and the footer instead of behind them.
-          `isolate` additionally confines the layer to this section's stacking context, so no z-index
-          inside the hero can hoist it out. Neither property changes what `fixed` is positioned against
-          (only transform, filter, perspective, contain and will-change do that), so the video stays
-          pinned to the viewport. */}
-      <section className="relative isolate z-0 min-h-svh w-full flex items-start lg:items-center overflow-hidden bg-background">
+      {/* overflow-hidden is what crops the object at the right edge of the viewport on desktop. */}
+      <section className="relative w-full overflow-hidden bg-background">
+        <div className="site-frame grid min-h-svh items-center gap-y-10 pb-16 pt-28 min-[760px]:grid-cols-[45fr_55fr] min-[760px]:gap-x-8 min-[760px]:pb-20 min-[760px]:pt-24">
 
-        {/* Hero background video — contained to this section only. The print head sits right of
-            centre in the footage, so the crop leans right to keep it in frame on portrait screens.
-            The filter warms the footage's own teal grade so no cyan reads through (blue cast measured ~50% lower). */}
-        {/* The pinned frame: the footage and its whole grade, fixed to the viewport so none of it moves
-            while the page travels over it. The sections wipe it away from the bottom edge upwards as
-            they climb — the video itself never shifts by a pixel. z-0 keeps it under the copy while
-            staying above the section's own background. */}
-        <div ref={parallaxRef} className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
-          <video
-            ref={videoRef}
-            src="/hero___video.mp4"
-            poster={HERO_POSTER}
-            className="w-full h-full object-cover object-[65%_50%] [filter:saturate(0.8)_sepia(0.2)]"
-            autoPlay
-            playsInline
-            muted
-            loop
+          {/* The object comes first in the DOM so it sits above the copy when the layout stacks on a
+              phone. From 760px it is placed into the second column instead.
+              --focus-x is where the object sits across the canvas: centred until the canvas can bleed,
+              then pushed right so its far side is cropped by the edge of the screen.
+              Sizes are fixed per breakpoint — a square on phones, a 4:5 box on tablets, a measured
+              height on desktop — so the space is reserved before the model arrives. */}
+          <HeroModel
+            className="
+              mx-auto aspect-square w-[70vw] [--focus-x:0.5]
+              min-[760px]:mx-0 min-[760px]:aspect-[4/5] min-[760px]:w-full min-[760px]:self-center
+              min-[760px]:col-start-2 min-[760px]:row-start-1
+              min-[1100px]:aspect-auto min-[1100px]:h-[clamp(26rem,72svh,45rem)] min-[1100px]:w-[calc(100%+12vw)]
+              min-[1100px]:[--focus-x:0.7]
+            "
           />
-          {/* Cinematic grade: black layers, not a charcoal wash. A flat charcoal overlay lifts the footage's shadows
-              to grey (the "faded" look); black keeps them deep while the print head's metal still catches the light.
-              Measured on the footage: the frame averages ~45% darker than the old 0.76/0.66 charcoal overlay
-              (~60% on phones), copper "WE PRINT." goes from 2.8:1 to 4.4:1 against the footage behind it and the
-              paragraph from 6.2:1 to 10:1. Effective darkening: ~55% on the printer, ~90% behind the copy. */}
-          {/* 1. Base: 55% black over the whole frame */}
-          <div className="absolute inset-0 bg-black/55"></div>
-          {/* 2. Behind the copy: top band on phones, left side on desktop — gone before the print head */}
-          <div className="absolute inset-0 bg-linear-to-b from-black/65 via-black/55 via-50% to-transparent to-72% lg:bg-linear-to-r lg:from-black/75 lg:via-black/55 lg:via-30% lg:to-transparent lg:to-62%"></div>
-          {/* 3. Vignette: clear around the print head, closing in to 60–70% black at the edges */}
-          <div className="absolute inset-0 bg-radial-[ellipse_90%_50%_at_50%_72%] from-transparent from-40% to-black/60 lg:bg-radial-[ellipse_60%_85%_at_66%_50%] lg:to-black/70"></div>
-          {/* 4. Shade under the navbar  5. Fade into the page background below the hero */}
-          <div className="absolute inset-x-0 top-0 h-[22%] bg-linear-to-b from-black/55 to-transparent"></div>
-          <div className="absolute inset-x-0 bottom-0 h-[22%] bg-linear-to-t from-background to-transparent"></div>
-        </div>
 
-        {/* site-frame: same full-width frame as the navbar, so the headline lines up under the wordmark.
-            Top padding clears the navbar; the extra top vs bottom padding sets the block just below centre. */}
-        <div className="site-frame relative z-20 pt-32 pb-24 lg:pt-36 lg:pb-28">
           <motion.div
             variants={reveal}
             initial="hidden"
             animate="visible"
-            className="w-full"
+            className="w-full min-[760px]:col-start-1 min-[760px]:row-start-1"
           >
-            {/* Micro-label: the studio's discipline, stated flatly above the headline. The copper rule
-                anchors the whole column to the left edge of the frame, which is where every heading on
-                the page below also starts. */}
             <motion.p variants={rise} className="label-micro flex items-center gap-4 text-text-secondary">
               <span className="h-px w-7 shrink-0 bg-accent-primary" aria-hidden="true" />
               Precision 3D Printing · Kolkata
             </motion.p>
 
-            {/* Brand headline: uppercase at weight 500, not black. At this scale the size and the -0.04em
-                tracking carry the weight on their own, and the lighter cut is what makes it read as a
-                studio masthead rather than a poster. Always exactly two lines: 104px on tablets, 112px
-                from 1024px, 128px on laptops/desktops, 152px from 1536px, 168px on 1800px+ screens — the
-                first line ends a little past the middle of the screen. Leading 0.9 closes the two lines up
-                into one block (the comma clears line two, which is shorter). Phones scale with the screen
-                (~62px at 375px) so "YOU THINK," never clips. The soft shadow separates it from bright spots. */}
+            {/* Sized so "YOU THINK," always fits the left column: it sets at about 5.1em wide, and the
+                column is ~40% of the viewport, so 6.6vw leaves a margin at every two-column width. Also
+                held to 12vh, which keeps the block clear of the navbar on a short laptop screen.
+                filament-text gives the letters their printed layer lines (see globals.css) and owns the
+                colour, which is why there is no text-* colour class here. */}
             <motion.h1
               variants={rise}
-              className="mt-10 md:mt-12 text-[clamp(2.75rem,16.5vw,4rem)] md:text-[6.5rem] lg:text-[7rem] xl:text-[8rem] 2xl:text-[9.5rem] min-[112.5rem]:text-[10.5rem] font-medium uppercase tracking-[-0.04em] leading-[0.9] text-text-primary whitespace-nowrap [text-shadow:0_2px_24px_rgba(0,0,0,0.45)]"
+              className="filament-text mt-7 text-[clamp(2.5rem,12vw,3.5rem)] font-medium uppercase leading-none tracking-[-0.04em] whitespace-nowrap min-[760px]:mt-[clamp(1.5rem,4.5vh,2.5rem)] min-[760px]:text-[clamp(3rem,min(6.6vw,12vh),7.5rem)]"
             >
               YOU THINK,
               <br />
-              <span className="text-accent-primary">WE PRINT.</span>
+              <span className="filament-text filament-accent">WE PRINT.</span>
             </motion.h1>
 
-            {/* 520px reading width, small against the headline — the gap between the two sizes is the
-                hierarchy, so the paragraph never grows to meet it. */}
             <motion.p
               variants={rise}
-              className="mt-12 md:mt-14 xl:mt-16 max-w-[520px] font-sans leading-[1.75] text-text-secondary text-base md:text-[17px]"
+              /* One line from 1100px, where the column is wide enough to hold the sentence; it wraps on
+                 narrower screens, where the column is not. */
+              className="mt-8 max-w-[34ch] font-sans text-base leading-[1.75] text-text-secondary md:text-[17px] min-[760px]:mt-[clamp(2rem,5vh,3rem)] min-[1100px]:max-w-none"
             >
               Turn your CAD files into precision-engineered parts.
-              <br className="hidden sm:block" />
-              {' '}Fast quotes. Multiple materials. Reliable results.
             </motion.p>
 
-            {/* Vertical rhythm: label → 40/48px → headline → 48/56/64px → paragraph → 56/64/72px → buttons */}
-            <motion.div variants={rise} className="mt-14 md:mt-16 xl:mt-18 flex flex-wrap gap-4 sm:gap-5">
+            <motion.div variants={rise} className="mt-9 min-[760px]:mt-[clamp(2.5rem,6vh,4rem)]">
               <button
                 type="button"
                 onClick={onOpenQuery}
-                className="hover-lift group flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 whitespace-nowrap px-6 sm:px-8 py-4 rounded-control bg-accent-primary text-on-accent font-semibold text-[13px] uppercase tracking-[0.12em] [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                className="hover-lift group inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-control bg-accent-primary px-8 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Get Instant Quote
-                <ArrowRight className="hidden sm:block w-4 h-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" />
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" />
               </button>
-              <a
-                href="#materials"
-                className="hover-lift flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap px-6 sm:px-8 py-4 rounded-control border border-text-primary/25 bg-transparent text-text-primary font-semibold text-[13px] uppercase tracking-[0.12em] [transition-property:transform,border-color,background-color] hover:border-text-primary/60 hover:bg-text-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
-              >
-                Explore Materials
-              </a>
             </motion.div>
           </motion.div>
-        </div>
 
+        </div>
       </section>
     </MotionConfig>
   );

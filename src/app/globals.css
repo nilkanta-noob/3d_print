@@ -119,6 +119,100 @@
   letter-spacing: 0.22em;
 }
 
+/*
+ * Filament texture — the hero headline only, and nothing else on the site. The words are meant to look
+ * as though they were printed: fine horizontal layer bands across the letterforms, each lit along its
+ * top edge, falling away to a darker seam at the bottom.
+ *
+ * It is a repeating linear-gradient clipped to the text, so the headline stays real, selectable text in
+ * a real <h1> — no images, no SVG, no per-letter spans, no script.
+ *
+ * The band height is in `em` on purpose: it scales with font-size, so the layers stay proportional to
+ * the letters at every screen size. In px the texture holds together on a desktop headline and collapses
+ * into moiré on a phone.
+ *
+ * The four colours are the brand's own — warm ivory and copper, mixed a little toward the tokens either
+ * side of them — and they sit close together in lightness, so from across the room the headline still
+ * reads as one colour rather than a set of stripes.
+ */
+@utility filament-text {
+  --layer: 0.16em;
+  --filament-highlight: color-mix(in oklab, var(--text) 90%, white);
+  --filament-base: var(--text);
+  --filament-shadow: color-mix(in oklab, var(--text) 90%, var(--text-muted));
+  --filament-seam: color-mix(in oklab, var(--text) 78%, var(--text-muted));
+
+  /* The fallback, and what forced-colors and print fall back to: the plain brand colour. */
+  color: var(--filament-base);
+
+  /* The guard also tests color-mix, not just the clip. A browser that supports background-clip: text but
+     not color-mix (Chrome 100–110, Safari 16.0–16.1) would compute the band colours as invalid, drop the
+     gradient, keep `color: transparent` — and render an invisible headline. Testing both means those
+     browsers take the solid-colour path instead. */
+  @supports ((background-clip: text) or (-webkit-background-clip: text)) and
+    (color: color-mix(in oklab, red 50%, white)) {
+    background-image: linear-gradient(
+      to bottom,
+      var(--filament-highlight) 0%,
+      var(--filament-base) 45%,
+      var(--filament-shadow) 92%,
+      var(--filament-seam) 100%
+    );
+    background-size: 100% var(--layer);
+    background-repeat: repeat;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Phones: the headline is ~45px, too small to carry fine bands, so they get taller and half as deep. */
+  @media (width < 37.5rem) {
+    --layer: 0.22em;
+    --filament-highlight: color-mix(in oklab, var(--text) 95%, white);
+    --filament-shadow: color-mix(in oklab, var(--text) 95%, var(--text-muted));
+    --filament-seam: color-mix(in oklab, var(--text) 89%, var(--text-muted));
+  }
+
+  /* Large screens: the headline is 90px+, so the layers can be finer. */
+  @media (width >= 87.5rem) {
+    --layer: 0.13em;
+  }
+
+  /* Windows high-contrast mode: no gradient, and the fill handed back to the system colour. */
+  @media (forced-colors: active) {
+    background-image: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+  }
+
+  @media print {
+    background-image: none;
+    color: var(--filament-base);
+    -webkit-text-fill-color: var(--filament-base);
+  }
+}
+
+/*
+ * The copper half of the headline. It carries its own gradient rather than inheriting the ivory one,
+ * because "WE PRINT." is a separate colour in the brand headline and an inline background clips to its
+ * own text. Its bands are shallower than they look: over the hero footage the copper only clears large-
+ * text AA by half a step, so the darkest band is held at 94% accent (3.19:1 against the worst frame,
+ * where the solid colour measures 3.50:1). The highlight is the existing --accent-hover token.
+ */
+@utility filament-accent {
+  --filament-highlight: var(--accent-hover);
+  --filament-base: var(--accent);
+  --filament-shadow: color-mix(in oklab, var(--accent) 97%, var(--background));
+  --filament-seam: color-mix(in oklab, var(--accent) 94%, var(--background));
+
+  @media (width < 37.5rem) {
+    --filament-highlight: color-mix(in oklab, var(--accent-hover) 50%, var(--accent));
+    --filament-shadow: color-mix(in oklab, var(--accent) 98.5%, var(--background));
+    --filament-seam: color-mix(in oklab, var(--accent) 97%, var(--background));
+  }
+}
+
 @layer base {
   body {
     background: var(--background);
