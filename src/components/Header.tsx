@@ -20,6 +20,16 @@ export default function Header() {
   const menuOpen = menuOpenOn === pathname;
   const closeMenu = () => setMenuOpenOn(null);
 
+  // The bar is invisible over the top of the hero and materialises as a card once the page moves. 8px
+  // rather than 0 so a trackpad's rubber-band at the top of the page does not flicker it on and off.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   // Full-screen mobile menu: lock page scroll behind it and close on Escape
   useEffect(() => {
     if (!menuOpen) return;
@@ -38,27 +48,24 @@ export default function Header() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <header className="fixed top-0 z-50 w-full">
-        {/* The charcoal bar, solid from the top of the page with an 8% cool-white hairline under it.
-            It used to stay transparent until the page scrolled, but the hero footage's top edge is bright
-            orange and lime bokeh: over it the links fell to 1.5–2.8:1 and the accent "WARRIORS" to
-            2.3–3.8:1. A solid bar is the clean fix — a crisp edge, not a gradient fading into the video —
-            and it frames the footage as a rectangle below the navigation. Opaque rather than 95%, so no
-            colour from the video tints through behind the links. No backdrop blur. */}
-        <div aria-hidden="true" className="absolute inset-0 -z-10 border-b border-border bg-background" />
-
-        {/* site-frame: full-width with narrow gutters, so the wordmark and Get Quote sit near the screen edges.
-            Desktop and laptops (lg, 1024px+): three columns — wordmark left, links centred, Get Quote right.
-            Phones and tablets: wordmark left, Get Quote + menu button right. */}
-        {/* A taller bar from 1024px (96px) gives the links more air above and below than a standard navbar —
-            the same restraint the sections below it use. Both heights live on --nav-h in globals.css,
-            because the hero has to pad itself by exactly this much and the two must not drift apart. */}
-        <div className="site-frame flex h-[var(--nav-h)] items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
+      {/* The bar floats: inset from the top and both sides so it reads as a card laid over the page rather
+          than a band bolted to it. Over the hero it is invisible and the links sit straight on the
+          artwork; the moment the page scrolls it fills in, takes its hairline and carries the content
+          past it. Opaque, not translucent, and no backdrop blur — the design system's rule. */}
+      <header
+        className="fixed inset-x-0 top-0 z-50 px-[var(--nav-inset)] pt-[var(--nav-inset)]"
+      >
+        <div className="mx-auto w-full max-w-[120rem]">
+          <div
+            className={`flex h-[var(--nav-bar-h)] items-center justify-between gap-4 rounded-control border px-5 lg:px-7 [transition-property:background-color,border-color] duration-300 lg:grid lg:grid-cols-[1fr_auto_1fr] ${
+              scrolled ? 'border-border bg-surface' : 'border-transparent bg-transparent'
+            }`}
+          >
           {/* Wordmark — text only, one element so PRINT and WARRIORS share a baseline.
               A touch smaller on 1024–1279px laptops so the centred links keep their room. */}
           <Link
             href="/"
-            className="justify-self-start whitespace-nowrap font-display text-[13px] font-semibold uppercase tracking-[0.2em] text-white transition-opacity duration-300 hover:opacity-70 sm:text-[15px] sm:tracking-[0.26em] lg:text-[15px] lg:tracking-[0.24em] xl:tracking-[0.26em]"
+            className="justify-self-start whitespace-nowrap font-display text-[15px] font-semibold uppercase tracking-[0.2em] text-white transition-opacity duration-300 hover:opacity-70 sm:text-[17px] sm:tracking-[0.24em] lg:text-[18px] lg:tracking-[0.22em] xl:tracking-[0.24em]"
           >
             Print<span className="text-accent-primary">Warriors</span>
           </Link>
@@ -68,7 +75,7 @@ export default function Header() {
               Each step keeps the space between the wordmark and the first link larger than the gaps between links. */}
           <nav
             aria-label="Main"
-            className="hidden items-center gap-5 text-[11px] font-medium uppercase tracking-[0.16em] text-text-secondary lg:flex min-[72rem]:gap-6 min-[72rem]:tracking-[0.18em] min-[76rem]:gap-7 xl:gap-8 min-[90rem]:gap-10 2xl:gap-12"
+            className="hidden items-center gap-4 text-[11px] font-medium uppercase tracking-[0.14em] text-white lg:flex min-[72rem]:gap-[1.125rem] min-[72rem]:tracking-[0.15em] min-[76rem]:gap-5 xl:gap-[1.375rem] min-[90rem]:gap-6 2xl:gap-7"
           >
             {NAV_LINKS.map((link) => {
               const active = isActive(pathname, link.href);
@@ -80,7 +87,7 @@ export default function Header() {
                   href={link.href}
                   aria-current={active ? 'page' : undefined}
                   className={`relative py-1 transition-colors duration-300 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:bg-accent-primary after:transition-opacity after:duration-300 ${
-                    active ? 'text-text-primary after:opacity-100' : 'hover:text-text-primary after:opacity-0 hover:after:opacity-60'
+                    active ? 'after:opacity-100' : 'hover:opacity-70 after:opacity-0 hover:after:opacity-60'
                   }`}
                 >
                   {link.label}
@@ -94,7 +101,7 @@ export default function Header() {
             <Link
               href={QUOTE_HREF}
               aria-current={isActive(pathname, QUOTE_HREF) ? 'page' : undefined}
-              className="hover-lift inline-flex h-9 items-center whitespace-nowrap rounded-control bg-accent-primary px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary sm:px-5 lg:h-11 lg:px-6 lg:text-xs"
+              className="hover-lift inline-flex h-8 items-center whitespace-nowrap rounded-control bg-accent-primary px-3.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary sm:px-4 lg:h-9 lg:px-5 lg:text-xs"
             >
               Get Quote
             </Link>
@@ -108,6 +115,7 @@ export default function Header() {
             >
               {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
+          </div>
           </div>
         </div>
       </header>

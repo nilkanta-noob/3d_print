@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 // 13px uppercase label at wide tracking, and a single 2px rise on hover. Both variants share the shape
 // and the motion, so primary and secondary read as the same object in two weights.
 export const BUTTON_BASE =
-  'hover-lift inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-control px-7 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary';
+  'hover-lift inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-control px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary';
 
 export const BUTTON_VARIANTS = {
   primary: 'bg-accent-primary text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover',

@@ -15,27 +15,29 @@ const OPEN_MS = 420;
 export default function ServicesList() {
   // Behaviour only — everything about how the list *looks* is done with CSS media queries, so the
   // server-rendered HTML is already right and there is nothing for hydration to correct.
-  const canHover = useMediaQuery('(hover: hover) and (pointer: fine)');
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
-  // No row is active on the server, which is what a mouse should see. Touch devices open the first
-  // row just after hydration (below), so the two HTML outputs still match.
-  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  // The first row is open on arrival, on every device and on every refresh — the section should never
+  // greet you as a stack of closed bars with nothing to read. Set as the initial state rather than in an
+  // effect so the server renders it open too: the markup matches on hydration and the row does not pop
+  // open a frame after the page appears. Opening any other row closes this one, as it always did, since
+  // only one slug can be active at a time.
+  const [activeSlug, setActiveSlug] = useState<string | null>(SERVICES[0].slug);
 
   const headerRefs = useRef(new Map<string, HTMLButtonElement>());
-
-  // A touch device opens the first row; a mouse starts with none open. matchMedia is read here rather
-  // than from the hook's value, because during hydration the hook still reports the server's "no match".
-  useEffect(() => {
-    const touch = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setActiveSlug((current) => (touch ? current ?? SERVICES[0].slug : null));
-  }, [canHover]);
 
   // If a taller row above collapses, the row you just opened can be dragged up past the navbar. Only that
   // case scrolls — a tall open row whose bottom runs past the fold is left alone, since scrolling the page
   // for it would feel like the list jumping out from under the click.
+  const settled = useRef(false);
   useEffect(() => {
+    // …but not for the row that is open on arrival. That one was never clicked, so there is nothing to
+    // correct for, and scrolling the page on load would yank the visitor down to a section they have not
+    // reached yet.
+    if (!settled.current) {
+      settled.current = true;
+      return;
+    }
     if (!activeSlug) return;
     const header = headerRefs.current.get(activeSlug);
     if (!header) return;

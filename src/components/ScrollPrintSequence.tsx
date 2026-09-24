@@ -118,7 +118,7 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
               <button
                 type="button"
                 onClick={onOpenQuery}
-                className="hover-lift group inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-control bg-accent-primary px-8 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                className="hover-lift group inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-control bg-accent-primary px-7 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Get Instant Quote
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" />

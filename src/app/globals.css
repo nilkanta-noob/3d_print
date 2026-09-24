@@ -34,16 +34,27 @@
   --accent-dark: #7EA6E0; /* pressed states and focus rings, where the hover tone needs somewhere to go */
   --on-accent: #121417; /* near-black on the blue — 10.4:1 */
 
-  /* Height of the fixed header. This is the single source of truth for it: Header.tsx sizes its bar from
-     this variable and the hero pads itself by it, so the two cannot drift apart. The bar's hairline is
-     drawn inside the box, so this is the full height including it. */
-  --nav-h: 4rem;
+  /* The header floats: a contained bar inset from the top and sides rather than a band welded to the
+     edges of the screen. Three values, one source of truth — Header.tsx sizes its bar from them and the
+     hero pads itself by --nav-h, so the two cannot drift apart.
+       --nav-inset  the gap between the bar and the edges of the viewport
+       --nav-bar-h  the bar's own height
+       --nav-h      what the whole thing occupies from the top of the page, which is what content clears */
+  --nav-inset: 0.75rem;
+  --nav-bar-h: 3.25rem;
+  --nav-h: calc(var(--nav-inset) + var(--nav-bar-h));
+
+  /* The page gutter, named so the floating navbar can subtract its own inset from it and still land its
+     wordmark on the same line as the hero headline and every section heading. site-frame uses it too. */
+  --frame-gutter: max(1.5rem, 5.6%);
 }
 
-/* The bar grows at the lg breakpoint — see Header.tsx, which reads this rather than setting its own. */
+/* The bar grows at the lg breakpoint — see Header.tsx, which reads these rather than setting its own.
+   --nav-h is a calc over the two, so it follows without being restated. */
 @media (min-width: 64rem) {
   :root {
-    --nav-h: 6rem;
+    --nav-inset: 1.25rem;
+    --nav-bar-h: 3.75rem;
   }
 }
 
@@ -107,7 +118,7 @@
   width: 100%;
   max-width: 120rem;
   margin-inline: auto;
-  padding-inline: max(1.5rem, 5.6%);
+  padding-inline: var(--frame-gutter);
 }
 
 /*
