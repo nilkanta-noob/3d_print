@@ -155,7 +155,7 @@ export default function ServicesList() {
               <p
                 aria-hidden={active}
                 inert={active}
-                className={`hidden text-[15px] leading-relaxed text-text-secondary md:col-start-3 md:row-start-1 md:block md:py-10 md:pr-8 xl:py-14 motion-safe:transition-opacity motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`hidden text-[15px] leading-relaxed text-text-secondary md:col-start-3 md:row-start-1 md:block md:py-10 md:pl-8 md:pr-8 xl:py-14 xl:pl-10 motion-safe:transition-opacity motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   active ? 'opacity-0' : 'opacity-100'
                 }`}
               >
@@ -171,7 +171,7 @@ export default function ServicesList() {
               <div
                 id={detailId}
                 inert={!active}
-                className={`pointer-events-none relative z-10 grid md:col-start-3 md:row-start-1 md:py-10 md:pr-8 xl:py-14 motion-safe:transition-[grid-template-rows,opacity] motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`pointer-events-none relative z-10 grid md:col-start-3 md:row-start-1 md:py-10 md:pl-8 md:pr-8 xl:py-14 xl:pl-10 motion-safe:transition-[grid-template-rows,opacity] motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   active ? 'grid-rows-[1fr] md:opacity-100' : 'grid-rows-[0fr] md:opacity-0'
                 }`}
               >

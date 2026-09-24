@@ -12,12 +12,12 @@ interface CtaBannerProps {
   description?: string;
   primary: Action;
   secondary?: Action;
-  tone?: 'base' | 'band';
+  tone?: 'base' | 'band' | 'emphasis';
 }
 
 // Closing call-to-action used at the bottom of pages. Not a boxed panel: a rule, a large heading and the
 // buttons, sitting in the page's own whitespace. The only frame is the hairline above it.
-export default function CtaBanner({ title, description, primary, secondary, tone = 'base' }: CtaBannerProps) {
+export default function CtaBanner({ title, description, primary, secondary, tone = 'band' }: CtaBannerProps) {
   return (
     <Section tone={tone}>
       <div className="border-t border-border pt-16 md:pt-20 lg:grid lg:grid-cols-12 lg:gap-20">

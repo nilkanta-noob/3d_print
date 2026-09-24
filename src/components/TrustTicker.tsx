@@ -15,7 +15,7 @@ export default function TrustTicker() {
   const half = [0, 1, 2].flatMap((pass) => TRUST_ITEMS.map((title) => ({ key: `${pass}-${title}`, title })));
 
   return (
-    <div aria-hidden="true" className="relative w-full select-none overflow-hidden border-y border-border bg-background py-6">
+    <div aria-hidden="true" className="relative w-full select-none overflow-hidden bg-accent-primary py-6">
       {/* Two identical halves on one track: the animation slides it half its width, so the second half
           lands exactly where the first began and the loop has no seam. w-max keeps it all on one line.
           motion-safe: with reduced motion the track simply sits still at the start of the loop. */}
@@ -23,9 +23,9 @@ export default function TrustTicker() {
         {[0, 1].map((copy) => (
           <ul key={copy} className="flex shrink-0 items-center">
             {half.map((item) => (
-              <li key={item.key} className="label-micro flex items-center text-text-secondary">
+              <li key={item.key} className="label-micro flex items-center text-on-accent">
                 <span className="px-8 sm:px-10">{item.title}</span>
-                <span className="h-px w-6 bg-accent-primary" />
+                <span className="h-px w-6 bg-on-accent" />
               </li>
             ))}
           </ul>

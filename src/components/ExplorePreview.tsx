@@ -49,10 +49,10 @@ function ExploreCard({ item }: { item: ExploreHighlight }) {
             alt={item.alt ?? ''} 
             fill 
             sizes="(min-width: 768px) 50vw, 100vw" 
-            className="object-cover brightness-[0.65] transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-100" 
+            className="object-cover brightness-90 transition-transform duration-700 ease-out group-hover:scale-[1.03]" 
           />
         ) : (
-          <div className="absolute inset-0 bg-radial-[ellipse_75%_65%_at_50%_32%] from-elevated to-background brightness-[0.65] transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:brightness-100">
+          <div className="absolute inset-0 bg-radial-[ellipse_75%_65%_at_50%_32%] from-elevated to-background brightness-90 transition-transform duration-700 ease-out group-hover:scale-[1.03]">
             <RenderPlaceholder item={item} />
           </div>
         )}
@@ -62,7 +62,7 @@ function ExploreCard({ item }: { item: ExploreHighlight }) {
           higher than the card's old height needed, so the description still sits on a dark enough field
           now that the copy starts further up the image. */}
       <div
-        className="absolute inset-0 z-10 bg-[linear-gradient(to_top,rgba(0,0,0,0.78)_0%,rgba(0,0,0,0.45)_45%,rgba(0,0,0,0.10)_100%)] transition-opacity duration-700 ease-out group-hover:opacity-80"
+        className="absolute inset-0 z-10 bg-[linear-gradient(to_top,rgba(0,0,0,0.78)_0%,rgba(0,0,0,0.45)_45%,rgba(0,0,0,0.10)_100%)] "
         aria-hidden="true"
       />
 
@@ -96,7 +96,7 @@ function ExploreCard({ item }: { item: ExploreHighlight }) {
 
 export default function ExplorePreview() {
   return (
-    <Section id="explore" tone="band">
+    <Section id="explore">
       <SectionHeading
         accent
         eyebrow="Explore"

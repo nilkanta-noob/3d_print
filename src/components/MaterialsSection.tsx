@@ -75,7 +75,7 @@ export default function MaterialsSection() {
   const [activeMaterial, setActiveMaterial] = useState("pla-plus");
 
   return (
-    <Section id="materials" tone="band">
+    <Section id="materials">
       <SectionHeading
         accent
         eyebrow="Materials"

@@ -20,9 +20,18 @@
  */
 :root {
   color-scheme: dark;
-  --background: #1B1D21;
-  --surface: #25282D;
-  --elevated: #2D3137;
+  /* The page reads as three tones, not one. Every value is a colder, darker step than the charcoal it
+     replaces, so the sections separate by tone rather than by the gaps between them.
+       background  hero, materials, explore — the floor the page sits on
+       surface     services and the closing CTA, and every card and panel
+       elevated    pricing, which is meant to carry slightly more weight than its neighbours */
+  --background: #0F1218;
+  --surface: #141923;
+  --elevated: #171D28;
+
+  /* The rule that opens each section. The accent at 12% rather than a neutral grey: it belongs to the
+     palette, and at this strength it reads as a drawn line rather than as a colour. */
+  --divider: rgba(164, 196, 244, 0.12);
   --text: #F5F7FA;
   --text-secondary: #A7AFBC;
   --text-muted: #7C8593;
@@ -70,6 +79,7 @@
   --color-accent-dark: var(--accent-dark);
   --color-on-accent: var(--on-accent);
   --color-border: var(--border);
+  --color-divider: var(--divider);
 
   /* Shape language — architectural, not app-like.
      Content containers (cards, images, tables, panels, the quote modal) carry no radius at all: they are

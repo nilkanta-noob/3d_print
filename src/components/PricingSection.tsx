@@ -14,7 +14,7 @@ const ROWS = [
 export default function PricingSection() {
   // Page background: Materials above it is the raised band, so this sits back and the two stay apart
   return (
-    <Section id="pricing">
+    <Section id="pricing" tone="emphasis">
       <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
         <SectionHeading
           className="lg:col-span-5"
@@ -34,7 +34,15 @@ export default function PricingSection() {
               <tr className="border-y border-border">
                 <th scope="col" className="label-micro py-5 pr-6 text-text-muted">Material</th>
                 <th scope="col" className="label-micro py-5 pr-6 text-text-muted">Standard</th>
-                <th scope="col" className="label-micro py-5 text-text-muted">Student</th>
+                {/* The Student column is the offer this section exists to make, so it is picked out as a
+                    column rather than a cell: a 6% accent wash with a hairline down each side, carried by
+                    every cell in the column so the band runs unbroken from the head to the last row. */}
+                <th
+                  scope="col"
+                  className="label-micro border-x border-accent-primary/[0.18] bg-accent-primary/[0.06] px-6 py-5 text-text-secondary"
+                >
+                  Student
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -49,11 +57,11 @@ export default function PricingSection() {
                     <span className="text-base text-text-muted">/g</span>
                   </td>
                   <td
-                    className={
+                    className={`border-x border-accent-primary/[0.18] bg-accent-primary/[0.06] px-6 ${
                       row.studentIsPrice
                         ? 'py-8 font-display text-2xl font-medium tracking-[-0.03em] text-accent-primary'
                         : 'py-8 text-sm text-text-muted'
-                    }
+                    }`}
                   >
                     {row.student}
                     {row.studentIsPrice && <span className="text-base text-accent-primary/70">/g</span>}
