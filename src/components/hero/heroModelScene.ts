@@ -34,8 +34,10 @@ const AZIMUTH = THREE.MathUtils.degToRad(30); // two faces and a sliver of the t
 // Fallback for how much of the canvas height the part fills, if the CSS variable is missing.
 const DEFAULT_MODEL_FILL = 0.7;
 
-// Build surface. Cells at D/4, with a heavier line every fourth cell. The plate's own size is PLATE_SIZE
-// below; the grid no longer ends where the geometry does, so the two are set independently.
+// Build surface. The cell is an ABSOLUTE size in world units — deliberately not a fraction of the part.
+// It used to be D/4, which meant every change to the object's size silently resized the grid with it and
+// the cells appeared to shrink whenever the model did. The plate is a workbench: its ruling stays put and
+// the part sitting on it gets bigger or smaller. A heavier line falls every fourth cell.
 const GRID_CELL = 0.25;
 const GRID_MAJOR_EVERY = 4;
 const GRID_MINOR_OPACITY = 0.07;
@@ -231,6 +233,17 @@ function focusX(host: HTMLElement): number {
  * column, so the part has to stay smaller there to keep clear of the headline. HeroModel sizes the
  * static image from the same variable.
  */
+/**
+ * How much bigger or smaller the object itself is, in world units, relative to the build plate. This is
+ * the only honest way to change the object's size on its own: --model-scale reframes by walking the
+ * camera back, which shrinks the plate's ruling in exactly the same proportion, so the object never
+ * actually changes size against the surface it sits on. This does, and leaves the camera alone.
+ */
+function partScale(host: HTMLElement): number {
+  const raw = parseFloat(getComputedStyle(host).getPropertyValue('--part-scale'));
+  return Number.isFinite(raw) ? Math.min(Math.max(raw, 0.05), 10) : 1;
+}
+
 function modelFill(host: HTMLElement): number {
   const raw = parseFloat(getComputedStyle(host).getPropertyValue('--model-scale'));
   return Number.isFinite(raw) ? Math.min(Math.max(raw, 0.1), 1) : DEFAULT_MODEL_FILL;
@@ -437,6 +450,9 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     //
     // Two distances are worked out and the camera takes whichever is further back.
     const fill = modelFill(host);
+    const part = partScale(host);
+    pivot.scale.setScalar(part);
+    contactShadow.scale.setScalar(part); // the shadow belongs to the object, so it grows with it
     const target = sphereCentre;
 
     const place = (distance: number) => {
@@ -460,7 +476,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
       let lowest = Infinity;
       let highest = -Infinity;
       for (const corner of corners) {
-        probe.copy(corner).applyQuaternion(resting).project(camera);
+        probe.copy(corner).applyQuaternion(resting).multiplyScalar(part).project(camera);
         lowest = Math.min(lowest, probe.y);
         highest = Math.max(highest, probe.y);
       }
@@ -494,7 +510,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
         let lowest = Infinity;
         let highest = -Infinity;
         for (let corner = 0; corner < 8; corner += 1) {
-          probe.copy(poses[pose + corner]).project(camera);
+          probe.copy(poses[pose + corner]).multiplyScalar(part).project(camera);
           left = Math.min(left, probe.x);
           right = Math.max(right, probe.x);
           lowest = Math.min(lowest, probe.y);
@@ -516,15 +532,23 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     const distance = Math.max(forFill, farEnough);
     place(distance);
 
-    // Near and far bracket the sphere with room to spare, so nothing is ever cut by a clip plane as it
-    // turns. Near is held above zero — at zero a perspective projection loses all depth precision.
-    camera.near = Math.max(0.01, distance - sphereRadius * 2);
-    camera.far = distance + sphereRadius * 4;
-    camera.updateProjectionMatrix();
-
     // Slide the whole set sideways to the focus point, in the view's own units at the part's depth.
     const viewHeightAtTarget = 2 * Math.tan((FOV * Math.PI) / 360) * distance;
     frame.position.x = (focusX(host) - 0.5) * viewHeightAtTarget * camera.aspect;
+
+    // Near and far bracket the sphere with room to spare, so nothing is ever cut by a clip plane as it
+    // turns. Near is held above zero — at zero a perspective projection loses all depth precision.
+    //
+    // Measured against where the object actually ends up, which is neither the camera's target nor the
+    // radius the geometry was loaded with: the part carries --part-scale, and the frame then slides it
+    // sideways, which brings it nearer the camera than `distance` suggests. Taking the brief's literal
+    // numbers instead put the near plane straight through the front of the part at any scale above 1.
+    const reach = sphereRadius * part;
+    const centreNow = sphereCentre.clone().multiplyScalar(part).setX(frame.position.x);
+    const trueDistance = camera.position.distanceTo(centreNow);
+    camera.near = Math.max(0.01, trueDistance - reach * 2);
+    camera.far = trueDistance + reach * 4;
+    camera.updateProjectionMatrix();
 
     requestRender();
   };
