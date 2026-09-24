@@ -16,7 +16,7 @@ export const SITE = {
 
 export const QUOTE_HREF = '/get-quote';
 
-// The copper ticker between Pricing and Explore runs these after the service names.
+// The accent ticker between Pricing and Explore runs these after the service names.
 export const TRUST_ITEMS: string[] = [
   'Pan-India Delivery',
   '3–4 Day Turnaround',

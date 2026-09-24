@@ -14,7 +14,7 @@ import { MATERIALS, type Material } from './content/materials';
 //
 // The three cards share one continuous hairline grid — a single rectangle divided twice, rather than
 // three boxes with gaps between them. No radius, no shadow, no fill change: the only hover signal is a
-// copper rule that draws itself across the top of the card, which is enough on a surface this quiet.
+// accent rule that draws itself across the top of the card, which is enough on a surface this quiet.
 function MaterialCard({
   material,
   activeMaterial,

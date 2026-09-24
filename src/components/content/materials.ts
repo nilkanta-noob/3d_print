@@ -18,7 +18,7 @@ export interface Material {
   slug: string;
   name: string;
   tag: string; // tier, shown as a capsule on the home page card
-  highlighted?: boolean; // picks the tier capsule out in copper
+  highlighted?: boolean; // picks the tier capsule out in the accent
   summary: string; // one line on the home page card
   useCases: string[]; // "Best for" on the home page card — short, outcome-focused
   description: string;

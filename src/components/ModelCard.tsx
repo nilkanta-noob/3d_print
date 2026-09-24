@@ -27,14 +27,14 @@ export default function ModelCard({ title, author, imageUrl, likes, downloads, c
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
         {/* Quick action button (like) */}
-        <button className="absolute top-3 right-3 p-2 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-full text-gray-600 dark:text-gray-200 hover:text-orange-600 dark:hover:text-orange-500 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-[-10px] group-hover:translate-y-0">
+        <button className="absolute top-3 right-3 p-2 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-full text-gray-600 dark:text-gray-200 hover:text-accent-primary opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-[-10px] group-hover:translate-y-0">
           <Heart className="w-5 h-5" />
         </button>
       </div>
 
       {/* Content Area */}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-orange-600 dark:group-hover:text-orange-500 transition-colors">
+        <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-accent-primary transition-colors">
           {title}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 hover:underline cursor-pointer">
@@ -43,14 +43,14 @@ export default function ModelCard({ title, author, imageUrl, likes, downloads, c
 
         <div className="mt-auto pt-4 flex items-center justify-between text-xs font-medium text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 hover:text-orange-600 transition-colors cursor-pointer">
+            <span className="flex items-center gap-1 hover:text-accent-primary transition-colors cursor-pointer">
               <Heart className="w-4 h-4" /> {likes}
             </span>
             <span className="flex items-center gap-1">
               <MessageSquare className="w-4 h-4" /> {comments}
             </span>
           </div>
-          <span className="flex items-center gap-1 hover:text-orange-600 transition-colors cursor-pointer">
+          <span className="flex items-center gap-1 hover:text-accent-primary transition-colors cursor-pointer">
             <Download className="w-4 h-4" /> {downloads}
           </span>
         </div>

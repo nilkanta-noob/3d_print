@@ -29,7 +29,7 @@ export default function ButtonLink({ href, variant = 'primary', className = '', 
   );
 }
 
-// Inline text link: the copper rule sits under the words rather than around them, so it reads as a
+// Inline text link: the accent rule sits under the words rather than around them, so it reads as a
 // continuation of the copy instead of a second button.
 export function ArrowLink({ href, className = '', children }: { href: string; className?: string; children: React.ReactNode }) {
   return (

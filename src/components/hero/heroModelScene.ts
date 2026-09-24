@@ -38,18 +38,18 @@ const DEFAULT_MODEL_FILL = 0.7;
 // It used to be D/4, which meant every change to the object's size silently resized the grid with it and
 // the cells appeared to shrink whenever the model did. The plate is a workbench: its ruling stays put and
 // the part sitting on it gets bigger or smaller. A heavier line falls every fourth cell.
-const GRID_CELL = 0.25;
+const GRID_CELL = 0.2613;
 const GRID_MAJOR_EVERY = 4;
 const GRID_MINOR_OPACITY = 0.07;
 const GRID_MAJOR_OPACITY = 0.14;
-// A desaturated blue-grey. Not the brand amber: that belongs to the CTA, the wordmark and the headline
-// accent, and four amber things in one screen is three too many.
+// A desaturated blue-grey, tuned to the brand accent's hue but far duller. Never the accent itself: that
+// belongs to the CTA, the wordmark and the headline, and four blue things in one screen is three too many.
 // The *rendered* line is what should sit just above the page, and these opacities are small — at 7% a
 // colour only slightly lighter than the background moves the pixel by two or three values, which is
 // nothing. So the source colour is well clear of the page and the alpha brings it back down: 7% of this
 // lands on #24272D against a #1B1D21 page, 14% on #2D3138.
-const GRID_COLOUR = '#9AA3B2';
-const PART_COLOUR = '#B8BCB8';
+const GRID_COLOUR = '#93A6C4';
+const PART_COLOUR = '#BDC1C4';
 
 // The plate is 12D across, and its grid dissolves radially long before that. The fade is in UV space:
 // it starts at 0.15 (1.8D from the part) and is fully gone by 0.38 (4.6D), which leaves 1.4D of empty
@@ -355,8 +355,8 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   scene.add(key);
   scene.add(new THREE.AmbientLight(0xffffff, 0.45));
 
-  // Neutral grey, not amber: the part is the subject, and the colour belongs to the CTA, the wordmark and
-  // the headline accent. flatShading stays off — STL geometry is non-indexed with per-face normals, so
+  // Neutral grey, never the accent: the part is machined metal, not a brand element. Cool rather than warm
+  // so it reads as brushed aluminium or titanium against a blue-accented page. flatShading stays off — STL geometry is non-indexed with per-face normals, so
   // the facets are already hard without it.
   const material = new THREE.MeshStandardMaterial({
     color: new THREE.Color(PART_COLOUR),

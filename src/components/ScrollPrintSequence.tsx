@@ -77,8 +77,8 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
               min-[1024px]:pointer-events-none min-[1024px]:absolute min-[1024px]:inset-0
               min-[1024px]:aspect-auto min-[1024px]:mx-0 min-[1024px]:h-auto min-[1024px]:w-auto
               min-[1024px]:self-stretch
-              min-[1024px]:[--focus-x:0.72] min-[1024px]:[--model-scale:0.55]
-              min-[1024px]:[--part-scale:1.7471]
+              min-[1024px]:[--focus-x:0.72] min-[1024px]:[--model-scale:0.385]
+              min-[1024px]:[--part-scale:1.2230]
             "
           />
 

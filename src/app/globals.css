@@ -6,26 +6,33 @@
  * The site is permanently dark. Raw values live on :root and `@theme inline` below maps them to utilities
  * (bg-background, bg-surface, bg-elevated, text-text-secondary, bg-accent-primary, text-on-accent, …).
  *
- * Brand: charcoal, copper, warm ivory — no blue, cyan or teal anywhere in the UI.
+ * Brand: charcoal, engineering blue, cool grey. The palette is deliberately not the warm copper it used
+ * to be — copper reads as a consumer SaaS accent, and this is a prototyping and precision-parts shop.
+ * The reference points are Fusion 360 and Autodesk: technical, restrained, no neon.
  *
  * Usage rules:
  * - background → surface (section bands, large containers, forms) → elevated (cards inside them).
  * - Text: primary → secondary (body copy) → muted (labels, units, captions, fine print).
  * - Accent is only for CTAs, key highlighted words, active/focus states, small badges and small accents.
- * - Text on an accent fill uses on-accent (the navbar's Get Quote button is the one white-on-copper exception).
+ *   Not headings, not icons, not every component — the restraint is what makes it read as engineering.
+ * - Text on an accent fill ALWAYS uses on-accent. The accent is light now, so light text on it fails:
+ *   white on this blue is 1.8:1. There is no white-on-accent exception any more.
  */
 :root {
   color-scheme: dark;
   --background: #1B1D21;
   --surface: #25282D;
   --elevated: #2D3137;
-  --text: #F6F4F1;
-  --text-secondary: #C9C5BE;
-  --text-muted: #A29D95;
-  --accent: #B87333;
-  --border: rgba(246, 244, 241, 0.08);
-  --accent-hover: color-mix(in oklab, var(--accent) 88%, white); /* slightly brighter copper */
-  --on-accent: #121417; /* near-black on copper — 4.86:1, clears AA (the charcoal background only made 4.45:1) */
+  --text: #F5F7FA;
+  --text-secondary: #A7AFBC;
+  --text-muted: #7C8593;
+  --accent: #A4C4F4;
+  --border: rgba(245, 247, 250, 0.08);
+  /* Hover goes DARKER, not brighter. The old copper was mid-toned so lightening it read as a lift; this
+     blue is already light, and lightening it just washes it out toward the page's white text. */
+  --accent-hover: #8FB4EB;
+  --accent-dark: #7EA6E0; /* pressed states and focus rings, where the hover tone needs somewhere to go */
+  --on-accent: #121417; /* near-black on the blue — 10.4:1 */
 
   /* Height of the fixed header. This is the single source of truth for it: Header.tsx sizes its bar from
      this variable and the hero pads itself by it, so the two cannot drift apart. The bar's hairline is
@@ -49,6 +56,7 @@
   --color-text-muted: var(--text-muted);
   --color-accent-primary: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-dark: var(--accent-dark);
   --color-on-accent: var(--on-accent);
   --color-border: var(--border);
 
@@ -68,7 +76,7 @@
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-fira-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  /* The copper ticker between Pricing and Explore. Its track holds the list twice and slides exactly
+  /* The accent ticker between Pricing and Explore. Its track holds the list twice and slides exactly
      half its width, so the loop repeats without a visible seam. It starts half-way along and travels
      back to the start, which carries the wording rightwards across the screen. */
   --animate-ticker: ticker 66s linear infinite;

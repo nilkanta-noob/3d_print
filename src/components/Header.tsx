@@ -39,9 +39,9 @@ export default function Header() {
   return (
     <MotionConfig reducedMotion="user">
       <header className="fixed top-0 z-50 w-full">
-        {/* The charcoal bar, solid from the top of the page with an 8% warm-ivory hairline under it.
+        {/* The charcoal bar, solid from the top of the page with an 8% cool-white hairline under it.
             It used to stay transparent until the page scrolled, but the hero footage's top edge is bright
-            orange and lime bokeh: over it the links fell to 1.5–2.8:1 and the copper "WARRIORS" to
+            orange and lime bokeh: over it the links fell to 1.5–2.8:1 and the accent "WARRIORS" to
             2.3–3.8:1. A solid bar is the clean fix — a crisp edge, not a gradient fading into the video —
             and it frames the footage as a rectangle below the navigation. Opaque rather than 95%, so no
             colour from the video tints through behind the links. No backdrop blur. */}
@@ -73,7 +73,7 @@ export default function Header() {
             {NAV_LINKS.map((link) => {
               const active = isActive(pathname, link.href);
               return (
-                // The current page is marked by a copper hairline under the label rather than a filled
+                // The current page is marked by an accent hairline under the label rather than a filled
                 // pill or a colour swap alone — the quietest marker that still reads at a glance.
                 <Link
                   key={link.href}
@@ -94,7 +94,7 @@ export default function Header() {
             <Link
               href={QUOTE_HREF}
               aria-current={isActive(pathname, QUOTE_HREF) ? 'page' : undefined}
-              className="hover-lift inline-flex h-9 items-center whitespace-nowrap rounded-control bg-accent-primary px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-white [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary sm:px-5 lg:h-11 lg:px-6 lg:text-xs"
+              className="hover-lift inline-flex h-9 items-center whitespace-nowrap rounded-control bg-accent-primary px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary sm:px-5 lg:h-11 lg:px-6 lg:text-xs"
             >
               Get Quote
             </Link>
