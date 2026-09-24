@@ -51,8 +51,9 @@ export default function Header() {
             Desktop and laptops (lg, 1024px+): three columns — wordmark left, links centred, Get Quote right.
             Phones and tablets: wordmark left, Get Quote + menu button right. */}
         {/* A taller bar from 1024px (96px) gives the links more air above and below than a standard navbar —
-            the same restraint the sections below it use. */}
-        <div className="site-frame flex h-16 items-center justify-between gap-4 lg:grid lg:h-24 lg:grid-cols-[1fr_auto_1fr]">
+            the same restraint the sections below it use. Both heights live on --nav-h in globals.css,
+            because the hero has to pad itself by exactly this much and the two must not drift apart. */}
+        <div className="site-frame flex h-[var(--nav-h)] items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
           {/* Wordmark — text only, one element so PRINT and WARRIORS share a baseline.
               A touch smaller on 1024–1279px laptops so the centred links keep their room. */}
           <Link

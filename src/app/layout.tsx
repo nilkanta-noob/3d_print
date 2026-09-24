@@ -1,10 +1,20 @@
 import type { Metadata } from "next";
-import { Outfit, Fira_Code } from "next/font/google";
+import { Space_Grotesk, Inter, Fira_Code } from "next/font/google";
 import "./globals.css";
 
-// The original PrintWarriors typeface: a geometric sans (variable, weights 100–900) for body and headings
-const outfit = Outfit({
-  variable: "--font-outfit",
+// Headings. Space Grotesk is a technical grotesque — squared-off bowls, a single-storey `a`, drafting-table
+// numerals — which is what gives the headline its engineered feel. Variable, and its range stops at 700:
+// Bold is the heaviest weight it has, so there is no ExtraBold to reach for.
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Everything else: body copy, navigation, labels, buttons. Inter is drawn for screen text at small sizes,
+// which is the whole job here.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -23,7 +33,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${firaCode.variable} font-sans h-full antialiased`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${firaCode.variable} font-sans h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-text-primary">{children}</body>
     </html>
   );

@@ -14,9 +14,10 @@ import type { HeroScene } from './heroModelScene';
 
 const MODEL_URL = '/hero/model.stl';
 const FALLBACK_IMAGE = '/hero/model-fallback.png';
-// The fallback PNG is square with the model's bounding sphere inscribed, so matching the scene's own
-// MODEL_SCALE here puts the still and the live object at exactly the same size.
-const FALLBACK_SIZE = '82%';
+// The fallback PNG is cropped tight to the part's own height and rendered from the scene's camera, so
+// reading the same --model-scale the scene reads puts the still and the live part at the same size and
+// the same angle. Its width follows from the image's own aspect.
+const FALLBACK_SIZE = 'calc(var(--model-scale, 0.7) * 100%)';
 
 function supportsWebGL(): boolean {
   try {
@@ -91,7 +92,7 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
         alt=""
         aria-hidden="true"
         draggable={false}
-        className="pointer-events-none absolute top-1/2 aspect-square -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-700"
+        className="pointer-events-none absolute top-1/2 w-auto max-w-none -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-700"
         style={{
           left: 'calc(var(--focus-x, 0.5) * 100%)',
           height: FALLBACK_SIZE,
@@ -102,8 +103,16 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
       {live && (
         <span
           aria-hidden="true"
-          className="label-micro pointer-events-none absolute bottom-0 -translate-x-1/2 text-text-muted transition-opacity duration-500"
-          style={{ left: 'calc(var(--focus-x, 0.5) * 100%)', opacity: interacted ? 0 : 1 }}
+          className="label-micro pointer-events-none absolute -translate-x-1/2 text-text-muted transition-opacity duration-500"
+          /* Sits just under the object rather than at the foot of the box. The two were the same thing
+             while the box was a tight frame around the model; now that it spans the whole hero, bottom-0
+             would strand the label at the section border. The object is centred vertically and is
+             --model-scale of the height, so its underside is at 50% + half of that. */
+          style={{
+            left: 'calc(var(--focus-x, 0.5) * 100%)',
+            top: 'calc(50% + var(--model-scale, 0.7) * 54%)',
+            opacity: interacted ? 0 : 1,
+          }}
         >
           Drag to rotate
         </span>
