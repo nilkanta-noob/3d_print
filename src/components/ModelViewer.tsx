@@ -20,11 +20,14 @@ function Loader() {
   );
 }
 
+// Brand copper (the accent in globals.css) — reads as a printed part on both the dark and light viewer
+const MODEL_COLOR = "#B56A38";
+
 function STLModel({ url }: { url: string }) {
   const geometry = useLoader(STLLoader, url);
   return (
     <mesh geometry={geometry}>
-      <meshStandardMaterial color="#22d3ee" roughness={0.3} metalness={0.1} />
+      <meshStandardMaterial color={MODEL_COLOR} roughness={0.3} metalness={0.1} />
     </mesh>
   );
 }
@@ -36,7 +39,7 @@ function OBJModel({ url }: { url: string }) {
     obj.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         (child as THREE.Mesh).material = new THREE.MeshStandardMaterial({
-          color: "#22d3ee",
+          color: MODEL_COLOR,
           roughness: 0.3,
           metalness: 0.1,
         });
@@ -54,7 +57,7 @@ export default function ModelViewer({ fileUrl, fileName }: { fileUrl: string; fi
 
   if (!isStl && !isObj) {
     return (
-      <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-background/50 rounded-sm border border-border flex-col text-text-muted">
+      <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-background/50 rounded-sm border border-border flex-col text-text-secondary">
         <div className="w-16 h-16 mb-4 rounded-full bg-accent-primary/10 flex items-center justify-center">
           <span className="font-bold text-accent-primary uppercase tracking-widest">{extension || 'CAD'}</span>
         </div>
@@ -68,12 +71,12 @@ export default function ModelViewer({ fileUrl, fileName }: { fileUrl: string; fi
     <div className="w-full h-full min-h-[300px] bg-background/50 rounded-sm border border-border relative overflow-hidden group">
       <div className="absolute top-4 left-4 z-10 bg-background/80 backdrop-blur px-3 py-1.5 rounded-sm border border-border/50">
         <span className="text-[10px] font-bold text-accent-primary uppercase tracking-widest flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span className="w-2 h-2 rounded-full bg-accent-primary animate-pulse"></span>
           Interactive Preview
         </span>
       </div>
       
-      <div className="absolute top-4 right-4 z-10 text-[10px] font-bold text-text-muted uppercase tracking-widest bg-background/80 backdrop-blur px-3 py-1.5 rounded-sm border border-border/50">
+      <div className="absolute top-4 right-4 z-10 text-[10px] font-bold text-text-secondary uppercase tracking-widest bg-background/80 backdrop-blur px-3 py-1.5 rounded-sm border border-border/50">
         Drag to rotate • Scroll to zoom
       </div>
 

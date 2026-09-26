@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!emailResult.success) {
-      console.error('Failed to send OTP email:', (emailResult as any).error);
+      console.error('Failed to send OTP email:', (emailResult as { error?: unknown }).error);
       return NextResponse.json({ error: 'Failed to send OTP email' }, { status: 500 });
     }
 

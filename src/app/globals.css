@@ -1,32 +1,205 @@
 @import "tailwindcss";
 
+/*
+ * Theme — Tailwind v4 CSS-first config (this project has no tailwind.config.js).
+ *
+ * The site is permanently dark. Raw values live on :root and `@theme inline` below maps them to utilities
+ * (bg-background, bg-surface, bg-elevated, text-text-secondary, bg-accent-primary, text-on-accent, …).
+ *
+ * Brand: charcoal, engineering blue, cool grey. The palette is deliberately not the warm copper it used
+ * to be — copper reads as a consumer SaaS accent, and this is a prototyping and precision-parts shop.
+ * The reference points are Fusion 360 and Autodesk: technical, restrained, no neon.
+ *
+ * Usage rules:
+ * - background → surface (section bands, large containers, forms) → elevated (cards inside them).
+ * - Text: primary → secondary (body copy) → muted (labels, units, captions, fine print).
+ * - Accent is only for CTAs, key highlighted words, active/focus states, small badges and small accents.
+ *   Not headings, not icons, not every component — the restraint is what makes it read as engineering.
+ * - Text on an accent fill ALWAYS uses on-accent. The accent is light now, so light text on it fails:
+ *   white on this blue is 1.8:1. There is no white-on-accent exception any more.
+ */
 :root {
-  --background: #0A0E0F;
-  --surface: #12181A;
-  --accent-primary: #E11D48;
-  --accent-primary-deep: #BE123C;
-  --accent-secondary: #F43F5E;
-  --text-primary: #F5F5F0;
-  --text-muted: #8A9296;
-  --border: #1F2729;
+  color-scheme: dark;
+  /* The page reads as three tones, not one. Every value is a colder, darker step than the charcoal it
+     replaces, so the sections separate by tone rather than by the gaps between them.
+       background  hero, materials, explore — the floor the page sits on
+       surface     services and the closing CTA, and every card and panel
+       elevated    pricing, which is meant to carry slightly more weight than its neighbours */
+  --background: #0F1218;
+  --surface: #141923;
+  --elevated: #171D28;
+  --surface-deep: #0A0F1C; /* footer only — a step below the page, so the site closes by going quiet */
+
+  /* The rule that opens each section. The accent at 12% rather than a neutral grey: it belongs to the
+     palette, and at this strength it reads as a drawn line rather than as a colour. */
+  --divider: rgba(164, 196, 244, 0.12);
+  --text: #F5F7FA;
+  --text-secondary: #A7AFBC;
+  --text-muted: #7C8593;
+  --accent: #A4C4F4;
+  --border: rgba(245, 247, 250, 0.08);
+  /* Hover goes DARKER, not brighter. The old copper was mid-toned so lightening it read as a lift; this
+     blue is already light, and lightening it just washes it out toward the page's white text. */
+  --accent-hover: #8FB4EB;
+  --accent-dark: #7EA6E0; /* pressed states and focus rings, where the hover tone needs somewhere to go */
+  --on-accent: #121417; /* near-black on the blue — 10.4:1 */
+
+  /* The header floats: a contained bar inset from the top and sides rather than a band welded to the
+     edges of the screen. Three values, one source of truth — Header.tsx sizes its bar from them and the
+     hero pads itself by --nav-h, so the two cannot drift apart.
+       --nav-inset  the gap between the bar and the edges of the viewport
+       --nav-bar-h  the bar's own height
+       --nav-h      what the whole thing occupies from the top of the page, which is what content clears */
+  --nav-inset: 0.75rem;
+  --nav-bar-h: 3.25rem;
+  --nav-h: calc(var(--nav-inset) + var(--nav-bar-h));
+
+  /* The page gutter, named so the floating navbar can subtract its own inset from it and still land its
+     wordmark on the same line as the hero headline and every section heading. site-frame uses it too. */
+  --frame-gutter: max(1.5rem, 5.6%);
+}
+
+/* The bar grows at the lg breakpoint — see Header.tsx, which reads these rather than setting its own.
+   --nav-h is a calc over the two, so it follows without being restated. */
+@media (min-width: 64rem) {
+  :root {
+    --nav-inset: 1.25rem;
+    --nav-bar-h: 3.75rem;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
-  --color-accent-primary: var(--accent-primary);
-  --color-accent-primary-deep: var(--accent-primary-deep);
-  --color-accent-secondary: var(--accent-secondary);
-  --color-text-primary: var(--text-primary);
+  --color-elevated: var(--elevated);
+  --color-surface-deep: var(--surface-deep);
+  --color-text-primary: var(--text);
+  --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
+  --color-accent-primary: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-dark: var(--accent-dark);
+  --color-on-accent: var(--on-accent);
   --color-border: var(--border);
+  --color-divider: var(--divider);
 
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  /* Shape language — architectural, not app-like.
+     Content containers (cards, images, tables, panels, the quote modal) carry no radius at all: they are
+     rectangles, and their edges come from hairline borders and whitespace instead.
+     The only curvature on the site is on controls, where a square corner reads as unfinished:
+       rounded-control (5px) — buttons, inputs, selects, textareas, file pickers
+       rounded-chip    (3px) — small badges, tags and icon squares
+     Anything rounder than this belongs to a genuinely circular object (an avatar, a progress dot). */
+  /* Body sizes carry the reading leading; headings never use these — they set their own below. */
+  --text-sm--line-height: 1.7;
+  --text-base--line-height: 1.7;
+  --text-lg--line-height: 1.7;
+
+  --radius-control: 5px;
+  --radius-chip: 3px;
+
+  /* next/font declares these on <html> (see layout.tsx). Split by job: the display face sets every heading,
+     Inter sets everything that has to be read rather than looked at, and the mono is kept for order
+     numbers and the OTP input. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'General Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* The accent ticker between Pricing and Explore. Its track holds the list twice and slides exactly
+     half its width, so the loop repeats without a visible seam. It starts half-way along and travels
+     back to the start, which carries the wording rightwards across the screen. */
+  --animate-ticker: ticker 66s linear infinite;
+
+  @keyframes ticker {
+    from {
+      transform: translate3d(-50%, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
 }
 
-body {
-  background: var(--background);
-  color: var(--text-primary);
+/*
+ * The page's one frame. Everything on the site sits in it — the navbar, the hero, every section and the
+ * footer — so the wordmark, the headline and every section heading start on the same line.
+ *
+ * The gutter is a proportion of the screen rather than a set of breakpoint steps: 5.6% of the width, with
+ * a 24px floor so phones keep a usable measure. That works out at 24px on a phone, 43px at 768px, 71px at
+ * 1260px and 108px at 1920px — the margin reads the same at every size instead of jumping at each
+ * breakpoint, which is the proportion the architecture sites this design follows use.
+ *
+ * A percentage, not vw: percentages resolve against the containing block, so the vertical scrollbar can't
+ * make the left and right gutters disagree. Capped at 1920px, centred beyond that.
+ */
+@utility site-frame {
+  width: 100%;
+  max-width: 120rem;
+  margin-inline: auto;
+  padding-inline: var(--frame-gutter);
+}
+
+/*
+ * The site's one movement on hover: a 2px rise. Used on buttons and on cards that are a single link.
+ * Deliberately restrained — no scale, no shadow bloom — and it carries its own easing so every lift
+ * on the page travels at the same speed. Colour transitions are left to the element itself.
+ */
+@utility hover-lift {
+  transition-property: transform;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+
+  @media (prefers-reduced-motion: no-preference) {
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+/*
+ * Editorial micro-label: the uppercase line above a heading, or a spec label inside a card.
+ * One definition so every label on the site sits at the same size, weight and tracking.
+ */
+@utility label-micro {
+  font-size: 0.6875rem; /* 11px */
+  line-height: 1.2;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--text);
+    /* A roomier default line for body copy. Anything that sets its own leading — headings, labels,
+       buttons — overrides this, so it only reaches the running text that had no value of its own. */
+    line-height: 1.7;
+  }
+
+  /* The heading scale lives here and nowhere else. It used to be spread across ~30 components, each
+     setting its own weight, tracking and leading inline — which is how a type system drifts. Components
+     now set size and colour only; weight, tracking and leading come from this block, so changing the
+     pairing is a change in one file. */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+
+  h1 {
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 0.92;
+  }
+
+  h2 {
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
 }
