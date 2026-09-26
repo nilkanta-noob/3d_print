@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import type { HeroScene } from './heroModelScene';
 
 /*
@@ -16,7 +17,11 @@ import type { HeroScene } from './heroModelScene';
  * is a fixed aspect ratio at every breakpoint, so nothing moves when the live model takes over.
  */
 
-const MODEL_URL = '/hero/benchy.stl';
+const MODELS = [
+  { url: '/hero/benchy.glb', color: '#60a5fa', scaleFactor: 0.9 }, // Lighter blue benchy
+  { url: '/hero/puppydog.glb', color: '#8b5cf6', scaleFactor: 0.72 }, // Purple dog (20% smaller)
+  { url: '/hero/C17.glb', color: '#fffff0', scaleFactor: 0.7, rotation: [0, 0, 0] as [number, number, number] } // Ivory plane (no X rotation so it sits level)
+];
 const FALLBACK_IMAGE = '/hero/model-fallback.png';
 // The fallback PNG is cropped tight to the part's own height and rendered from the scene's camera, so
 // reading the same --model-scale the scene reads puts the still and the live part at the same size and
@@ -43,6 +48,11 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
   // WebGL, a chunk that will not load, a missing STL — simply leaves this false, which keeps the static
   // image on screen and the drag hint hidden. There is nothing to drag, so there is nothing to say.
   const [live, setLive] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextModel = () => {
+    setCurrentIndex((prev) => (prev + 1) % MODELS.length);
+  };
 
   useEffect(() => {
     const host = hostRef.current;
@@ -55,7 +65,10 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
       .then(({ mountHeroModel }) =>
         mountHeroModel({
           host,
-          url: MODEL_URL,
+          url: MODELS[currentIndex].url,
+          color: MODELS[currentIndex].color,
+          scaleFactor: MODELS[currentIndex].scaleFactor,
+          rotation: MODELS[currentIndex].rotation,
           reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
           onReady: () => {
             if (!cancelled) setLive(true);
@@ -81,7 +94,7 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
       cancelled = true;
       scene?.dispose();
     };
-  }, []);
+  }, [currentIndex]);
 
   return (
     // Decorative: the headline beside it carries the meaning, so the whole thing is hidden from
@@ -99,10 +112,19 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
         style={{
           left: 'calc(var(--focus-x, 0.5) * 100%)',
           height: FALLBACK_SIZE,
-          opacity: live ? 0 : 1,
+          opacity: (live || currentIndex !== 0) ? 0 : 1,
         }}
       />
 
+      {live && (
+        <button
+          onClick={nextModel}
+          aria-label="Next 3D model"
+          className="pointer-events-auto absolute right-4 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full bg-background/50 p-3 text-text-primary backdrop-blur-sm transition-colors hover:bg-accent-primary hover:text-on-accent md:right-8"
+        >
+          <ArrowRight className="h-6 w-6" />
+        </button>
+      )}
     </div>
   );
 }

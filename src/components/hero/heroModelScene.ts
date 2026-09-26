@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 /*
@@ -85,6 +87,12 @@ export interface HeroSceneOptions {
   url: string;
   /** No auto-rotation, and a single frame drawn instead of a loop. Dragging still works. */
   reducedMotion: boolean;
+  /** Optional color for the material */
+  color?: string;
+  /** Optional scale factor (defaults to 0.9) */
+  scaleFactor?: number;
+  /** Optional custom rotation [x, y, z] to apply before scaling (defaults to [-Math.PI / 2, 0, 0]) */
+  rotation?: [number, number, number];
   /** Fired once the first frame is on screen, so the static image can be faded out. */
   onReady: () => void;
   /** Fired on the first drag, so the "Drag to rotate" hint can be retired. */
@@ -250,13 +258,34 @@ function modelFill(host: HTMLElement): number {
 }
 
 export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroScene> {
-  const { host, url, reducedMotion, onReady, onFirstInteraction } = options;
+  const { host, url, color, scaleFactor = 0.9, rotation: modelRotation = [-Math.PI / 2, 0, 0], reducedMotion, onReady, onFirstInteraction } = options;
 
-  const geometry = await new STLLoader().loadAsync(url);
+  let geometry: THREE.BufferGeometry | null = null;
+  if (url.toLowerCase().endsWith('.gltf') || url.toLowerCase().endsWith('.glb')) {
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('/draco/');
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.setDRACOLoader(dracoLoader);
+    
+    const gltf = await gltfLoader.loadAsync(url);
+    gltf.scene.updateMatrixWorld(true);
+    gltf.scene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh && !geometry) {
+        const mesh = child as THREE.Mesh;
+        geometry = mesh.geometry.clone();
+        geometry.applyMatrix4(mesh.matrixWorld);
+      }
+    });
+    if (!geometry) throw new Error('No mesh found in GLTF file');
+  } else {
+    geometry = await new STLLoader().loadAsync(url);
+  }
 
-  // STLs come out of CAD Z-up; three is Y-up. Baking the axis fix into the geometry rather than the mesh
-  // means every measurement below is taken in the orientation the part is actually displayed in.
-  geometry.rotateX(-Math.PI / 2);
+  // Apply orientation correction (usually needed for Z-up exports)
+  if (modelRotation[0] !== 0) geometry.rotateX(modelRotation[0]);
+  if (modelRotation[1] !== 0) geometry.rotateY(modelRotation[1]);
+  if (modelRotation[2] !== 0) geometry.rotateZ(modelRotation[2]);
+
   if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
 
   // Normalise to D = 1, where D is the largest dimension of the bounding box, then seat the part: centred
@@ -265,7 +294,8 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   const rawBox = geometry.boundingBox ?? new THREE.Box3();
   const rawSize = rawBox.getSize(new THREE.Vector3());
   const D = Math.max(rawSize.x, rawSize.y, rawSize.z) || 1;
-  geometry.scale(1 / D, 1 / D, 1 / D);
+  // Reduce the size by the scaleFactor (default 0.9)
+  geometry.scale(scaleFactor / D, scaleFactor / D, scaleFactor / D);
 
   geometry.computeBoundingBox();
   const seated = geometry.boundingBox ?? new THREE.Box3();
@@ -359,7 +389,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   // so it reads as brushed aluminium or titanium against a blue-accented page. flatShading stays off — STL geometry is non-indexed with per-face normals, so
   // the facets are already hard without it.
   const material = new THREE.MeshStandardMaterial({
-    color: new THREE.Color(PART_COLOUR),
+    color: new THREE.Color(color || PART_COLOUR),
     roughness: 0.75,
     metalness: 0,
   });

@@ -34,7 +34,7 @@ export default function ImageSlot({ image, alt, variant, className = '', sizes =
     <div className={`relative overflow-hidden ${surface === 'elevated' ? 'bg-elevated' : 'bg-background'} ${className}`}>
       {image ? (
         layout === 'fill' ? (
-          <Image src={image} alt={alt} fill sizes={sizes} className="object-cover" />
+          <Image src={image} alt={alt} fill sizes={sizes} className="object-cover object-center" />
         ) : (
           <Image
             src={image}
@@ -42,7 +42,7 @@ export default function ImageSlot({ image, alt, variant, className = '', sizes =
             width={ratio[0] * 80}
             height={ratio[1] * 80}
             sizes={sizes}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-center"
           />
         )
       ) : (

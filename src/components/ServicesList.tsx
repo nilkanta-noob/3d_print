@@ -195,8 +195,8 @@ export default function ServicesList() {
                       for the floating tile to overhang it top and bottom. */}
                   {/* Facts above the button on tablets, beside it on wide screens. Never wrapping means a
                       long facts line can't push the button onto its own row and make that row taller. */}
-                  <div className="mt-3 md:mt-4 md:flex md:flex-col md:items-start md:gap-4 xl:flex-row xl:flex-nowrap xl:items-center xl:gap-6">
-                    <ul className="flex min-w-0 flex-wrap items-center gap-x-2.5 font-mono text-[11px] uppercase leading-[1.5] tracking-[0.14em] text-on-accent md:min-h-[3lh]">
+                  <div className="mt-3 md:mt-4 md:flex md:flex-col md:items-start md:gap-4 xl:flex-row xl:flex-wrap xl:items-end xl:justify-between xl:gap-y-6">
+                    <ul className="flex min-w-0 flex-wrap items-center gap-x-2.5 font-mono text-[11px] uppercase leading-[1.5] tracking-[0.14em] text-on-accent md:min-h-[3lh] xl:min-h-0 xl:w-2/3">
                       {service.meta.map((fact, i) => (
                         <li key={fact} className="flex items-center gap-2">
                           {i > 0 && <span aria-hidden="true">·</span>}
@@ -223,9 +223,9 @@ export default function ServicesList() {
                     {/* TODO: the quote form has no service field yet, so ?service= is only carried in the
                         URL. Read it in QueryForm (and preselect a material) when that field exists. */}
                     <Link
-                    href={`${QUOTE_HREF}?service=${service.slug}`}
-                    tabIndex={active ? undefined : -1}
-                      className="hover-lift pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-control bg-on-accent px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-text-primary [transition-property:transform,opacity] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-accent md:mt-0"
+                      href={`${QUOTE_HREF}?service=${service.slug}`}
+                      tabIndex={active ? undefined : -1}
+                      className="hover-lift pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-control bg-on-accent px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-text-primary [transition-property:transform,opacity] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-accent md:mt-0 xl:ml-auto xl:mt-2"
                     >
                       Get a quote for this
                       <ArrowRight aria-hidden="true" className="size-4" />

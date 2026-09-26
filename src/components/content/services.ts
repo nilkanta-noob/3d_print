@@ -30,7 +30,7 @@ export const SERVICES: Service[] = [
     index: '01',
     title: 'Student Projects',
     description: 'Built for final-year projects, robotics teams, competitions, and academic prototypes.',
-    meta: ['PLA (student rate), PLA+ or PETG', '3–4 business days'],
+    meta: ['PLA (Student Rate)', 'PLA+ or PETG', '3-4 business days'],
     audience: 'Students with a valid college ID — PLA at the ₹2.5/g student rate.',
     examples: ['Robot chassis parts', 'Sensor and PCB mounts', 'Competition and project models'],
     turnaround: STANDARD_TURNAROUND,
