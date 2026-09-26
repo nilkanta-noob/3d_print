@@ -18,9 +18,8 @@ import type { HeroScene } from './heroModelScene';
  */
 
 const MODELS = [
-  { url: '/hero/benchy.glb', color: '#60a5fa', scaleFactor: 0.9 }, // Lighter blue benchy
-  { url: '/hero/puppydog.glb', color: '#8b5cf6', scaleFactor: 0.72 }, // Purple dog (20% smaller)
-  { url: '/hero/C17.glb', color: '#fffff0', scaleFactor: 0.7, rotation: [0, 0, 0] as [number, number, number] } // Ivory plane (no X rotation so it sits level)
+  { url: '/hero/benchy.glb', color: '#F2F4F7', scaleFactor: 0.9 },
+  { url: '/hero/C17.glb', color: '#F2F4F7', scaleFactor: 0.7, rotation: [0, 0, 0] as [number, number, number] } // no X rotation so it sits level
 ];
 const FALLBACK_IMAGE = '/hero/model-fallback.png';
 // The fallback PNG is cropped tight to the part's own height and rendered from the scene's camera, so
@@ -54,12 +53,25 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
     setCurrentIndex((prev) => (prev + 1) % MODELS.length);
   };
 
+  /*
+   * The scene currently on screen. It is held in a ref rather than torn down by the effect's cleanup,
+   * because mountHeroModel has to fetch and parse a multi-megabyte GLB before it can draw anything.
+   * Disposing on cleanup removed the old canvas the instant the model changed and left the hero empty —
+   * no part, no build plate, no grid — for as long as the next file took to arrive.
+   *
+   * So the outgoing scene keeps rendering until the incoming one reports that it has drawn its first
+   * frame, and only then is it retired. The canvases are absolutely positioned and overlap for that
+   * moment, so the swap is a straight cut with nothing missing in between.
+   */
+  const liveSceneRef = useRef<HeroScene | null>(null);
+
   useEffect(() => {
     const host = hostRef.current;
     if (!host || !supportsWebGL()) return;
 
-    let scene: HeroScene | null = null;
     let cancelled = false;
+    // Captured now: whatever is on screen when this effect starts is what this mount replaces.
+    const outgoing = liveSceneRef.current;
 
     import('./heroModelScene')
       .then(({ mountHeroModel }) =>
@@ -71,7 +83,11 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
           rotation: MODELS[currentIndex].rotation,
           reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
           onReady: () => {
-            if (!cancelled) setLive(true);
+            if (cancelled) return;
+            // Fires synchronously from inside mountHeroModel, after its first draw — the earliest
+            // moment the new scene has something on screen, and so the right moment to drop the old one.
+            outgoing?.dispose();
+            setLive(true);
           },
           // Nothing listens for the first drag any more — the prompt that used to disappear on it is
           // gone — but the scene still announces it, so this absorbs the call.
@@ -83,18 +99,26 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
           mounted.dispose();
           return;
         }
-        scene = mounted;
+        liveSceneRef.current = mounted;
       })
       .catch(() => {
-        // A failed chunk, a missing STL, a WebGL context that refuses to come up: `live` stays false and
-        // the hero keeps the static image rather than a hole.
+        // A failed chunk, a missing model, a WebGL context that refuses to come up: the scene on screen
+        // is left alone, so a failed swap keeps the previous model rather than emptying the hero.
       });
 
     return () => {
       cancelled = true;
-      scene?.dispose();
     };
   }, [currentIndex]);
+
+  // Teardown on unmount only — the swap path above retires scenes itself.
+  useEffect(
+    () => () => {
+      liveSceneRef.current?.dispose();
+      liveSceneRef.current = null;
+    },
+    [],
+  );
 
   return (
     // Decorative: the headline beside it carries the meaning, so the whole thing is hidden from

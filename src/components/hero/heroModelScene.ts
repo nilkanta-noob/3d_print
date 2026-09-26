@@ -207,9 +207,17 @@ function buildPlate(): THREE.Mesh {
         // Second dissolve, against the canvas border, so nothing is ever cut off by the edge of the
         // frame either. On desktop the canvas is wider than the viewport and its right-hand edge is
         // already off screen, where this costs nothing.
-        vec2 screen = gl_FragCoord.xy / uResolution;
-        float toEdge = min(min(screen.x, 1.0 - screen.x), min(screen.y, 1.0 - screen.y));
-        alpha *= smoothstep(0.0, uEdgeFade, toEdge);
+        //
+        // Guarded, because this reads a uniform the CPU has to publish. Before layout() has run,
+        // uResolution is still its placeholder 1x1: gl_FragCoord then divides to something in the
+        // hundreds, 1.0 - screen.x goes hugely negative, the smoothstep returns 0 and every fragment of
+        // the grid discards — the plate vanishes while the part carries on rendering, because the part
+        // does not read this. Skipping the fade until a real size arrives fails visible instead.
+        if (uResolution.x > 2.0) {
+          vec2 screen = gl_FragCoord.xy / uResolution;
+          float toEdge = min(min(screen.x, 1.0 - screen.x), min(screen.y, 1.0 - screen.y));
+          alpha *= smoothstep(0.0, uEdgeFade, toEdge);
+        }
 
         if (alpha <= 0.001) discard;
         gl_FragColor = vec4(uColour, alpha);
@@ -306,14 +314,14 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   const finalSize = (geometry.boundingBox ?? new THREE.Box3()).getSize(new THREE.Vector3());
   const modelHeight = finalSize.y || 1;
 
-  // The bounding sphere aims the camera and sets the clip planes. It is NOT what the framing is solved
+  // The bounding sphere's centre is what the camera aims at. It is NOT what the framing is solved
   // against, though the obvious reading says it should be: a sphere is rotation-invariant only about its
   // own centre, and this part turns about its base, where it meets the plate. Rotating a sphere of
   // radius 0.87D about a point 0.5D beneath its centre sweeps a ball of 1.37D, and framing that ball
   // would leave the part at about a third of the canvas. The sweep below measures the real thing instead.
+  // Its radius no longer sets the clip planes — those have to hold the plate, which is far larger.
   geometry.computeBoundingSphere();
   const sphereCentre = geometry.boundingSphere?.center.clone() ?? new THREE.Vector3(0, modelHeight / 2, 0);
-  const sphereRadius = geometry.boundingSphere?.radius ?? modelHeight;
   // The eight corners of the seated box. Framing is solved by projecting these through the real camera
   // rather than by estimating the silhouette from the box's dimensions: looking down at the part the top
   // face is in view too, the near corner is magnified by perspective, and the footprint that faces the
@@ -364,7 +372,14 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   // only becomes visible because the still fades out. Any interruption to that fade (a transition that
   // never runs, a paused compositor) leaves a frozen image over a live scene. Positioning the canvas
   // puts it on top for good, and the still simply fades away beneath it.
-  renderer.domElement.style.position = 'relative';
+  // Absolute, not relative, so two canvases can occupy the same box. Swapping models keeps the outgoing
+  // scene on screen until the incoming one has drawn, and for that moment both are in the host — if they
+  // were in flow they would stack and double its height. The host is sized by CSS at every breakpoint,
+  // so it does not depend on the canvas for its dimensions.
+  // z-index 1 keeps it over the static fallback image, which is also absolutely positioned: a positioned
+  // element paints over an unpositioned one whatever the document order.
+  renderer.domElement.style.position = 'absolute';
+  renderer.domElement.style.inset = '0';
   renderer.domElement.style.zIndex = '1';
   host.appendChild(renderer.domElement);
 
@@ -431,6 +446,9 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   let disposed = false;
 
   const draw = () => {
+    // If the first layout found the host unmeasured, take the size now rather than waiting for a resize
+    // that may never come. One comparison per frame, and it stops the moment a real size lands.
+    if (!laidOut) layout();
     renderer.render(scene, camera);
     dirty = false;
   };
@@ -461,9 +479,16 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     if (visible && (spinning || dragging)) schedule();
   }
 
+  // Whether layout() has ever completed. It bails when the host measures zero — which happens if the
+  // scene mounts while its box is still being laid out, as it can when one model is swapped for another
+  // and the old canvas is removed in the same frame. Nothing would run it again unless the element's
+  // size later changed, so draw() retries while this is false.
+  let laidOut = false;
+
   const layout = () => {
     const { clientWidth, clientHeight } = host;
     if (!clientWidth || !clientHeight) return;
+    laidOut = true;
 
     const pixelRatio = Math.min(window.devicePixelRatio || 1, MAX_DPR);
     renderer.setPixelRatio(pixelRatio);
@@ -573,11 +598,19 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     // radius the geometry was loaded with: the part carries --part-scale, and the frame then slides it
     // sideways, which brings it nearer the camera than `distance` suggests. Taking the brief's literal
     // numbers instead put the near plane straight through the front of the part at any scale above 1.
-    const reach = sphereRadius * part;
     const centreNow = sphereCentre.clone().multiplyScalar(part).setX(frame.position.x);
     const trueDistance = camera.position.distanceTo(centreNow);
-    camera.near = Math.max(0.01, trueDistance - reach * 2);
-    camera.far = trueDistance + reach * 4;
+
+    // The clip planes have to hold the PLATE, not the part. The plate is PLATE_SIZE across and its far
+    // corner can sit most of that beyond the model, so bracketing the part's bounding sphere — which is
+    // what `reach * 2` and `reach * 4` did — cut the grid off mid-surface. It went unnoticed while the
+    // geometry was normalised to D = 1 and the camera therefore stood ~7 units back, where `reach * 4`
+    // happened to be far enough. Once models started carrying their own scaleFactor the camera moved in,
+    // far came down with it, and the plate was sliced away — more so for the smaller model, which is why
+    // the grid vanished on switching. Half the plate behind and a full plate in front covers it at any
+    // distance, and near stays clear of zero so the depth buffer keeps its precision.
+    camera.near = Math.max(0.1, trueDistance - PLATE_SIZE * 0.5);
+    camera.far = trueDistance + PLATE_SIZE;
     camera.updateProjectionMatrix();
 
     requestRender();
