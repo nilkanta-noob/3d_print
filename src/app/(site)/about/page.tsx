@@ -3,12 +3,10 @@ import type { Metadata } from 'next';
 import PageHeader from '@/components/PageHeader';
 import AboutSection from '@/components/AboutSection';
 import Section from '@/components/Section';
-import SectionHeading from '@/components/SectionHeading';
-import StepTimeline from '@/components/StepTimeline';
 import FAQSection from '@/components/FAQSection';
-import ValueChips from '@/components/ValueChips';
+import ProcessShowcase from '@/components/ProcessShowcase';
 import CtaBanner from '@/components/CtaBanner';
-import { PROCESS_STEPS, VALUES, QUOTE_HREF } from '@/components/content/site';
+import { PROCESS_STEPS, QUOTE_HREF } from '@/components/content/site';
 
 export const metadata: Metadata = {
   title: 'About | PrintWarriors',
@@ -19,6 +17,7 @@ export default function AboutPage() {
   return (
     <>
       <PageHeader
+        compact
         eyebrow="About"
         title="About PrintWarriors"
         description="A Kolkata 3D printing service founded by an engineering student to make prototyping accessible — for students, makers, engineers and startups."
@@ -27,31 +26,20 @@ export default function AboutPage() {
       {/* Story — an asymmetric text split, then the stats row */}
       <AboutSection />
 
-      {/* Values — a row of chips, so the sentence is on demand rather than always on screen */}
-      <Section id="mission">
-        {/* A foundation under the heading rather than a field behind it — the bands rise from the base
-            of the block and fade out before they reach the type. Building from the ground up. */}
-        <div className="relative">
-          <div className="relative">
-            <SectionHeading
-              eyebrow="Mission"
-              title="Make prototyping accessible"
-            />
-            <ValueChips values={VALUES} />
-          </div>
-        </div>
-      </Section>
-
-      {/* Process — a connected horizontal stepper */}
-      <Section id="process" tone="band">
-        <SectionHeading
-          eyebrow="Process"
-          title="From CAD file to finished part"
+      {/* Mission and process, merged. One section: the aim on the left, the four steps beside it.
+          Tones alternate down the page — header base, story band, this base, FAQ band — using the site's
+          own three surfaces rather than a set of colours particular to this page. */}
+      <Section id="process">
+        <ProcessShowcase
+          steps={PROCESS_STEPS}
+          eyebrow="Mission"
+          title="Make prototyping accessible"
+          description="Student pricing, no minimum order and an exact quote before you pay. Every part is checked before it ships, and delivered across India in three to four days."
+          action={{ href: QUOTE_HREF, label: 'Get a quote' }}
         />
-        <StepTimeline steps={PROCESS_STEPS} className="mt-14 md:mt-16" />
       </Section>
 
-      <FAQSection tone="base" initialCount={5} />
+      <FAQSection tone="band" initialCount={5} />
 
       <CtaBanner
         title="Ready to print something real?"

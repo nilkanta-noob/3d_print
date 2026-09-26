@@ -125,13 +125,19 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
     // assistive technology and nothing inside it is focusable.
     <div ref={hostRef} aria-hidden="true" className={`relative ${className}`}>
       {/* A plain <img>, not next/image: this is a fixed-size decorative asset that has to sit at an
-          exact transformed position, and at 12KB there is nothing for an optimiser to win. */}
+          exact transformed position, which next/image's own layout would fight.
+          It is also the page's real Largest Contentful Paint — measured at 1136ms on a cold load at the
+          top of the page, the largest thing in the viewport until the canvas takes over — so it carries
+          fetchPriority="high". Without the hint the browser ranks a parser-discovered image below the
+          fonts and the route's JS, and the hero's only visible content waits behind them. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={FALLBACK_IMAGE}
         alt=""
         aria-hidden="true"
         draggable={false}
+        fetchPriority="high"
+        decoding="async"
         className="pointer-events-none absolute top-1/2 w-auto max-w-none -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-700"
         style={{
           left: 'calc(var(--focus-x, 0.5) * 100%)',

@@ -42,14 +42,14 @@ const DEFAULT_MODEL_FILL = 0.7;
 // the part sitting on it gets bigger or smaller. A heavier line falls every fourth cell.
 const GRID_CELL = 0.2613;
 const GRID_MAJOR_EVERY = 4;
-const GRID_MINOR_OPACITY = 0.07;
-const GRID_MAJOR_OPACITY = 0.14;
+const GRID_MINOR_OPACITY = 0.12;
+const GRID_MAJOR_OPACITY = 0.19;
 // A desaturated blue-grey, tuned to the brand accent's hue but far duller. Never the accent itself: that
 // belongs to the CTA, the wordmark and the headline, and four blue things in one screen is three too many.
 // The *rendered* line is what should sit just above the page, and these opacities are small — at 7% a
 // colour only slightly lighter than the background moves the pixel by two or three values, which is
-// nothing. So the source colour is well clear of the page and the alpha brings it back down: 7% of this
-// lands on #24272D against a #1B1D21 page, 14% on #2D3138.
+// nothing. So the source colour is well clear of the page and the alpha brings it back down: 12% of
+// this lands around #262B34 against the page, 19% around #2D333F.
 const GRID_COLOUR = '#93A6C4';
 const PART_COLOUR = '#F2F4F7';
 

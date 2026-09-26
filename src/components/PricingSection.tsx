@@ -5,8 +5,8 @@ import SectionHeading from './SectionHeading';
 // Per-gram rates. Kept as data so the table below is pure layout.
 const ROWS = [
   { material: 'PLA', note: null, standard: '₹3.5', student: '₹2.5', studentIsPrice: true },
-  { material: 'PLA+', note: 'Engineering', standard: '₹4', student: 'Coming soon', studentIsPrice: false },
-  { material: 'PETG', note: null, standard: '₹5.5', student: 'Coming soon', studentIsPrice: false },
+  { material: 'PLA+', note: 'Engineering', standard: '₹4', student: 'To be discussed', studentIsPrice: false },
+  { material: 'PETG', note: null, standard: '₹5.5', student: 'To be discussed', studentIsPrice: false },
 ] as const;
 
 // Pricing as a rate card, not a set of plan cards: one rectangular table, hairline rules, and the
@@ -32,31 +32,34 @@ export default function PricingSection() {
             <thead>
               <tr className="border-y border-border">
                 <th scope="col" className="label-micro py-5 pr-6 text-text-muted">Material</th>
-                <th scope="col" className="label-micro py-5 pr-6 text-text-muted">Standard</th>
+                <th scope="col" className="label-micro py-5 pr-12 text-text-muted">Standard</th>
                 {/* The Student column is the offer this section exists to make, so it is picked out as a
-                    column rather than a cell: a 6% accent wash with a hairline down each side, carried by
-                    every cell in the column so the band runs unbroken from the head to the last row. */}
+                    closed box rather than an open band: a 6% accent wash with a hairline all the way
+                    round. A table cannot carry one border across a whole column, so the box is assembled
+                    from the cells — sides on every cell, a cap on the head and a base on the last row. */}
                 <th
                   scope="col"
-                  className="label-micro border-x border-accent-primary/[0.18] bg-accent-primary/[0.06] px-6 py-5 text-text-secondary"
+                  className="label-micro border-x border-t border-accent-primary/[0.18] bg-accent-primary/[0.06] px-8 py-5 text-text-secondary"
                 >
                   Student
                 </th>
               </tr>
             </thead>
             <tbody>
-              {ROWS.map((row) => (
+              {ROWS.map((row, index) => (
                 <tr key={row.material} className="border-b border-border align-baseline">
                   <th scope="row" className="py-8 pr-6 font-display text-2xl font-bold tracking-[-0.03em] text-text-primary">
                     {row.material}
                     {row.note && <span className="label-micro mt-2 block text-text-muted">{row.note}</span>}
                   </th>
-                  <td className="py-8 pr-6 font-display text-2xl font-bold tracking-[-0.03em] text-text-secondary">
+                  <td className="py-8 pr-12 font-display text-2xl font-bold tracking-[-0.03em] text-text-primary">
                     {row.standard}
                     <span className="text-base text-text-muted">/g</span>
                   </td>
                   <td
-                    className={`border-x border-accent-primary/[0.18] bg-accent-primary/[0.06] px-6 ${
+                    className={`border-x border-accent-primary/[0.18] bg-accent-primary/[0.06] px-8 ${
+                      index === ROWS.length - 1 ? 'border-b' : ''
+                    } ${
                       row.studentIsPrice
                         ? 'py-8 font-display text-2xl font-bold tracking-[-0.03em] text-accent-primary'
                         : 'py-8 text-sm text-text-muted'

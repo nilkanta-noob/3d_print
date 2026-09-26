@@ -43,13 +43,19 @@ function ExploreCard({ item }: { item: ExploreHighlight }) {
       className="group relative flex min-h-[400px] w-full flex-col justify-end overflow-hidden bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary md:min-h-[360px] lg:min-h-[380px] xl:min-h-[400px]"
     >
       <div className="absolute inset-0 z-0">
+        {/* Lazy on purpose — no `priority`, no loading="eager". Explore is the sixth section of the home
+            page, so these photographs are never above the fold on a load that starts at the top. Next
+            will warn that one of them "was detected as the LCP" if the page is reloaded while already
+            scrolled down here; that is the browser reporting the largest paint in the restored viewport,
+            not a missing hint. Eager-loading four large photos would preload them on every home-page
+            load and push out the hero, which is the actual LCP (see hero/HeroModel.tsx). */}
         {item.image ? (
-          <Image 
-            src={item.image} 
-            alt={item.alt ?? ''} 
-            fill 
-            sizes="(min-width: 768px) 50vw, 100vw" 
-            className="object-cover brightness-90 transition-transform duration-700 ease-out group-hover:scale-[1.03]" 
+          <Image
+            src={item.image}
+            alt={item.alt ?? ''}
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-cover brightness-90 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           />
         ) : (
           <div className="absolute inset-0 bg-radial-[ellipse_75%_65%_at_50%_32%] from-elevated to-background brightness-90 transition-transform duration-700 ease-out group-hover:scale-[1.03]">
