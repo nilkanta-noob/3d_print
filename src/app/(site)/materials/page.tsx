@@ -48,7 +48,7 @@ export default function MaterialsPage() {
         <div className="mt-16 md:mt-20 lg:mt-24">
           <MaterialComparison />
         </div>
-        <p className="mt-10 max-w-[62ch] text-sm leading-[1.75] text-text-muted">
+        <p className="mt-10 max-w-[62ch] text-sm text-text-muted">
           Ratings compare these three materials against each other. Exact properties vary with the filament brand and print settings such as infill.
         </p>
       </Section>
@@ -60,7 +60,7 @@ export default function MaterialsPage() {
             <div className="mt-16">
               <StrengthComparison />
             </div>
-            <p className="mt-10 max-w-[52ch] text-[15px] leading-[1.75] text-text-secondary">
+            <p className="mt-10 max-w-[52ch] text-[15px] text-text-secondary">
               PLA is stiff but brittle. PLA+ adds toughness and layer adhesion. PETG absorbs impact and flexes before it breaks.
             </p>
           </div>
@@ -92,7 +92,6 @@ export default function MaterialsPage() {
       </Section>
 
       <CtaBanner
-        tone="band"
         title="Ready to print?"
         description="Upload your CAD file, choose a material and get a quote by email — usually within the hour."
         primary={{ href: QUOTE_HREF, label: 'Get a quote' }}

@@ -34,10 +34,10 @@ export default function ExplorePage() {
               />
               <div className="p-8 md:p-10">
                 <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                  <h2 className="font-display text-[1.75rem] font-medium leading-[1.05] tracking-[-0.035em] text-text-primary lg:text-[2rem]">{category.title}</h2>
+                  <h2 className="text-[1.75rem] text-text-primary lg:text-[2rem]">{category.title}</h2>
                   <span className="label-micro text-text-muted">{category.materials}</span>
                 </div>
-                <p className="mt-5 text-[15px] leading-[1.75] text-text-secondary">{category.description}</p>
+                <p className="mt-5 text-[15px] text-text-secondary">{category.description}</p>
                 <ul className="mt-8 flex flex-wrap gap-2">
                   {category.ideas.map((idea) => (
                     <li key={idea} className="label-micro rounded-chip border border-border px-3 py-1.5 text-text-secondary">{idea}</li>

@@ -44,13 +44,13 @@ function MaterialCard({
         {material.tag}
       </p>
 
-      <h3 className="mt-8 text-[2.5rem] font-display font-medium leading-[0.95] tracking-[-0.04em] text-text-primary lg:text-[3rem]">
+      <h3 className="mt-8 text-[2.5rem] text-text-primary lg:text-[3rem]">
         {material.name}
       </h3>
 
       {/* On phones the stacked cards reserve two lines so they stay the same height; wider stacked cards (tablets)
           fit everything on one line, and side by side (1024px+) the grid row equalises them */}
-      <p className="mt-6 min-h-[2lh] text-base leading-[1.75] text-text-secondary md:min-h-0">{material.summary}</p>
+      <p className="mt-6 min-h-[2lh] text-base text-text-secondary md:min-h-0">{material.summary}</p>
 
       <div className="mt-8 border-t border-border pt-6">
         <p className="label-micro text-text-muted">Best for</p>

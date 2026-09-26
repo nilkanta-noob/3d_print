@@ -21,8 +21,8 @@ export default function HomePage() {
       <TrustTicker />
       <ExplorePreview />
       <CtaBanner
-        title="Ready to bring your idea to life?"
-        description="Upload your CAD file and get a quote by email — usually within the hour."
+        title="Turn Your Design Into Something Real."
+        description="Upload your CAD file and receive a quote within hours."
         primary={{ href: QUOTE_HREF, label: 'Get a Quote' }}
       />
     </>

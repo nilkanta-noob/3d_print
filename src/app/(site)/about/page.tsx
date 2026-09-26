@@ -36,8 +36,8 @@ export default function AboutPage() {
           {VALUES.map((value) => (
             <li key={value.title} className="bg-elevated p-8">
               <span className="block h-px w-7 bg-accent-primary" aria-hidden="true" />
-              <h3 className="mt-8 font-display text-xl font-medium tracking-[-0.03em] text-text-primary">{value.title}</h3>
-              <p className="mt-4 text-[15px] leading-[1.75] text-text-secondary">{value.body}</p>
+              <h3 className="leading-[1.1] mt-8 text-xl text-text-primary">{value.title}</h3>
+              <p className="mt-4 text-[15px] text-text-secondary">{value.body}</p>
             </li>
           ))}
         </ul>

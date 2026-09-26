@@ -67,8 +67,8 @@ export default function ContactPage() {
           </div>
 
           <div className="border border-border bg-elevated p-8 md:p-12 lg:col-span-7">
-            <h2 className="font-display text-[2rem] font-medium leading-[1.05] tracking-[-0.035em] text-text-primary">Send a message</h2>
-            <p className="mb-12 mt-5 text-[15px] leading-[1.75] text-text-secondary">For quotes, the quote form is faster — it includes your file.</p>
+            <h2 className="text-[2rem] text-text-primary">Send a message</h2>
+            <p className="mb-12 mt-5 text-[15px] text-text-secondary">For quotes, the quote form is faster — it includes your file.</p>
             <ContactForm />
           </div>
         </div>

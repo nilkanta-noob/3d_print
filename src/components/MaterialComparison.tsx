@@ -37,7 +37,7 @@ export default function MaterialComparison() {
       <ul className="border-t border-border lg:hidden">
         {MATERIALS.map((material) => (
           <li key={material.slug} className="border-x border-b border-border bg-elevated p-8">
-            <h3 className="font-display text-2xl font-medium tracking-[-0.03em] text-text-primary">{material.name}</h3>
+            <h3 className="leading-[1.1] text-2xl text-text-primary">{material.name}</h3>
             <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-6">
               {RATING_ATTRIBUTES.map((attribute) => (
                 <div key={attribute.key}>

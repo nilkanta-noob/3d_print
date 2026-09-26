@@ -18,7 +18,7 @@ export default function AboutSection() {
         {/* Company story */}
         <div>
           <SectionHeading eyebrow="Our story" title="Built to bring your ideas to life." />
-          <div className="mt-8 max-w-[60ch] space-y-6 text-base leading-[1.75] text-text-secondary md:text-[17px]">
+          <div className="mt-8 max-w-[60ch] space-y-6 text-base text-text-secondary md:text-[17px]">
             <p>
               PrintWarriors was started to make 3D printing more accessible for anyone with an idea worth building. Founded by an engineering student at Heritage Institute of Technology, Kolkata, we understand the challenges of turning digital designs into physical prototypes without spending a fortune.
             </p>
@@ -62,7 +62,7 @@ export default function AboutSection() {
           {AUDIENCES.map((audience) => (
             <li key={audience.title} className="bg-surface p-8">
               <p className="font-display text-xl font-medium tracking-[-0.03em] text-text-primary">{audience.title}</p>
-              <p className="mt-4 text-sm leading-[1.75] text-text-secondary">{audience.body}</p>
+              <p className="mt-4 text-sm text-text-secondary">{audience.body}</p>
             </li>
           ))}
         </ul>

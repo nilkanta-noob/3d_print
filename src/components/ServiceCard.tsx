@@ -43,10 +43,10 @@ export default function ServiceCard({ service, step }: ServiceCardProps) {
         <p className="font-mono text-[11px] tracking-[0.2em] text-accent-primary" aria-hidden="true">
           {String(step).padStart(2, '0')}
         </p>
-        <h3 className="mt-5 text-[1.75rem] font-display font-medium leading-[1.05] tracking-[-0.035em] text-text-primary lg:text-[2rem]">{service.title}</h3>
+        <h3 className="mt-5 text-[1.75rem] text-text-primary lg:text-[2rem]">{service.title}</h3>
         {/* Closed cards stay the same height by reserving the longest description's lines (3 on phones and
             tablets, 2 from 1024px) — the grid doesn't stretch cards, so opening one never resizes its neighbour */}
-        <p className="mt-4 min-h-[3lh] max-w-[46ch] text-base leading-[1.75] text-text-secondary lg:min-h-[2lh] lg:text-[17px]">{service.description}</p>
+        <p className="mt-4 min-h-[3lh] max-w-[46ch] text-base text-text-secondary lg:min-h-[2lh] lg:text-[17px]">{service.description}</p>
 
         {!linked && (
           // Expanding details: grid-rows 0fr → 1fr animates the height; inert keeps the hidden link out of the tab order

@@ -4,7 +4,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { HeroScene } from './heroModelScene';
 
 /*
- * The hero object: a 10mm XYZ calibration cube, the part every printer owner has run.
+ * The hero object: 3DBenchy, the torture-test boat every printer owner has run.
+ *
+ * The mesh is a decimated copy of the uploaded model — 225,706 triangles at 11.3MB is a slicer's file,
+ * not a hero's. Vertex-clustered to 40,174 at 2.0MB, which at the size this renders is the same
+ * silhouette. The original is kept in public/uploads if it is ever needed at full resolution.
  *
  * This component owns everything except the three.js itself, which lives behind a dynamic import so it
  * stays out of the initial bundle. Until that import resolves — and permanently, if WebGL is missing or
@@ -12,7 +16,7 @@ import type { HeroScene } from './heroModelScene';
  * is a fixed aspect ratio at every breakpoint, so nothing moves when the live model takes over.
  */
 
-const MODEL_URL = '/hero/model.stl';
+const MODEL_URL = '/hero/benchy.stl';
 const FALLBACK_IMAGE = '/hero/model-fallback.png';
 // The fallback PNG is cropped tight to the part's own height and rendered from the scene's camera, so
 // reading the same --model-scale the scene reads puts the still and the live part at the same size and
@@ -39,7 +43,6 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
   // WebGL, a chunk that will not load, a missing STL — simply leaves this false, which keeps the static
   // image on screen and the drag hint hidden. There is nothing to drag, so there is nothing to say.
   const [live, setLive] = useState(false);
-  const [interacted, setInteracted] = useState(false);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -57,9 +60,9 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
           onReady: () => {
             if (!cancelled) setLive(true);
           },
-          onFirstInteraction: () => {
-            if (!cancelled) setInteracted(true);
-          },
+          // Nothing listens for the first drag any more — the prompt that used to disappear on it is
+          // gone — but the scene still announces it, so this absorbs the call.
+          onFirstInteraction: () => {},
         }),
       )
       .then((mounted) => {
@@ -100,23 +103,6 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
         }}
       />
 
-      {live && (
-        <span
-          aria-hidden="true"
-          className="label-micro pointer-events-none absolute -translate-x-1/2 text-text-muted transition-opacity duration-500"
-          /* Sits just under the object rather than at the foot of the box. The two were the same thing
-             while the box was a tight frame around the model; now that it spans the whole hero, bottom-0
-             would strand the label at the section border. The object is centred vertically and is
-             --model-scale of the height, so its underside is at 50% + half of that. */
-          style={{
-            left: 'calc(var(--focus-x, 0.5) * 100%)',
-            top: 'calc(50% + var(--model-scale, 0.7) * 54%)',
-            opacity: interacted ? 0 : 1,
-          }}
-        >
-          Drag to rotate
-        </span>
-      )}
     </div>
   );
 }

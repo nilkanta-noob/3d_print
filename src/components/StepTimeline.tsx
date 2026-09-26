@@ -10,10 +10,10 @@ export default function StepTimeline({ steps, className = '' }: { steps: Process
       {steps.map((step, index) => (
         <li key={step.title} className="border-t border-border pt-8">
           <span className="label-micro block text-accent-primary">Step {String(index + 1).padStart(2, '0')}</span>
-          <h3 className="mt-6 font-display text-[1.5rem] font-medium leading-[1.1] tracking-[-0.035em] text-text-primary">
+          <h3 className="mt-6 text-[1.5rem] text-text-primary">
             {step.title}
           </h3>
-          <p className="mt-4 text-[15px] leading-[1.75] text-text-secondary">{step.body}</p>
+          <p className="mt-4 text-[15px] text-text-secondary">{step.body}</p>
         </li>
       ))}
     </ol>

@@ -71,7 +71,7 @@ function ExploreCard({ item }: { item: ExploreHighlight }) {
       <div className="relative z-20 w-full p-8 pb-10 md:p-12 md:pb-14">
         {/* The title has the card's full width to itself — sharing a row with the arrow is what forced
             "Product Development" onto two lines. Only the description sits beside the arrow. */}
-        <h3 className="text-[1.75rem] font-display font-medium leading-[1.05] tracking-[-0.035em] text-white text-balance lg:text-[2.25rem]">
+        <h3 className="text-[1.75rem] text-white text-balance lg:text-[2.25rem]">
           {item.title}
         </h3>
 

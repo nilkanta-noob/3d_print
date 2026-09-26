@@ -48,18 +48,18 @@ export default function PricingSection() {
             <tbody>
               {ROWS.map((row) => (
                 <tr key={row.material} className="border-b border-border align-baseline">
-                  <th scope="row" className="py-8 pr-6 font-display text-2xl font-medium tracking-[-0.03em] text-text-primary">
+                  <th scope="row" className="py-8 pr-6 font-display text-2xl font-bold tracking-[-0.03em] text-text-primary">
                     {row.material}
                     {row.note && <span className="label-micro mt-2 block text-text-muted">{row.note}</span>}
                   </th>
-                  <td className="py-8 pr-6 font-display text-2xl font-medium tracking-[-0.03em] text-text-secondary">
+                  <td className="py-8 pr-6 font-display text-2xl font-bold tracking-[-0.03em] text-text-secondary">
                     {row.standard}
                     <span className="text-base text-text-muted">/g</span>
                   </td>
                   <td
                     className={`border-x border-accent-primary/[0.18] bg-accent-primary/[0.06] px-6 ${
                       row.studentIsPrice
-                        ? 'py-8 font-display text-2xl font-medium tracking-[-0.03em] text-accent-primary'
+                        ? 'py-8 font-display text-2xl font-bold tracking-[-0.03em] text-accent-primary'
                         : 'py-8 text-sm text-text-muted'
                     }`}
                   >
@@ -74,7 +74,7 @@ export default function PricingSection() {
           {/* Footnote, set as fine print under the rule rather than boxed into an alert panel */}
           <div className="mt-10 grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8">
             <h3 className="label-micro text-text-muted sm:pt-1">Student rate</h3>
-            <p className="max-w-[60ch] text-[15px] leading-[1.75] text-text-secondary">
+            <p className="max-w-[60ch] text-[15px] text-text-secondary">
               Requires a valid college ID or referral at checkout. The student rate currently applies to PLA only —
               PLA+ and PETG student pricing will be added later.
             </p>

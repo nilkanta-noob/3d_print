@@ -17,11 +17,11 @@ export default function PageHeader({ eyebrow, title, description, children }: Pa
           <Eyebrow>{eyebrow}</Eyebrow>
           {/* The page's largest type: weight 500, tracking -0.04em, leading just under 1 — the same
               masthead treatment the home page's section headings use, one step larger. */}
-          <h1 className="mt-6 text-[clamp(2.5rem,9vw,3rem)] sm:text-[clamp(3.5rem,6vw,5rem)] font-display font-medium leading-[0.94] tracking-[-0.04em] text-text-primary text-balance">
+          <h1 className="mt-6 text-[clamp(2.5rem,9vw,3rem)] sm:text-[clamp(3.5rem,6vw,5rem)] text-text-primary text-balance">
             {title}
           </h1>
           {description && (
-            <p className="mt-8 max-w-[60ch] text-base leading-[1.75] text-text-secondary md:text-[17px]">{description}</p>
+            <p className="mt-8 max-w-[60ch] text-base text-text-secondary md:text-[17px]">{description}</p>
           )}
           {children && <div className="mt-12 flex flex-wrap items-center gap-4 sm:gap-5">{children}</div>}
         </div>

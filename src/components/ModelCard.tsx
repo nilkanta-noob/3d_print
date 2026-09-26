@@ -34,7 +34,7 @@ export default function ModelCard({ title, author, imageUrl, likes, downloads, c
 
       {/* Content Area */}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-accent-primary transition-colors">
+        <h3 className="text-gray-900 dark:text-white line-clamp-1 group-hover:text-accent-primary transition-colors">
           {title}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 hover:underline cursor-pointer">

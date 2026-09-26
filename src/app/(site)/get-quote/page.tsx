@@ -51,7 +51,7 @@ export default function GetQuotePage() {
             {notes.map((note) => (
               <li key={note.title} className="bg-elevated p-8">
                 <h2 className="label-micro text-text-muted">{note.title}</h2>
-                <p className="mt-5 text-[15px] leading-[1.75] text-text-secondary">{note.body}</p>
+                <p className="mt-5 text-[15px] text-text-secondary">{note.body}</p>
               </li>
             ))}
           </ul>

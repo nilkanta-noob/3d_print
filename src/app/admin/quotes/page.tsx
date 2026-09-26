@@ -15,7 +15,7 @@ export default async function AdminQuotesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-text-primary uppercase tracking-widest">
+        <h1 className="leading-[0.92] text-2xl text-text-primary uppercase tracking-widest">
           Quotations & Orders
         </h1>
         <div className="text-sm font-mono text-text-secondary">

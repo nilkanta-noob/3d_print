@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter, Fira_Code } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-// Headings. Space Grotesk is a technical grotesque — squared-off bowls, a single-storey `a`, drafting-table
-// numerals — which is what gives the headline its engineered feel. Variable, and its range stops at 700:
-// Bold is the heaviest weight it has, so there is no ExtraBold to reach for.
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  display: "swap",
-});
-
+// Headings are General Sans, loaded from Fontshare rather than next/font.
+//
+// It is free for commercial use but is not on Google Fonts, so next/font/google cannot reach it and the
+// stylesheet is linked instead. That costs a third-party connection on first paint, which preconnect
+// below softens but does not remove. Self-hosting the .woff2 files through next/font/local would be
+// faster and is the better end state — it needs the files downloading from Fontshare first.
 // Everything else: body copy, navigation, labels, buttons. Inter is drawn for screen text at small sizes,
 // which is the whole job here.
 const inter = Inter({
@@ -19,10 +16,12 @@ const inter = Inter({
   display: "swap",
 });
 
-// Monospace labels (order numbers, OTP input)
-const firaCode = Fira_Code({
-  variable: "--font-fira-code",
+// Every eyebrow and micro-label on the site, plus order numbers and the OTP input. IBM Plex Mono is a
+// drawing-office monospace, which is the register those labels are meant to sit in.
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -33,7 +32,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${firaCode.variable} font-sans h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} font-sans h-full antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f%5B%5D=general-sans@500,600,700&display=swap"
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-text-primary">{children}</body>
     </html>
   );

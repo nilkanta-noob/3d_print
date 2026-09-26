@@ -211,8 +211,8 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
     return (
       <div className="flex h-full flex-col items-center justify-center border border-accent-primary/20 bg-surface p-12 text-center">
         <CheckCircle className="w-16 h-16 text-accent-primary mb-4 animate-pulse" strokeWidth={1.5} />
-        <h3 className="mb-4 font-display text-[2rem] font-medium tracking-[-0.035em] text-text-primary">Request logged</h3>
-        <p className="mb-10 max-w-[52ch] text-[15px] leading-[1.75] text-text-secondary">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
+        <h3 className="mb-4 text-[2rem] text-text-primary">Request logged</h3>
+        <p className="mb-10 max-w-[52ch] text-[15px] text-text-secondary">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
 
         <button
           onClick={() => {
@@ -539,7 +539,7 @@ export default function QueryFormModal({ isOpen, onClose }: QueryFormModalProps)
       >
         <div className="flex shrink-0 items-center justify-between border-b border-border bg-surface p-6 lg:px-10">
           <div>
-            <h2 className="font-display text-2xl font-medium tracking-[-0.035em] text-text-primary">Job specifications</h2>
+            <h2 className="leading-[1] text-2xl text-text-primary">Job specifications</h2>
             <p className="mt-2 text-sm text-text-secondary">Configure parameters and preview geometry</p>
           </div>
           <button

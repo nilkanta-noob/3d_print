@@ -57,7 +57,7 @@ export default function FAQSection({ items = FAQS, initialCount, tone = 'band' }
                   <div
                     className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-8 opacity-100' : 'max-h-0 opacity-0'}`}
                   >
-                    <div className="max-w-[62ch] whitespace-pre-line text-[15px] leading-[1.75] text-text-secondary">
+                    <div className="max-w-[62ch] whitespace-pre-line text-[15px] text-text-secondary">
                       {faq.answer}
                     </div>
                   </div>

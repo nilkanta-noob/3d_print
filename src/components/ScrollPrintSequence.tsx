@@ -77,8 +77,8 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
               min-[1024px]:pointer-events-none min-[1024px]:absolute min-[1024px]:inset-0
               min-[1024px]:aspect-auto min-[1024px]:mx-0 min-[1024px]:h-auto min-[1024px]:w-auto
               min-[1024px]:self-stretch
-              min-[1024px]:[--focus-x:0.72] min-[1024px]:[--model-scale:0.385]
-              min-[1024px]:[--part-scale:1.2230]
+              min-[1024px]:[--focus-x:0.72] min-[1024px]:[--model-scale:0.462]
+              min-[1024px]:[--part-scale:1.4676]
             "
           />
 
@@ -97,19 +97,31 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
                 two-column width. Also held to 12.5vh, which keeps the block clear of the navbar on a
                 short laptop screen. Re-measure both numbers if the face or the tracking changes. */}
             <motion.h1
-              variants={rise}
-              className="text-[clamp(2.75rem,13vw,3.75rem)] font-bold uppercase leading-[1.04] tracking-[-0.045em] text-text-primary whitespace-nowrap min-[760px]:text-[clamp(3.25rem,min(7.2vw,12.5vh),8rem)]"
+ variants={rise}
+              /* The one heading on the site that overrides the base scale, and deliberately so. At the
+                 shared h1 weight of 700 it read as a poster and flattened the object beside it; 600 holds
+                 the line without shouting, and the second line drops again to 500 so the accent carries
+                 the emphasis rather than the weight. Sizes are ~12% off the previous clamps and leading
+                 opens from 0.92 to 0.98 — a lighter face needs more air between lines, not less. The
+                 letter-spacing is untouched.
+                 The 6.8vw ceiling keeps "YOU THINK," inside the left column at every two-column width —
+                 measured ink, not the element box, which is block-level and fills the column either way:
+                 517px of text in 555px at 1440, 395 in 419 at 1100, 287 in 299 at 800. That is the
+                 binding constraint on this clamp, since whitespace-nowrap means the line overhangs rather
+                 than wraps once it runs out. Re-measure it the same way if the face, the tracking or the
+                 wording changes. */
+              className="text-[clamp(2.6rem,12.3vw,3.55rem)] font-semibold leading-[0.98] uppercase text-text-primary whitespace-nowrap min-[760px]:text-[clamp(3.08rem,min(6.8vw,11.9vh),7.55rem)]"
             >
               YOU THINK,
               <br />
-              <span className="text-accent-primary">WE PRINT.</span>
+              <span className="font-medium text-accent-primary">WE PRINT.</span>
             </motion.h1>
 
             <motion.p
               variants={rise}
               /* One line from 1100px, where the column is wide enough to hold the sentence; it wraps on
                  narrower screens, where the column is not. */
-              className="mt-8 max-w-[34ch] font-sans text-base leading-[1.75] text-text-secondary md:text-[17px] min-[760px]:mt-[clamp(2rem,5vh,3rem)] min-[1100px]:max-w-none"
+              className="mt-4 max-w-[34ch] font-sans text-base text-text-secondary md:text-[17px] min-[760px]:mt-[clamp(1.25rem,3vh,1.75rem)] min-[1100px]:max-w-none"
             >
               Turn your CAD files into precision-engineered parts.
             </motion.p>

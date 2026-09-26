@@ -28,6 +28,7 @@
   --background: #0F1218;
   --surface: #141923;
   --elevated: #171D28;
+  --surface-deep: #0A0F1C; /* footer only — a step below the page, so the site closes by going quiet */
 
   /* The rule that opens each section. The accent at 12% rather than a neutral grey: it belongs to the
      palette, and at this strength it reads as a drawn line rather than as a colour. */
@@ -71,6 +72,7 @@
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-elevated: var(--elevated);
+  --color-surface-deep: var(--surface-deep);
   --color-text-primary: var(--text);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
@@ -88,14 +90,20 @@
        rounded-control (5px) — buttons, inputs, selects, textareas, file pickers
        rounded-chip    (3px) — small badges, tags and icon squares
      Anything rounder than this belongs to a genuinely circular object (an avatar, a progress dot). */
+  /* Body sizes carry the reading leading; headings never use these — they set their own below. */
+  --text-sm--line-height: 1.7;
+  --text-base--line-height: 1.7;
+  --text-lg--line-height: 1.7;
+
   --radius-control: 5px;
   --radius-chip: 3px;
 
-  /* next/font declares these on <html> (see layout.tsx). Two faces, split by job: Space Grotesk sets
-     every heading, Inter sets everything that has to be read rather than looked at. */
+  /* next/font declares these on <html> (see layout.tsx). Split by job: the display face sets every heading,
+     Inter sets everything that has to be read rather than looked at, and the mono is kept for order
+     numbers and the OTP input. */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-fira-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-display: 'General Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* The accent ticker between Pricing and Explore. Its track holds the list twice and slides exactly
      half its width, so the loop repeats without a visible seam. It starts half-way along and travels
@@ -155,9 +163,9 @@
 @utility label-micro {
   font-size: 0.6875rem; /* 11px */
   line-height: 1.2;
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.12em;
 }
 
 @layer base {
@@ -166,13 +174,32 @@
     color: var(--text);
     /* A roomier default line for body copy. Anything that sets its own leading — headings, labels,
        buttons — overrides this, so it only reaches the running text that had no value of its own. */
-    line-height: 1.65;
+    line-height: 1.7;
   }
 
-  /* Headings are the site's primary design element: display face, and tighter than the body copy at
-     every size. Individual headings still set their own weight and leading. */
+  /* The heading scale lives here and nowhere else. It used to be spread across ~30 components, each
+     setting its own weight, tracking and leading inline — which is how a type system drifts. Components
+     now set size and colour only; weight, tracking and leading come from this block, so changing the
+     pairing is a change in one file. */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+  }
+
+  h1 {
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 0.92;
+  }
+
+  h2 {
+    font-weight: 600;
     letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
   }
 }

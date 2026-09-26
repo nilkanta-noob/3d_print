@@ -46,7 +46,7 @@ export default function AdminLogin() {
             </div>
           </div>
           
-          <h2 className="text-2xl font-display font-bold uppercase tracking-widest text-center mb-8">Admin Access</h2>
+          <h2 className="leading-[1] text-2xl uppercase tracking-widest text-center mb-8">Admin Access</h2>
 
           {error && (
             <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-sm text-center">

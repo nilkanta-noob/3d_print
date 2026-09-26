@@ -29,12 +29,15 @@ export default function SectionHeading({ eyebrow, title, description, align = 'l
     <div className={`${display ? 'max-w-4xl' : 'max-w-3xl'} ${centered ? 'mx-auto text-center' : ''} ${className}`}>
       <Eyebrow centered={centered} accent={display || accent}>{eyebrow}</Eyebrow>
       {display ? (
-        // Phones ~40px, 56px on tablets, 72px at 1280px, 88px from 1536px
-        <h2 className="mt-6 lg:mt-8 text-[clamp(2.5rem,9vw,2.75rem)] sm:text-[clamp(3.5rem,5.6vw,5.5rem)] font-display font-medium leading-[0.94] tracking-[-0.04em] text-text-primary text-balance">
+        // Phones ~32px, 44px on tablets, 66px at 1440px, 68px from ~1480px up.
+        // It used to top out at 88px, which put it within ten points of the hero and left the page with
+        // two headlines instead of a headline and a section. Standard section headings cap at 56px, so
+        // this still reads as the larger of the two without competing upward.
+        <h2 className="mt-6 lg:mt-8 text-[clamp(2rem,7.5vw,2.375rem)] sm:text-[clamp(2.75rem,4.6vw,4.25rem)] text-text-primary text-balance">
           {title}
         </h2>
       ) : (
-        <h2 className="mt-6 text-[clamp(2rem,6vw,2.25rem)] sm:text-[clamp(2.5rem,4vw,3.5rem)] font-display font-medium leading-[0.98] tracking-[-0.035em] text-text-primary text-balance">
+        <h2 className="mt-6 text-[clamp(2rem,6vw,2.25rem)] sm:text-[clamp(2.5rem,4vw,3.5rem)] text-text-primary text-balance">
           {title}
         </h2>
       )}
@@ -42,7 +45,7 @@ export default function SectionHeading({ eyebrow, title, description, align = 'l
         // The standfirst stays small against the heading — the contrast between the two is the hierarchy.
         // 60 characters is the measure; wider than that and the eye loses the line.
         <p
-          className={`mt-6 lg:mt-8 max-w-[60ch] text-base leading-[1.75] text-pretty text-text-secondary md:text-[17px] ${
+          className={`mt-6 lg:mt-8 max-w-[60ch] text-base text-pretty text-text-secondary md:text-[17px] ${
             centered ? 'mx-auto' : ''
           }`}
         >

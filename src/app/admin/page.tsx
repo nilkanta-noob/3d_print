@@ -29,7 +29,7 @@ export default async function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-display font-black uppercase tracking-widest text-text-primary flex items-center gap-3">
+          <h1 className="leading-[0.92] text-3xl uppercase tracking-widest text-text-primary flex items-center gap-3">
             <Package className="text-accent-primary" />
             Admin Dashboard
           </h1>
@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
         <div className="bg-surface border border-border p-6 rounded-sm flex items-start justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Total Requests</p>
-            <h3 className="text-3xl font-mono font-bold">{orders.length}</h3>
+            <h3 className="leading-[1.1] text-3xl font-mono">{orders.length}</h3>
           </div>
           <div className="p-3 bg-accent-primary/10 text-accent-primary rounded-sm">
             <FileText className="w-6 h-6" />
@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
         <div className="bg-surface border border-border p-6 rounded-sm flex items-start justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Pending Quotes</p>
-            <h3 className="text-3xl font-mono font-bold">
+            <h3 className="leading-[1.1] text-3xl font-mono">
               {orders.filter(o => o.status === 'QUOTE_REQUESTED').length}
             </h3>
           </div>
@@ -75,7 +75,7 @@ export default async function AdminDashboard() {
         <div className="bg-surface border border-border p-6 rounded-sm flex items-start justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Active Jobs</p>
-            <h3 className="text-3xl font-mono font-bold">
+            <h3 className="leading-[1.1] text-3xl font-mono">
               {orders.filter(o => o.status === 'PRINTING').length}
             </h3>
           </div>

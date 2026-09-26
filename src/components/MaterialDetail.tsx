@@ -28,7 +28,7 @@ export default function MaterialDetail({ material }: { material: Material }) {
     <article id={material.slug} className="scroll-mt-24 border border-border bg-elevated p-8 md:p-12">
       <div className="flex flex-wrap items-start justify-between gap-8">
         <div>
-          <h3 className="font-display text-[2.5rem] font-medium leading-[0.95] tracking-[-0.04em] text-text-primary">{material.name}</h3>
+          <h3 className="text-[2.5rem] text-text-primary">{material.name}</h3>
           <p className="label-micro mt-5 text-text-muted">
             {material.tag} · {formatRate(standard)}/g{student !== null && ` · student ${formatRate(student)}/g`}
           </p>
@@ -36,7 +36,7 @@ export default function MaterialDetail({ material }: { material: Material }) {
         <ButtonLink href={QUOTE_HREF} variant="secondary">Get a quote</ButtonLink>
       </div>
 
-      <p className="mt-8 max-w-[62ch] text-base leading-[1.75] text-text-secondary md:text-[17px]">{material.description}</p>
+      <p className="mt-8 max-w-[62ch] text-base text-text-secondary md:text-[17px]">{material.description}</p>
 
       <div className="mt-12 grid gap-10 border-t border-border pt-10 md:grid-cols-3">
         <DetailList title="Advantages" items={material.advantages} icon={Plus} />

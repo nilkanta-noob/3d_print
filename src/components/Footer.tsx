@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Mail, MessageCircle, MapPin } from 'lucide-react';
-import { SITE, QUOTE_HREF, whatsappHref } from './content/site';
+import { SITE } from './content/site';
 
 const InstagramIcon = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -26,121 +25,92 @@ const YoutubeIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const COLUMNS = [
-  {
-    title: 'Explore',
-    links: [
-      { href: '/materials', label: 'Materials guide' },
-      { href: '/#services', label: 'Services' },
-      { href: '/#pricing', label: 'Pricing' },
-      { href: '/explore', label: 'Explore ideas' },
-      { href: '/gallery', label: 'Gallery' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { href: '/about', label: 'About' },
-      { href: '/about#faq', label: 'FAQ' },
-      { href: '/contact', label: 'Contact' },
-      { href: QUOTE_HREF, label: 'Get a quote' },
-    ],
-  },
+const NAV = [
+  { href: '/materials', label: 'Materials' },
+  { href: '/#services', label: 'Services' },
+  { href: '/#pricing', label: 'Pricing' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/contact', label: 'Contact' },
 ];
 
+const SOCIAL = [
+  { label: 'Instagram', Icon: InstagramIcon },
+  { label: 'LinkedIn', Icon: LinkedinIcon },
+  { label: 'YouTube', Icon: YoutubeIcon },
+];
+
+/*
+ * Supporting information, not another page.
+ *
+ * It used to open with its own masthead — a wordmark, a 28px statement and a second standfirst beside it —
+ * then a four-column link grid, then a bottom bar, on 96/128px of padding. That is a page's worth of
+ * structure for a set of links. What is left is three columns, a rule and a line of small print, on the
+ * darkest surface on the site so the page closes by going quiet rather than by putting up one more panel.
+ */
 export default function Footer() {
-  const whatsapp = whatsappHref(SITE.whatsappNumber);
-
   return (
-    // The page's quietest surface: charcoal rather than the raised band, so the site closes by fading out
-    // rather than by putting up one more panel. A single hairline separates it from the page.
-    <footer className="relative z-10 border-t border-border bg-background pb-12 pt-24 text-text-secondary md:pt-32">
+    <footer className="relative z-10 bg-surface-deep pb-8 pt-14 text-text-secondary">
       <div className="site-frame">
+        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-12">
 
-        {/* The wordmark and the statement sit alone across the top — the footer's own masthead. */}
-        <div className="grid gap-12 border-b border-border pb-16 lg:grid-cols-12 lg:gap-20 lg:pb-20">
-          <div className="lg:col-span-5">
-            <p className="font-display text-[15px] font-semibold uppercase tracking-[0.26em] text-text-primary">
+          <div>
+            <p className="font-display text-[19px] font-semibold uppercase tracking-[0.2em] text-text-primary">
               Print<span className="text-accent-primary">Warriors</span>
             </p>
-            <p className="mt-8 max-w-[34ch] font-display text-[1.75rem] font-medium leading-[1.15] tracking-[-0.035em] text-text-primary">
-              We help turn ideas into real products.
+            <p className="mt-3 max-w-[30ch] text-[15px]">
+              Precision 3D printing for prototypes and functional parts.
             </p>
           </div>
 
-          <div className="lg:col-span-4 lg:col-start-9">
-            <p className="label-micro text-text-muted">Precision · Speed · Reliability</p>
-            <p className="mt-5 max-w-[42ch] text-[15px] leading-[1.75] text-text-secondary">
-              Closing the cost gap for students and engineers to rapidly iterate from CAD to physical parts.
-            </p>
+          {/* The two link columns travel together, so the space between them is a value we set rather
+              than whatever is left over after dividing the frame in three. */}
+          <div className="flex flex-col gap-8 sm:flex-row sm:gap-16 lg:gap-24">
+          <div>
+            <h2 className="label-micro text-text-muted">Navigation</h2>
+            <nav aria-label="Footer" className="mt-3 flex flex-col items-start gap-2 text-[15px]">
+              {NAV.map((link) => (
+                <Link key={link.href} href={link.href} className="transition-colors duration-200 hover:text-text-primary">
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
           </div>
-        </div>
 
-        {/* Three link columns and contact, on one editorial grid */}
-        <div className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8 lg:py-20">
-          {COLUMNS.map((column) => (
-            <div key={column.title} className="lg:col-span-3">
-              <h2 className="label-micro text-text-muted">{column.title}</h2>
-              <nav aria-label={column.title} className="mt-8 flex flex-col items-start gap-4 text-[15px]">
-                {column.links.map((link) => (
-                  <Link key={link.href} href={link.href} className="transition-colors duration-200 hover:text-text-primary">
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          ))}
-
-          {/* Contact. min-w-0 lets this column shrink: grid items refuse to go below their content's
-              width by default, and at 1024px the email address is wider than its column, which pushed the
-              whole page 3px sideways. With the column free to shrink, the address wraps instead. */}
-          <div className="flex min-w-0 flex-col items-start lg:col-span-3">
+          {/* min-w-0 lets this column shrink: a grid item will not go below its content's width by
+              default, and the address is wider than the column at some sizes, which pushed the whole
+              page sideways. With the column free to shrink, the address wraps instead. */}
+          <div className="flex min-w-0 flex-col items-start">
             <h2 className="label-micro text-text-muted">Contact</h2>
-            <div className="mt-8 flex min-w-0 max-w-full flex-col gap-4 text-[15px]">
-              {/* break-all, not break-words: an address is one unbroken word, and break-words still holds the
-                  box open to its width. min-w-0 lets the flex item itself shrink. */}
-              <a href={`mailto:${SITE.email}`} className="flex min-w-0 items-start gap-2.5 break-all transition-colors duration-200 hover:text-text-primary">
-                <Mail className="mt-1 size-4 shrink-0" strokeWidth={1.5} /> {SITE.email}
+            <div className="mt-3 flex min-w-0 max-w-full flex-col gap-2 text-[15px]">
+              <a href={`mailto:${SITE.email}`} className="min-w-0 break-all transition-colors duration-200 hover:text-text-primary">
+                {SITE.email}
               </a>
-              {whatsapp && (
-                <a href={whatsapp} className="flex items-center gap-2.5 transition-colors duration-200 hover:text-text-primary">
-                  <MessageCircle className="size-4 shrink-0" strokeWidth={1.5} /> WhatsApp
+              <span className="text-text-muted">{SITE.location}</span>
+            </div>
+
+            {/* Social sits with the contact details rather than in a row of its own. Given three small
+                tiles, a dedicated bottom-right slot cost more vertical space than the icons occupy. */}
+            <div className="mt-4 flex gap-2.5">
+              {SOCIAL.map(({ label, Icon }) => (
+                <a
+                  key={label}
+                  href="#"
+                  aria-label={label}
+                  className="hover-lift grid size-9 place-items-center rounded-chip border border-border text-text-secondary [transition-property:transform,color,border-color] hover:border-accent-primary/50 hover:text-accent-primary"
+                >
+                  <Icon className="size-4" />
                 </a>
-              )}
-              <span className="flex items-center gap-2.5 text-text-muted">
-                <MapPin className="size-4 shrink-0" strokeWidth={1.5} /> {SITE.location}
-              </span>
+              ))}
             </div>
           </div>
-
-          {/* Social — square hairline tiles, matching the site's geometry */}
-          <div className="flex gap-3 sm:col-span-2 lg:col-span-3 lg:justify-end">
-            {[
-              { label: 'Instagram', Icon: InstagramIcon },
-              { label: 'LinkedIn', Icon: LinkedinIcon },
-              { label: 'YouTube', Icon: YoutubeIcon },
-            ].map(({ label, Icon }) => (
-              <a
-                key={label}
-                href="#"
-                aria-label={label}
-                className="hover-lift grid size-10 place-items-center rounded-chip border border-border text-text-secondary [transition-property:transform,color,border-color] hover:border-text-primary/30 hover:text-text-primary"
-              >
-                <Icon className="size-4" />
-              </a>
-            ))}
           </div>
+
         </div>
 
-        {/* Bottom bar */}
-        <div className="flex flex-col items-start justify-between gap-4 border-t border-border pt-10 md:flex-row md:items-center">
+        <div className="mt-12 border-t border-border pt-6">
           <p className="label-micro text-text-muted">
             © {new Date().getFullYear()} PrintWarriors
           </p>
-          <div className="label-micro flex gap-8">
-            <a href="#" className="text-text-muted transition-colors duration-200 hover:text-text-primary">Privacy Policy</a>
-            <a href="#" className="text-text-muted transition-colors duration-200 hover:text-text-primary">Terms of Service</a>
-          </div>
         </div>
 
       </div>

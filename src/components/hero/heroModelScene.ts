@@ -49,7 +49,7 @@ const GRID_MAJOR_OPACITY = 0.14;
 // nothing. So the source colour is well clear of the page and the alpha brings it back down: 7% of this
 // lands on #24272D against a #1B1D21 page, 14% on #2D3138.
 const GRID_COLOUR = '#93A6C4';
-const PART_COLOUR = '#BDC1C4';
+const PART_COLOUR = '#F2F4F7';
 
 // The plate is 12D across, and its grid dissolves radially long before that. The fade is in UV space:
 // it starts at 0.15 (1.8D from the part) and is fully gone by 0.38 (4.6D), which leaves 1.4D of empty
