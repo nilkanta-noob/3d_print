@@ -685,7 +685,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
       renderer.domElement.removeEventListener('pointermove', onPointerMove);
       renderer.domElement.removeEventListener('pointerup', endDrag);
       renderer.domElement.removeEventListener('pointercancel', endDrag);
-      geometry.dispose();
+      geometry?.dispose();
       material.dispose();
       plate.geometry.dispose();
       (plate.material as THREE.Material).dispose();
