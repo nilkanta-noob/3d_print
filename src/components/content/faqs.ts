@@ -10,7 +10,7 @@ export const FAQS: Faq[] = [
   },
   {
     question: "How long does printing and delivery take?",
-    answer: "Print time depends on the part's size, infill and layer height. Standard delivery across India typically takes 3–4 business days from order confirmation. Within Kolkata, we also offer B2B drop-off/pickup and on-demand delivery via Porter for faster turnaround."
+    answer: "Standard delivery across India takes 3–4 business days from order confirmation. Within Kolkata, Porter delivery and B2B pickup are faster."
   },
   {
     question: "Do you deliver outside Kolkata?",
@@ -18,7 +18,7 @@ export const FAQS: Faq[] = [
   },
   {
     question: "Can students get a discount?",
-    answer: "Yes. PLA is ₹2.5/g instead of ₹3.5/g with a valid college ID or referral. Tick \"Apply Student Discount\" in the quote form and upload your ID. Student rates for PLA+ and PETG are coming soon."
+    answer: "Yes — PLA is ₹2.5/g instead of ₹3.5/g with a valid college ID or referral. Tick \"Apply Student Discount\" in the quote form and upload your ID."
   },
   {
     question: "What materials do you offer?",
@@ -26,7 +26,7 @@ export const FAQS: Faq[] = [
   },
   {
     question: "What printer and settings do you use?",
-    answer: "We print on a Creality CR-10 SE with a default layer height of 0.2mm, giving a solid balance of quality and speed for most prototyping and engineering needs. Finer layer heights (e.g. 0.12mm) can be requested for detail-critical parts — mention it in your quote request."
+    answer: "We print on a Creality CR-10 SE at 0.2mm layers by default. Ask for 0.12mm in your quote request if the part needs finer detail."
   },
   {
     question: "How is pricing calculated?",
@@ -38,7 +38,7 @@ export const FAQS: Faq[] = [
   },
   {
     question: "What's your minimum order size?",
-    answer: "There's no minimum order size — you can order any quantity or weight, and we'll print it for you anywhere in India. Orders above ₹599 qualify for free delivery; below ₹599, delivery and packaging costs are added separately. For B2B within Kolkata, there's no minimum — just contact us and we'll arrange a drop-off or pickup location."
+    answer: "No minimum — order any quantity or weight. Delivery is free above ₹599; below that, delivery and packaging are added separately."
   },
   {
     question: "How do I pay?",

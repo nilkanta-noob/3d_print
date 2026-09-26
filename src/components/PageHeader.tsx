@@ -11,8 +11,8 @@ interface PageHeaderProps {
 // Title block for inner pages (the home page has the video hero instead). Top padding clears the fixed navbar.
 export default function PageHeader({ eyebrow, title, description, children }: PageHeaderProps) {
   return (
-    <section className="border-b border-border bg-background pb-20 pt-36 md:pb-28 md:pt-48">
-      <div className="site-frame">
+    <section className="relative overflow-hidden border-b border-border bg-background pb-20 pt-36 md:pb-28 md:pt-48">
+      <div className="site-frame relative">
         <div className="max-w-4xl">
           <Eyebrow>{eyebrow}</Eyebrow>
           {/* The page's largest type: weight 500, tracking -0.04em, leading just under 1 — the same

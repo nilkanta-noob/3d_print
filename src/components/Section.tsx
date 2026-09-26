@@ -6,6 +6,9 @@ interface SectionProps {
   // top step, reserved for pricing. Alternate base and band down a page and use emphasis sparingly — it
   // only reads as emphasis while it is the only one.
   tone?: 'base' | 'band' | 'emphasis';
+  // compact: the standard vertical rhythm less 20%, for a section whose content already fills its height
+  // and does not need the full measure of air around it. Everything else keeps the site's one scale.
+  compact?: boolean;
   // afterHero: the first section under the home hero. The hero's footage fades into the same background
   // colour, so this section is separated by a single hairline rule rather than a tonal change.
   afterHero?: boolean;
@@ -20,12 +23,16 @@ interface SectionProps {
 // 160px from 1024px, top and bottom, so two adjacent sections are separated by 320px of empty space on a
 // desktop screen. Sections never carry a smaller value: the air between blocks is what makes the page
 // read as editorial rather than as a stack of panels.
-export default function Section({ id, tone = 'base', afterHero = false, className = '', children }: SectionProps) {
+export default function Section({ id, tone = 'base', afterHero = false, compact = false, className = '', children }: SectionProps) {
   const toneClass =
     tone === 'emphasis' ? 'bg-elevated' : tone === 'band' ? 'bg-surface' : 'bg-background';
   // The hero already fades into the page background above this section, so it opens with less top padding
   // than a standard section — the fade supplies the air, and the hairline supplies the edge.
-  const spacing = afterHero ? 'pt-20 pb-24 md:pt-24 md:pb-32 lg:pt-28 lg:pb-40' : 'py-24 md:py-32 lg:py-40';
+  const spacing = afterHero
+    ? 'pt-20 pb-24 md:pt-24 md:pb-32 lg:pt-28 lg:pb-40'
+    : compact
+      ? 'py-[4.8rem] md:py-[6.4rem] lg:py-[8rem]' // 96/128/160 less 20%
+      : 'py-24 md:py-32 lg:py-40';
 
   return (
     <section id={id} className={`scroll-mt-16 lg:scroll-mt-20 ${toneClass} ${className}`}>

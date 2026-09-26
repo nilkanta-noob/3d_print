@@ -18,7 +18,6 @@ export default function PricingSection() {
       <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
         <SectionHeading
           className="lg:col-span-5"
-          accent
           eyebrow="Pricing"
           /* nowrap on "per-gram": in the narrow heading column the line would otherwise break at the
              hyphen, leaving "per-" hanging at the end of a line */

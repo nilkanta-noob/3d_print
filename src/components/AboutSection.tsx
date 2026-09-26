@@ -1,7 +1,6 @@
 import React from 'react';
 import Section from './Section';
-import SectionHeading from './SectionHeading';
-import { AUDIENCES } from './content/site';
+import Eyebrow from './Eyebrow';
 
 const FACTS = [
   { label: 'Based in', value: 'Kolkata' },
@@ -9,63 +8,54 @@ const FACTS = [
   { label: 'Student rate from', value: '₹2.5/g' },
 ];
 
-// "Our story" on the About page: founder story and mission, key facts, and who we print for.
+/*
+ * The About page's opening: the story, and the three numbers that back it.
+ *
+ * Asymmetric on purpose. Every section on this page used to be an eyebrow, a centred heading, a
+ * paragraph and a four-box grid, four times over, which read as a template rather than a page. Here the
+ * label and heading hold a narrow left column and the prose runs in a wider one beside them — so the
+ * section is a split, the stats below it are a row, and neither looks like what follows.
+ *
+ * The copy is one paragraph because it used to be two that said the same thing: both claimed the work
+ * was "accessible" and both promised prototypes "without spending a fortune".
+ */
 export default function AboutSection() {
   return (
-    <Section id="story" tone="band">
-      <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
-
-        {/* Company story */}
+    <Section id="story" tone="band" compact>
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,1.5fr)] lg:items-center lg:gap-16">
         <div>
-          <SectionHeading eyebrow="Our story" title="Built to bring your ideas to life." />
-          <div className="mt-8 max-w-[60ch] space-y-6 text-base text-text-secondary md:text-[17px]">
-            <p>
-              PrintWarriors was started to make 3D printing more accessible for anyone with an idea worth building. Founded by an engineering student at Heritage Institute of Technology, Kolkata, we understand the challenges of turning digital designs into physical prototypes without spending a fortune.
+          <Eyebrow>Our story</Eyebrow>
+          <h2 className="mt-6 text-[clamp(2rem,6vw,2.25rem)] sm:text-[clamp(2.5rem,4vw,3.5rem)] text-text-primary text-balance">
+            Built to bring your ideas to life.
+          </h2>
+
+          <div className="mt-6 max-w-[58ch]">
+            <p className="text-base text-text-secondary md:text-[17px]">
+            PrintWarriors exists to make 3D printing affordable for anyone with an idea worth building.
+            We print one-off parts at per-gram rates — no minimum order, no setup fees, and a quote by
+              email before you pay.
             </p>
-            <p>
-              Our mission is to make prototyping accessible. Whether you&apos;re working on a college project, developing a prototype, creating a custom part, or simply bringing an idea to life, we provide affordable and reliable 3D printing to help you build, test, and iterate with confidence.
+            <p className="mt-6 text-[15px] text-text-muted">
+              Founded by an engineering student at Heritage Institute of Technology, Kolkata.
             </p>
           </div>
-
-          <dl className="mt-14 grid max-w-xl grid-cols-3 gap-8 border-t border-border pt-10">
-            {FACTS.map((fact) => (
-              <div key={fact.label}>
-                <dt className="label-micro text-text-muted">{fact.label}</dt>
-                <dd className="mt-3 font-display text-xl font-medium tracking-[-0.03em] text-text-primary sm:text-2xl">{fact.value}</dd>
-              </div>
-            ))}
-          </dl>
         </div>
-
-        {/* Brand visual.
-            PLACEHOLDER: a still frame of the hero footage (#t=6), cropped close on the print head, because the
-            site has no photos yet. Replace with a real workshop or team photo (e.g. public/about-workshop.jpg
-            via next/image) — that is what will make this section feel human. */}
-        <div className="relative aspect-[4/3] overflow-hidden border border-border bg-elevated">
-          <video
-            src="/hero/hero___video.mp4#t=6"
-            muted
-            playsInline
-            preload="metadata"
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover object-[70%_60%] scale-[1.35] origin-[70%_60%]"
-          />
-          {/* Neutral photo vignette */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent"></div>
-        </div>
+        {/* Reserved for a photo of the workshop or a finished part. Drop an <Image fill> in here when
+            one exists; the frame already holds its 3:4 shape so nothing reflows when it arrives. */}
+        <div className="relative aspect-[4/5] w-full overflow-hidden border border-border bg-surface" />
       </div>
-
-      {/* Who we print for */}
-      <div className="mt-24 lg:mt-32">
-        <h3 className="label-micro text-text-muted">Who we print for</h3>
-        <ul className="mt-10 grid gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-          {AUDIENCES.map((audience) => (
-            <li key={audience.title} className="bg-surface p-8">
-              <p className="font-display text-xl font-medium tracking-[-0.03em] text-text-primary">{audience.title}</p>
-              <p className="mt-4 text-sm text-text-secondary">{audience.body}</p>
-            </li>
+      {/* The strongest pattern on the page, kept as it was: three numbers on one rule. */}
+      <div className="relative mt-12 md:mt-14">
+        <dl className="relative grid grid-cols-3 gap-8 border-t border-border pt-8">
+          {FACTS.map((fact) => (
+            <div key={fact.label}>
+              <dt className="label-micro text-text-muted">{fact.label}</dt>
+              <dd className="mt-3 font-display text-xl font-medium tracking-[-0.03em] text-text-primary sm:text-2xl">
+                {fact.value}
+              </dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       </div>
     </Section>
   );

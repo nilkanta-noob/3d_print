@@ -214,7 +214,8 @@ export default function ServicesList() {
                         variant={service.illustration}
                         surface="elevated"
                         badge={false}
-                        sizes="100vw"
+                        layout="intrinsic"
+                        sizes="(min-width: 768px) 1px, 100vw"
                         className="h-full w-full"
                       />
                     </div>

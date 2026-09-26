@@ -6,7 +6,9 @@ import Section from '@/components/Section';
 import SectionHeading from '@/components/SectionHeading';
 import StepTimeline from '@/components/StepTimeline';
 import FAQSection from '@/components/FAQSection';
-import { PROCESS_STEPS, VALUES } from '@/components/content/site';
+import ValueChips from '@/components/ValueChips';
+import CtaBanner from '@/components/CtaBanner';
+import { PROCESS_STEPS, VALUES, QUOTE_HREF } from '@/components/content/site';
 
 export const metadata: Metadata = {
   title: 'About | PrintWarriors',
@@ -22,38 +24,41 @@ export default function AboutPage() {
         description="A Kolkata 3D printing service founded by an engineering student to make prototyping accessible — for students, makers, engineers and startups."
       />
 
-      {/* Story */}
+      {/* Story — an asymmetric text split, then the stats row */}
       <AboutSection />
 
-      {/* Mission */}
+      {/* Values — a row of chips, so the sentence is on demand rather than always on screen */}
       <Section id="mission">
-        <SectionHeading
-          eyebrow="Mission"
-          title="Make prototyping accessible"
-          description="Anyone with an idea worth building should be able to hold it in their hands without spending a fortune. These are the standards we hold ourselves to."
-        />
-        <ul className="mt-16 grid gap-px border border-border bg-border md:mt-20 md:grid-cols-2 lg:mt-24 lg:grid-cols-4">
-          {VALUES.map((value) => (
-            <li key={value.title} className="bg-elevated p-8">
-              <span className="block h-px w-7 bg-accent-primary" aria-hidden="true" />
-              <h3 className="leading-[1.1] mt-8 text-xl text-text-primary">{value.title}</h3>
-              <p className="mt-4 text-[15px] text-text-secondary">{value.body}</p>
-            </li>
-          ))}
-        </ul>
+        {/* A foundation under the heading rather than a field behind it — the bands rise from the base
+            of the block and fade out before they reach the type. Building from the ground up. */}
+        <div className="relative">
+          <div className="relative">
+            <SectionHeading
+              eyebrow="Mission"
+              title="Make prototyping accessible"
+            />
+            <ValueChips values={VALUES} />
+          </div>
+        </div>
       </Section>
 
-      {/* Process */}
+      {/* Process — a connected horizontal stepper */}
       <Section id="process" tone="band">
         <SectionHeading
           eyebrow="Process"
           title="From CAD file to finished part"
-          description="Four steps, with a person checking your file before anything is printed."
         />
-        <StepTimeline steps={PROCESS_STEPS} className="mt-16 md:mt-20 lg:mt-24" />
+        <StepTimeline steps={PROCESS_STEPS} className="mt-14 md:mt-16" />
       </Section>
 
-      <FAQSection tone="base" />
+      <FAQSection tone="base" initialCount={5} />
+
+      <CtaBanner
+        title="Ready to print something real?"
+        description="Upload your CAD file and get a quote by email."
+        primary={{ href: QUOTE_HREF, label: 'Get a Quote' }}
+        secondary={{ href: '/gallery', label: 'View Gallery' }}
+      />
     </>
   );
 }

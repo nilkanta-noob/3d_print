@@ -9,9 +9,6 @@ interface SectionHeadingProps {
   // display: the largest editorial header, for a section that opens a page (Services). Still clearly below
   // the hero headline, so it introduces the content instead of competing with the hero.
   size?: 'default' | 'display';
-  // accent: copper eyebrow, for the sections that carry the page's main argument (Materials, Pricing,
-  // Explore). Implied by size="display". It changes the label's colour only — the heading is the same.
-  accent?: boolean;
   className?: string;
 }
 
@@ -21,13 +18,13 @@ interface SectionHeadingProps {
 // The headings are set in the display face at weight 500, not bold. Weight is not what makes a heading
 // feel premium here — size, tight tracking (-0.035em) and leading just under 1 are. A heavier weight at
 // these sizes reads as a marketing banner; this reads as a masthead.
-export default function SectionHeading({ eyebrow, title, description, align = 'left', size = 'default', accent = false, className = '' }: SectionHeadingProps) {
+export default function SectionHeading({ eyebrow, title, description, align = 'left', size = 'default', className = '' }: SectionHeadingProps) {
   const centered = align === 'center';
   const display = size === 'display';
 
   return (
     <div className={`${display ? 'max-w-4xl' : 'max-w-3xl'} ${centered ? 'mx-auto text-center' : ''} ${className}`}>
-      <Eyebrow centered={centered} accent={display || accent}>{eyebrow}</Eyebrow>
+      <Eyebrow centered={centered}>{eyebrow}</Eyebrow>
       {display ? (
         // Phones ~32px, 44px on tablets, 66px at 1440px, 68px from ~1480px up.
         // It used to top out at 88px, which put it within ten points of the hero and left the page with

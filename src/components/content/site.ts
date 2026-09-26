@@ -46,22 +46,22 @@ export interface ProcessStep {
 export const PROCESS_STEPS: ProcessStep[] = [
   {
     title: 'Upload CAD file',
-    body: 'Send an STL, OBJ, STEP, IGES or 3MF file up to 100 MB and check it in the 3D preview before you submit.',
+    body: 'STL, STEP or 3MF, up to 100 MB.',
     icon: Upload,
   },
   {
     title: 'Review & validation',
-    body: 'A person reviews every file for printability, then emails your quote — usually within the hour.',
+    body: 'A person checks it and emails a quote.',
     icon: ClipboardCheck,
   },
   {
     title: 'Printing & quality check',
-    body: 'Printed at 0.2 mm layers by default (0.12 mm on request). Every part is checked; anything that fails on our side is reprinted free.',
+    body: 'Printed at 0.2 mm, then inspected.',
     icon: Layers,
   },
   {
     title: 'Delivery',
-    body: 'Courier anywhere in India in 3–4 business days, or Porter delivery and pickup in Kolkata. Free above ₹599.',
+    body: 'Couriered across India in 3–4 days.',
     icon: Truck,
   },
 ];
@@ -71,18 +71,11 @@ export interface TitledText {
   body: string;
 }
 
-export const AUDIENCES: TitledText[] = [
-  { title: 'Students', body: 'Final-year projects, robotics teams and coursework, at student rates.' },
-  { title: 'Makers', body: 'Replacement parts, mods and personal projects — no minimum order.' },
-  { title: 'Engineers', body: 'Functional prototypes, brackets and fixtures in PLA+ and PETG.' },
-  { title: 'Startups', body: 'Design revisions printed while you are still refining the product.' },
-];
-
 export const VALUES: TitledText[] = [
-  { title: 'Accessibility', body: 'Student pricing, no minimum order and no setup fees — a one-off part costs what it weighs.' },
-  { title: 'Reliability', body: 'Every print is quality-checked, and anything that fails on our side is reprinted at no cost before dispatch.' },
-  { title: 'Transparency', body: 'Published per-gram rates and an exact quote by email before you pay. No hidden fees.' },
-  { title: 'Speed', body: 'Quotes within the hour and delivery across India in 3–4 business days.' },
+  { title: 'Accessibility', body: 'Student pricing, no minimum order, no setup fees.' },
+  { title: 'Reliability', body: 'Every part is checked, and reprinted free if it fails on our side.' },
+  { title: 'Transparency', body: 'Published per-gram rates, and an exact quote before you pay.' },
+  { title: 'Speed', body: 'Quotes within the hour, delivery in 3–4 days.' },
 ];
 
 export function whatsappHref(number: string | null): string | null {

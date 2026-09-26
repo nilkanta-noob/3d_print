@@ -77,7 +77,6 @@ export default function MaterialsSection() {
   return (
     <Section id="materials">
       <SectionHeading
-        accent
         eyebrow="Materials"
         title="Three materials, chosen for real parts"
         description="Each filament is stocked for what it is actually good at — fine detail, impact strength or heat and water resistance. Choose by what the part has to survive."

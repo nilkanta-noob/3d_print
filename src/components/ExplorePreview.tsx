@@ -98,7 +98,6 @@ export default function ExplorePreview() {
   return (
     <Section id="explore">
       <SectionHeading
-        accent
         eyebrow="Explore"
         title="What you can do with 3D printing"
         description="Four of the things people bring us most often — from a one-off replacement part to a run of concept models."
