@@ -87,7 +87,7 @@ export default function ServicesList() {
                   Each size is taller than that breakpoint's open row, so it overhangs the band. */}
               <div
                 aria-hidden="true"
-                className={`pointer-events-none absolute left-[34%] top-1/2 z-20 ml-[10px] hidden h-[200px] w-[170px] -translate-y-1/2 overflow-hidden border border-border will-change-transform md:block lg:left-[36%] lg:h-[300px] lg:w-[260px] xl:h-[275px] xl:w-[280px] motion-safe:transition-[opacity,transform] motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`pointer-events-none absolute left-[34%] top-1/2 z-20 ml-[10px] hidden h-[200px] w-[170px] -translate-y-1/2 overflow-hidden border border-white/[0.08] will-change-transform md:block lg:left-[36%] lg:h-[300px] lg:w-[260px] xl:h-[275px] xl:w-[280px] motion-safe:transition-[opacity,transform] motion-safe:duration-[420ms] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   active ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
                 }`}
               >
@@ -207,7 +207,7 @@ export default function ServicesList() {
 
                     {/* Phones get the drawing inside the panel. The fixed ratio keeps the panel from
                         jumping while the image loads. */}
-                    <div aria-hidden="true" className="mt-5 aspect-[16/9] w-full overflow-hidden border border-border md:hidden">
+                    <div aria-hidden="true" className="mt-5 aspect-[16/9] w-full overflow-hidden border border-white/[0.08] md:hidden">
                       <ImageSlot
                         image={service.image}
                         alt=""

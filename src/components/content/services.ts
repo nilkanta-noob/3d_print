@@ -15,7 +15,9 @@ export interface Service {
   turnaround: string;
   materials: string;
   illustration: PartVariant;
-  image?: string; // add a photo from /public (e.g. '/services/rapid-prototyping.jpg') to replace the drawing
+  // A photo from /public. When set it replaces the line drawing and the "Render" badge, in both the
+  // floating desktop tile and the panel on phones — ImageSlot swaps them on this field alone.
+  image?: string;
   href?: string; // the service's own page, when it has one
 }
 
@@ -34,6 +36,7 @@ export const SERVICES: Service[] = [
     turnaround: STANDARD_TURNAROUND,
     materials: 'PLA (student rate); PLA+ or PETG for moving parts',
     illustration: 'standoffs',
+    image: '/all-images/product-imgs/student-project-2.webp',
   },
   {
     slug: 'rapid-prototyping',
@@ -46,6 +49,7 @@ export const SERVICES: Service[] = [
     turnaround: STANDARD_TURNAROUND,
     materials: 'PLA for form checks; PLA+ for functional tests',
     illustration: 'enclosure',
+    image: '/all-images/product-imgs/rapid-prototyping-1.webp',
   },
   {
     slug: 'custom-parts',
@@ -58,6 +62,7 @@ export const SERVICES: Service[] = [
     turnaround: STANDARD_TURNAROUND,
     materials: 'PLA+ for everyday parts; PETG for outdoor, wet or load-bearing use',
     illustration: 'bracket',
+    image: '/all-images/product-imgs/custom-pt-1.jpg',
   },
   {
     slug: 'product-development',
@@ -70,5 +75,6 @@ export const SERVICES: Service[] = [
     turnaround: STANDARD_TURNAROUND,
     materials: 'PLA+ and PETG',
     illustration: 'stepped',
+    image: '/all-images/product-imgs/productdevelopment.webp',
   },
 ];
