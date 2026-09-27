@@ -13,14 +13,17 @@ const FACTS = [
 ];
 
 /*
- * PLACEHOLDER. This frame is meant to hold a portrait photograph of the printer itself; there isn't one
- * in the repository yet, so it holds the next most honest thing — a bearing printed and assembled in a
- * single job, shot upright. Drop the printer photo in and change these two lines: the frame already
- * holds its 4:5 shape, so nothing around it reflows.
+ * The printer itself. The frame carries the photograph's own ratio — 1181x1600 — rather than a tidy 4:5,
+ * because the machine fills its frame to all four edges: at 4:5 object-cover would take 124px off the
+ * height, which is the light bar at the top and the base at the bottom. Matching the ratio means cover
+ * crops nothing at any width.
+ *
+ * Replacing the photo means changing the ratio with it, or the crop comes back.
  */
 const PORTRAIT = {
-  src: '/all-images/3d-print-our-gallery/functionalparts1.jpeg',
-  alt: 'A ball bearing printed in one piece, races and cages included',
+  src: '/explore_images/creality-3d_result.webp',
+  alt: 'The studio printer part-way through a job, filament feeding into the hot end',
+  ratio: '1181/1600',
 };
 
 /*
@@ -83,12 +86,19 @@ export default function AboutSection() {
               </ul>
             </div>
 
-            <div className="relative aspect-[4/5] w-full overflow-hidden border border-border">
+            {/* priority: this sits at the top of the page beside the heading, so it is a candidate for
+                the largest paint. Lazy-loading it would hold the section's right half empty until the
+                observer fired. */}
+            <div
+              className="relative w-full overflow-hidden border border-border"
+              style={{ aspectRatio: PORTRAIT.ratio }}
+            >
               <Image
                 src={PORTRAIT.src}
                 alt={PORTRAIT.alt}
                 fill
-                sizes="(min-width: 1024px) 42vw, 100vw"
+                priority
+                sizes="(min-width: 1024px) 40vw, 100vw"
                 className="object-cover object-center"
               />
             </div>
