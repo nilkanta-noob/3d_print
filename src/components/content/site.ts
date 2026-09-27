@@ -30,8 +30,9 @@ export const TRUST_ITEMS: string[] = [
 // Services and Pricing live on the home page (/#services, /#pricing); the rest are pages. The logo links home.
 export const NAV_LINKS: { href: string; label: string }[] = [
   { href: '/about', label: 'About' },
-  { href: '/materials', label: 'Materials' },
   { href: '/#services', label: 'Services' },
+  // The materials write-up lives in the home page section, not on a page of its own.
+  { href: '/#materials', label: 'Materials' },
   { href: '/#pricing', label: 'Pricing' },
   { href: '/explore', label: 'Explore' },
   { href: '/gallery', label: 'Gallery' },

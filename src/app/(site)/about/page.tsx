@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import PageHeader from '@/components/PageHeader';
 import AboutSection from '@/components/AboutSection';
 import Section from '@/components/Section';
 import FAQSection from '@/components/FAQSection';
@@ -16,14 +15,9 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <PageHeader
-        compact
-        eyebrow="About"
-        title="About PrintWarriors"
-        description="A Kolkata 3D printing service founded by an engineering student to make prototyping accessible — for students, makers, engineers and startups."
-      />
-
-      {/* Story — an asymmetric text split, then the stats row */}
+      {/* The page opens straight into the About section: it carries the eyebrow, the h1 and the
+          standfirst that used to live in a separate page header above it, so the page states its case
+          once instead of twice. It also pads for the fixed navbar, which the header used to do. */}
       <AboutSection />
 
       {/* Mission and process, merged. One section: the aim on the left, the four steps beside it.

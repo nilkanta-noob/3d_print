@@ -1,6 +1,10 @@
 import React from 'react';
-import Section from './Section';
+import Image from 'next/image';
 import Eyebrow from './Eyebrow';
+
+// The claims that sit under the argument, at caption size. Three short ones on one line rather than a
+// fourth paragraph: they are the terms of trade, not part of the prose.
+const CLAIMS = ['No minimum order', 'Manual review', 'Fast delivery'];
 
 const FACTS = [
   { label: 'Based in', value: 'Kolkata', accent: false },
@@ -9,61 +13,108 @@ const FACTS = [
 ];
 
 /*
- * The About page's opening: the story, and the three figures that back it.
+ * PLACEHOLDER. This frame is meant to hold a portrait photograph of the printer itself; there isn't one
+ * in the repository yet, so it holds the next most honest thing — a bearing printed and assembled in a
+ * single job, shot upright. Drop the printer photo in and change these two lines: the frame already
+ * holds its 4:5 shape, so nothing around it reflows.
+ */
+const PORTRAIT = {
+  src: '/all-images/3d-print-our-gallery/functionalparts1.jpeg',
+  alt: 'A ball bearing printed in one piece, races and cages included',
+};
+
+/*
+ * The whole of the About page's opening, in one section.
  *
- * Asymmetric on purpose. Every section on this page used to be an eyebrow, a centred heading, a
- * paragraph and a four-box grid, four times over, which read as a template rather than a page. Here the
- * label and heading hold a narrow left column and the prose runs in a wider one beside them — so the
- * section is a split, the figures below it are a row, and neither looks like what follows.
+ * It used to be two: a page header with a title and a standfirst, then a separate story section that
+ * opened with its own eyebrow and its own heading and said much the same thing again. Two headings for
+ * one idea is what made the page read as a template. Here the label, the heading and the argument hold
+ * one 620px column, the photograph holds the column beside it, and the figures sit under both — one
+ * statement, one piece of evidence, one set of numbers.
  *
- * Those figures are the loudest thing in the section by design: they are the only concrete claims on the
- * page, so they are set at display size with the label underneath, and the two a visitor is actually
- * weighing up carry the accent. They stay inside this section rather than becoming one of their own —
- * they are evidence for the paragraph above them, not a separate argument.
+ * The measure is deliberate. Prose set at 20px needs a column it can be read in: 620px is roughly 62
+ * characters at this size, which is the width a paragraph wants, and it is why the text column is
+ * capped rather than sharing the grid's spare space with the image.
  */
 export default function AboutSection() {
   return (
-    <Section id="story" tone="band" compact>
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1.5fr)] lg:items-center lg:gap-24">
-        <div>
-          <Eyebrow>Our story</Eyebrow>
-          <h2 className="mt-8 text-[clamp(2rem,6vw,2.25rem)] sm:text-[clamp(2.5rem,4vw,3.5rem)] text-text-primary text-balance">
-            Built to bring your ideas to life.
-          </h2>
+    <section id="story" className="bg-surface">
+      <div className="site-frame pb-24 pt-[calc(var(--nav-h)+4rem)] md:pb-32 md:pt-[calc(var(--nav-h)+5.5rem)]">
+        <div className="mx-auto w-full max-w-[1400px]">
+          {/* Tops aligned, not centres: the photograph starts on the same line as the eyebrow, so the
+              two columns open together and the section has one top edge rather than two. */}
+          <div className="grid gap-14 lg:grid-cols-[minmax(0,620px)_minmax(0,1fr)] lg:items-start lg:gap-24 xl:gap-32">
+            <div className="max-w-[620px]">
+              <Eyebrow>About</Eyebrow>
 
-          <div className="mt-8 max-w-[58ch]">
-            <p className="text-base text-text-secondary md:text-[17px]">
-              PrintWarriors exists to make 3D printing affordable for anyone with an idea worth building.
-              We print one-off parts at per-gram rates — no minimum order, no setup fees, and a quote by
-              email before you pay.
-            </p>
-            <p className="mt-7 text-[15px] text-text-muted">
-              Founded by an engineering student at Heritage Institute of Technology, Kolkata.
-            </p>
+              {/* Set to match the Mission heading further down the page exactly — the same size ramp,
+                  and the h2 scale's weight, tracking and leading rather than the h1 scale's. The element
+                  stays an h1 because it is the page's title; only its appearance is borrowed, and it is
+                  done here so no other page's title moves.
+
+                  The break is set rather than left to the balancer: the line wants to fall after
+                  "bring" at every width wide enough to hold two lines. Below 640px it flows. */}
+              <h1 className="mt-8 text-[clamp(2rem,6vw,2.25rem)] font-semibold leading-[1] tracking-[-0.03em] text-text-primary sm:text-[clamp(2.5rem,4vw,3.5rem)]">
+                Built to bring <span className="sm:block">ideas to life.</span>
+              </h1>
+
+              <div className="mt-10 space-y-7 text-[1.25rem] leading-[1.7] text-text-secondary md:mt-12">
+                <p>
+                  PrintWarriors is a Kolkata-based 3D printing studio making prototyping accessible for
+                  students, makers, engineers and startups.
+                </p>
+                <p>
+                  We print one-off parts, prototypes and custom components with transparent pricing, fast
+                  turnaround and no minimum order quantity.
+                </p>
+                <p>
+                  Every file is reviewed manually before printing to check wall thickness, tolerances and
+                  printability.
+                </p>
+              </div>
+
+              <ul className="label-micro mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 text-text-muted md:mt-12">
+                {CLAIMS.map((claim, i) => (
+                  <li key={claim} className="flex items-center gap-3">
+                    {i > 0 && <span aria-hidden="true">·</span>}
+                    {claim}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="relative aspect-[4/5] w-full overflow-hidden border border-border">
+              <Image
+                src={PORTRAIT.src}
+                alt={PORTRAIT.alt}
+                fill
+                sizes="(min-width: 1024px) 42vw, 100vw"
+                className="object-cover object-center"
+              />
+            </div>
           </div>
+
+          {/* The three figures that back the argument above. They are the only concrete claims on the
+              page, so they are set at display size with the label underneath, and the two a visitor is
+              actually weighing up carry the accent. */}
+          <dl className="mt-20 grid grid-cols-1 gap-10 border-t border-border pt-10 sm:grid-cols-3 md:mt-24">
+            {FACTS.map((fact) => (
+              // Reversed, so the figure reads first and its label sits underneath — while the markup keeps
+              // the term before its definition, which is the order a description list has to be written in.
+              <div key={fact.label} className="flex flex-col-reverse items-start">
+                <dt className="label-micro mt-3 text-text-muted">{fact.label}</dt>
+                <dd
+                  className={`font-display text-[clamp(1.875rem,2.8vw,2.375rem)] font-semibold leading-[1.05] tracking-[-0.035em] ${
+                    fact.accent ? 'text-accent-primary' : 'text-text-primary'
+                  }`}
+                >
+                  {fact.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
-
-        {/* Reserved for a photo of the workshop or a finished part. Drop an <Image fill> in here when
-            one exists; the frame already holds its 4:5 shape so nothing reflows when it arrives. */}
-        <div className="relative aspect-[4/5] w-full overflow-hidden border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]" />
       </div>
-
-      <dl className="mt-16 grid grid-cols-1 gap-8 border-t border-border pt-10 sm:grid-cols-3">
-        {FACTS.map((fact) => (
-          // Reversed, so the figure reads first and its label sits underneath — while the markup keeps
-          // the term before its definition, which is the order a description list has to be written in.
-          <div key={fact.label} className="flex flex-col-reverse items-start">
-            <dt className="label-micro mt-3 text-text-muted">{fact.label}</dt>
-            <dd
-              className={`font-display text-[clamp(1.875rem,2.8vw,2.375rem)] font-semibold leading-[1.05] tracking-[-0.035em] ${
-                fact.accent ? 'text-accent-primary' : 'text-text-primary'
-              }`}
-            >
-              {fact.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </Section>
+    </section>
   );
 }

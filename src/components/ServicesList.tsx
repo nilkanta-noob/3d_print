@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Plus } from 'lucide-react';
+import { ArrowUpRight, Plus } from 'lucide-react';
 import ImageSlot from './ImageSlot';
 import useMediaQuery from './useMediaQuery';
 import { SERVICES } from './content/services';
@@ -191,46 +191,37 @@ export default function ServicesList() {
                       it is, whether that service's copy runs to two lines or three. */}
                   <p className="text-[15px] leading-relaxed text-on-accent md:min-h-[3lh] xl:min-h-[2lh]">{service.description}</p>
 
-                  {/* The facts and the link share a line from tablets up, which keeps the row short enough
-                      for the floating tile to overhang it top and bottom. */}
-                  {/* Facts above the button on tablets, beside it on wide screens. Never wrapping means a
-                      long facts line can't push the button onto its own row and make that row taller. */}
-                  <div className="mt-3 md:mt-4 md:flex md:flex-col md:items-start md:gap-4 xl:flex-row xl:flex-wrap xl:items-end xl:justify-between xl:gap-y-6">
-                    <ul className="flex min-w-0 flex-wrap items-center gap-x-2.5 font-mono text-[11px] uppercase leading-[1.5] tracking-[0.14em] text-on-accent md:min-h-[3lh] xl:min-h-0 xl:w-2/3">
-                      {service.meta.map((fact, i) => (
-                        <li key={fact} className="flex items-center gap-2">
-                          {i > 0 && <span aria-hidden="true">·</span>}
-                          {fact}
-                        </li>
-                      ))}
-                    </ul>
+                  {/* Phones get the drawing inside the panel. The fixed ratio keeps the panel from
+                      jumping while the image loads. */}
+                  <div aria-hidden="true" className="mt-5 aspect-[16/9] w-full overflow-hidden border border-white/[0.08] md:hidden">
+                    <ImageSlot
+                      image={service.image}
+                      alt=""
+                      variant={service.illustration}
+                      surface="elevated"
+                      badge={false}
+                      layout="intrinsic"
+                      sizes="(min-width: 768px) 1px, 100vw"
+                      className="h-full w-full"
+                    />
+                  </div>
 
-                    {/* Phones get the drawing inside the panel. The fixed ratio keeps the panel from
-                        jumping while the image loads. */}
-                    <div aria-hidden="true" className="mt-5 aspect-[16/9] w-full overflow-hidden border border-white/[0.08] md:hidden">
-                      <ImageSlot
-                        image={service.image}
-                        alt=""
-                        variant={service.illustration}
-                        surface="elevated"
-                        badge={false}
-                        layout="intrinsic"
-                        sizes="(min-width: 768px) 1px, 100vw"
-                        className="h-full w-full"
-                      />
-                    </div>
-
-                    {/* TODO: the quote form has no service field yet, so ?service= is only carried in the
-                        URL. Read it in QueryForm (and preselect a material) when that field exists. */}
-                    <Link
-                      href={`${QUOTE_HREF}?service=${service.slug}`}
-                      tabIndex={active ? undefined : -1}
-                      className="hover-lift pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-control bg-on-accent px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-text-primary [transition-property:transform,opacity] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-accent md:mt-0 xl:ml-auto xl:mt-2"
-                    >
-                      Get a quote for this
-                      <ArrowRight aria-hidden="true" className="size-4" />
-                    </Link>
-                    </div>
+                  {/* An action, not a block: on a band that is already one flat colour, a filled button
+                      was a second rectangle inside the first. The rule under the words carries it
+                      instead, and the arrow leaves the line on hover.
+                      TODO: the quote form has no service field yet, so ?service= is only carried in the
+                      URL. Read it in QueryForm (and preselect a material) when that field exists. */}
+                  <Link
+                    href={`${QUOTE_HREF}?service=${service.slug}`}
+                    tabIndex={active ? undefined : -1}
+                    className="group/quote pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-on-accent md:mt-5"
+                  >
+                    <span className="underline decoration-1 underline-offset-[10px]">Get a quote for this</span>
+                    <ArrowUpRight
+                      aria-hidden="true"
+                      className="size-4 transition-transform duration-300 motion-safe:group-hover/quote:-translate-y-0.5 motion-safe:group-hover/quote:translate-x-0.5"
+                    />
+                  </Link>
                   </div>
                 </div>
               </div>

@@ -1,16 +1,14 @@
 "use client";
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 import Section from './Section';
 import SectionHeading from './SectionHeading';
-import ButtonLink from './ButtonLink';
 import { MATERIALS, type Material } from './content/materials';
 
 // One material as a rectangular specimen card: the tag, the name at display size, one line on what it's
-// for, best uses, and a link to its full write-up on the Materials page (MaterialDetail's id). The link's
-// ::after stretches over the card, so the whole card is clickable.
+// for, and best uses. The card used to close on a link to that material's write-up on the Materials
+// page; with that page gone the card is the whole of what the site says about the material, so it ends
+// on its specification rather than on an invitation to read more.
 //
 // The three cards share one continuous hairline grid — a single rectangle divided twice, rather than
 // three boxes with gaps between them. No radius, no shadow, no fill change: the only hover signal is a
@@ -29,7 +27,7 @@ function MaterialCard({
   return (
     <article
       onMouseEnter={() => setActiveMaterial(material.slug)}
-      className="group relative flex h-full w-full min-w-0 flex-col bg-surface p-8 lg:p-10"
+      className="relative flex h-full w-full min-w-0 flex-col bg-surface p-8 lg:p-10"
     >
       {/* The active rule: 2px of copper along the top edge of the card, drawn from the left */}
       <span
@@ -50,21 +48,15 @@ function MaterialCard({
 
       {/* On phones the stacked cards reserve two lines so they stay the same height; wider stacked cards (tablets)
           fit everything on one line, and side by side (1024px+) the grid row equalises them */}
-      <p className="mt-6 min-h-[2lh] text-base text-text-secondary md:min-h-0">{material.summary}</p>
+      <p className="mt-6 min-h-[2lh] pb-10 text-base text-text-secondary md:min-h-0">{material.summary}</p>
 
-      <div className="mt-8 border-t border-border pt-6">
+      {/* mt-auto holds this block to the foot of the card so the three rules sit on one line across the
+          row however long the summaries above them run — and the use-case line keeps its two-line floor
+          at every width, because one card's list wraps where the other two do not and the rules would
+          otherwise sit a line apart from each other. */}
+      <div className="mt-auto border-t border-border pt-6">
         <p className="label-micro text-text-muted">Best for</p>
-        <p className="mt-3 min-h-[2lh] text-[15px] leading-[1.7] text-text-primary md:min-h-0">{material.useCases.join(' · ')}</p>
-      </div>
-
-      <div className="mt-auto pt-10">
-        <Link
-          href={`/materials#${material.slug}`}
-          className="group/cta inline-flex items-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-text-primary after:absolute after:inset-0 focus-visible:outline-none"
-        >
-          Learn More<span className="sr-only"> about {material.name}</span>
-          <ArrowRight className="size-4 text-accent-primary transition-transform duration-300 motion-safe:group-hover:translate-x-1" aria-hidden="true" />
-        </Link>
+        <p className="mt-3 min-h-[2lh] text-[15px] leading-[1.7] text-text-primary">{material.useCases.join(' · ')}</p>
       </div>
     </article>
   );
@@ -96,11 +88,6 @@ export default function MaterialsSection() {
           </li>
         ))}
       </ul>
-
-      <ButtonLink href="/materials" className="group mt-16 lg:mt-20">
-        Explore Materials
-        <ArrowRight className="size-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" aria-hidden="true" />
-      </ButtonLink>
     </Section>
   );
 }

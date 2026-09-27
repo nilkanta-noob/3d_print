@@ -26,7 +26,6 @@ const YoutubeIcon = ({ className }: { className?: string }) => (
 );
 
 const NAV = [
-  { href: '/materials', label: 'Materials' },
   { href: '/#services', label: 'Services' },
   { href: '/#pricing', label: 'Pricing' },
   { href: '/gallery', label: 'Gallery' },
