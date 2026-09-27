@@ -1,10 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { Mail, MessageCircle, MapPin, Clock } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
-import Section from '@/components/Section';
 import ContactForm from '@/components/ContactForm';
-import { BUTTON_BASE, BUTTON_VARIANTS } from '@/components/ButtonLink';
 import { SITE, whatsappHref } from '@/components/content/site';
 
 export const metadata: Metadata = {
@@ -12,14 +9,24 @@ export const metadata: Metadata = {
   description: 'Contact PrintWarriors in Kolkata by email, WhatsApp or the contact form. Delivery across India.',
 };
 
-function InfoCard({ icon: Icon, title, children }: { icon: typeof Mail; title: string; children: React.ReactNode }) {
-  return (
-    <div className="border border-border bg-elevated p-8">
-      <Icon className="size-5 text-accent-primary" strokeWidth={1.5} aria-hidden="true" />
-      <h3 className="label-micro mt-6 text-text-muted">{title}</h3>
-      <div className="mt-4">{children}</div>
-    </div>
-  );
+/*
+ * One column, one axis, no containers.
+ *
+ * The page used to be four bordered cards beside a bordered form panel — six rectangles for a page whose
+ * whole job is three fields and an address. Everything that was a box is now either a line of type or a
+ * hairline rule: the fields sit on rules, the details sit on one line under a rule, and the page carries
+ * no fill of its own anywhere. What separates the parts is distance, not edges.
+ */
+const COLUMN = 'mx-auto w-full max-w-[36rem]';
+
+// The details that used to be cards. A strip, not a grid: three short facts on one line, divided by
+// hairlines, at the weight of a caption — the page's smallest type doing the page's smallest job.
+function Detail({ children }: { children: React.ReactNode }) {
+  return <span className="text-[15px] text-text-secondary">{children}</span>;
+}
+
+function Divider() {
+  return <span className="hidden h-4 w-px shrink-0 bg-border sm:block" aria-hidden="true" />;
 }
 
 export default function ContactPage() {
@@ -28,51 +35,66 @@ export default function ContactPage() {
   return (
     <>
       <PageHeader
+        compact
+        align="center"
+        spaceAfter="tight"
         eyebrow="Contact"
         title="Talk to us"
-        description="Questions about a part, a material or an order? Email us or send a message below."
+        description="Questions about a part, a material or an order? Tell us what you need and we'll come back to you with a straight answer."
+        note={
+          <>
+            Based in {SITE.location}, printing and shipping across India. Prefer email? Write to{' '}
+            <a
+              href={`mailto:${SITE.email}`}
+              className="text-text-secondary underline decoration-accent-primary underline-offset-4 hover:text-text-primary"
+            >
+              {SITE.email}
+            </a>
+            .
+          </>
+        }
       />
 
-      <Section tone="band">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="space-y-6 lg:col-span-5">
-            <h2 className="sr-only">Contact information</h2>
-
-            {/* WhatsApp CTA — the button appears once SITE.whatsappNumber is set in content/site.ts */}
-            <InfoCard icon={MessageCircle} title="WhatsApp">
-              {whatsapp ? (
-                <a href={whatsapp} className={`${BUTTON_BASE} ${BUTTON_VARIANTS.primary} mt-2`}>Chat on WhatsApp</a>
-              ) : (
-                <p className="text-[15px] leading-relaxed text-text-secondary">Order updates are shared directly on WhatsApp.</p>
-              )}
-            </InfoCard>
-
-            <InfoCard icon={Mail} title="Email">
-              <a href={`mailto:${SITE.email}`} className="font-display text-lg font-medium tracking-[-0.02em] text-text-primary underline decoration-accent-primary decoration-1 underline-offset-[8px] hover:decoration-text-primary">
-                {SITE.email}
-              </a>
-            </InfoCard>
-
-            <InfoCard icon={MapPin} title="Location">
-              <p className="font-display text-lg font-medium tracking-[-0.02em] text-text-primary">{SITE.location}</p>
-              <p className="mt-3 text-[15px] leading-[1.7] text-text-secondary">Porter delivery and pickup in Kolkata · courier across India.</p>
-            </InfoCard>
-
-            {/* Shown once SITE.businessHours is set in content/site.ts */}
-            {SITE.businessHours && (
-              <InfoCard icon={Clock} title="Business hours">
-                <p className="font-display text-lg font-medium tracking-[-0.02em] text-text-primary">{SITE.businessHours}</p>
-              </InfoCard>
-            )}
-          </div>
-
-          <div className="border border-border bg-elevated p-8 md:p-12 lg:col-span-7">
-            <h2 className="text-[2rem] text-text-primary">Send a message</h2>
-            <p className="mb-12 mt-5 text-[15px] text-text-secondary">For quotes, the quote form is faster — it includes your file.</p>
+      <section className="bg-background">
+        <div className="site-frame pb-28 pt-16 md:pb-36 md:pt-20">
+          <h2 className="sr-only">Send a message</h2>
+          <div className={COLUMN}>
             <ContactForm />
           </div>
+
+          {/* The one rule on the page that is not a field: it closes the form and opens the details, and
+              it is set to the column rather than to the screen so it measures the same thing the form
+              does. */}
+          <div className={`${COLUMN} mt-24 border-t border-border pt-10 md:mt-28`}>
+            <h2 className="sr-only">Contact details</h2>
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-6">
+              <Detail>{SITE.location}</Detail>
+              <Divider />
+              <Detail>
+                <a
+                  href={`mailto:${SITE.email}`}
+                  className="underline decoration-accent-primary decoration-1 underline-offset-[6px] transition-colors hover:text-text-primary"
+                >
+                  {SITE.email}
+                </a>
+              </Detail>
+              <Divider />
+              <Detail>Delivery across India</Detail>
+              {/* Appears once SITE.whatsappNumber is set in content/site.ts */}
+              {whatsapp && (
+                <>
+                  <Divider />
+                  <Detail>
+                    <a href={whatsapp} className="underline decoration-accent-primary decoration-1 underline-offset-[6px] transition-colors hover:text-text-primary">
+                      WhatsApp
+                    </a>
+                  </Detail>
+                </>
+              )}
+            </div>
+          </div>
         </div>
-      </Section>
+      </section>
     </>
   );
 }

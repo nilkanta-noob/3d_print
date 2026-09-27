@@ -43,7 +43,7 @@ export interface ProcessStep {
 
 export const PROCESS_STEPS: ProcessStep[] = [
   {
-    title: 'Upload CAD file',
+    title: 'Upload CAD files',
     body: 'STL, STEP or 3MF, up to 100 MB.',
   },
   {
