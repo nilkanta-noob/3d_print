@@ -11,6 +11,8 @@ export const SITE = {
   // PLACEHOLDER: add opening hours (e.g. 'Mon–Sat, 10:00–19:00') and the Contact page shows a Business hours card.
   businessHours: null as string | null,
   location: 'Kolkata, West Bengal',
+  // Printed as written and dialled with the spaces stripped — see telHref below.
+  phone: '+91 8335910068',
 };
 
 export const QUOTE_HREF = '/get-quote';
@@ -67,4 +69,10 @@ export interface TitledText {
 
 export function whatsappHref(number: string | null): string | null {
   return number ? `https://wa.me/${number}` : null;
+}
+
+// tel: takes digits and a leading +, nothing else, so the display spacing is stripped rather than kept in
+// a second copy of the number.
+export function telHref(number: string): string {
+  return `tel:${number.replace(/[^\d+]/g, '')}`;
 }

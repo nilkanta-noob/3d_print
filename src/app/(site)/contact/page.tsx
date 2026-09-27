@@ -1,100 +1,72 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import PageHeader from '@/components/PageHeader';
 import ContactForm from '@/components/ContactForm';
-import { SITE, whatsappHref } from '@/components/content/site';
+import { SITE, telHref } from '@/components/content/site';
 
 export const metadata: Metadata = {
   title: 'Contact | PrintWarriors',
-  description: 'Contact PrintWarriors in Kolkata by email, WhatsApp or the contact form. Delivery across India.',
+  description: 'Contact PrintWarriors in Kolkata by phone, email or the contact form. Delivery across India.',
 };
 
 /*
- * One column, one axis, no containers.
+ * One screen, two columns, nothing boxed.
  *
- * The page used to be four bordered cards beside a bordered form panel — six rectangles for a page whose
- * whole job is three fields and an address. Everything that was a box is now either a line of type or a
- * hairline rule: the fields sit on rules, the details sit on one line under a rule, and the page carries
- * no fill of its own anywhere. What separates the parts is distance, not edges.
+ * The page is the height of the window and does not scroll: the title holds the left third, the form
+ * holds the rest, and a hairline strip of details closes it at the foot. There is no page header
+ * component here, because the title and the form are one composition and the space between them is the
+ * layout — splitting it across a header's bottom padding and a section's top padding would put the two
+ * halves on separate rhythms.
+ *
+ * The label sits under the title rather than over it. Above, it would be the third small uppercase line
+ * on a page that already has one in the navbar; below, it reads as a caption to the title — which is
+ * what it is.
  */
-const COLUMN = 'mx-auto w-full max-w-[36rem]';
+// Understated by default and accent on hover — the page's one piece of colour stays on the send action.
+const LINK = 'text-text-primary transition-colors duration-200 hover:text-accent-primary';
 
-// The details that used to be cards. A strip, not a grid: three short facts on one line, divided by
-// hairlines, at the weight of a caption — the page's smallest type doing the page's smallest job.
-function Detail({ children }: { children: React.ReactNode }) {
-  return <span className="text-[15px] text-text-secondary">{children}</span>;
-}
-
-function Divider() {
-  return <span className="hidden h-4 w-px shrink-0 bg-border sm:block" aria-hidden="true" />;
+// A typographic mark, not an icon: it belongs to the line of text it closes.
+function OutArrow() {
+  return <span className="ml-1.5 align-baseline text-[0.8em]" aria-hidden="true">↗</span>;
 }
 
 export default function ContactPage() {
-  const whatsapp = whatsappHref(SITE.whatsappNumber);
-
   return (
-    <>
-      <PageHeader
-        compact
-        align="center"
-        spaceAfter="tight"
-        eyebrow="Contact"
-        title="Talk to us"
-        description="Questions about a part, a material or an order? Tell us what you need and we'll come back to you with a straight answer."
-        note={
-          <>
-            Based in {SITE.location}, printing and shipping across India. Prefer email? Write to{' '}
-            <a
-              href={`mailto:${SITE.email}`}
-              className="text-text-secondary underline decoration-accent-primary underline-offset-4 hover:text-text-primary"
-            >
-              {SITE.email}
-            </a>
-            .
-          </>
-        }
-      />
+    <section className="bg-background">
+      <div className="site-frame flex min-h-svh flex-col pb-8 pt-[calc(var(--nav-h)+2.5rem)]">
+        <div className="flex flex-1 items-center py-10">
+          <div className="grid w-full gap-10 lg:grid-cols-[minmax(0,34fr)_minmax(0,66fr)] lg:items-start lg:gap-20">
+            <div>
+              <h1 className="text-[clamp(2.75rem,5.5vw,4.5rem)] text-text-primary text-balance">Let&apos;s talk.</h1>
+              <p className="label-micro mt-6 text-text-muted">Project enquiry</p>
+            </div>
 
-      <section className="bg-background">
-        <div className="site-frame pb-28 pt-16 md:pb-36 md:pt-20">
-          <h2 className="sr-only">Send a message</h2>
-          <div className={COLUMN}>
-            <ContactForm />
-          </div>
-
-          {/* The one rule on the page that is not a field: it closes the form and opens the details, and
-              it is set to the column rather than to the screen so it measures the same thing the form
-              does. */}
-          <div className={`${COLUMN} mt-24 border-t border-border pt-10 md:mt-28`}>
-            <h2 className="sr-only">Contact details</h2>
-            <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-6">
-              <Detail>{SITE.location}</Detail>
-              <Divider />
-              <Detail>
-                <a
-                  href={`mailto:${SITE.email}`}
-                  className="underline decoration-accent-primary decoration-1 underline-offset-[6px] transition-colors hover:text-text-primary"
-                >
-                  {SITE.email}
-                </a>
-              </Detail>
-              <Divider />
-              <Detail>Delivery across India</Detail>
-              {/* Appears once SITE.whatsappNumber is set in content/site.ts */}
-              {whatsapp && (
-                <>
-                  <Divider />
-                  <Detail>
-                    <a href={whatsapp} className="underline decoration-accent-primary decoration-1 underline-offset-[6px] transition-colors hover:text-text-primary">
-                      WhatsApp
-                    </a>
-                  </Detail>
-                </>
-              )}
+            <div>
+              <h2 className="sr-only">Send an enquiry</h2>
+              <ContactForm />
             </div>
           </div>
         </div>
-      </section>
-    </>
+
+        {/* The foot of the page: three centred lines between two rules, at reading size rather than at
+            caption size. It carries what somebody might want instead of the form — a number and an
+            address — and it closes the page on its own centre line. */}
+        <div className="mx-auto w-full max-w-[48rem] border-y border-border py-8 text-center">
+          <h2 className="sr-only">Contact details</h2>
+          <p className="text-[1.125rem] leading-[1.4] text-text-secondary">Based in Kolkata, India.</p>
+          <p className="mt-3 text-[1.125rem] leading-[1.4]">
+            <a href={telHref(SITE.phone)} className={LINK}>
+              {SITE.phone}
+              <OutArrow />
+            </a>
+          </p>
+          <p className="mt-1.5 text-[1.125rem] leading-[1.4]">
+            <a href={`mailto:${SITE.email}`} className={LINK}>
+              {SITE.email}
+              <OutArrow />
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }

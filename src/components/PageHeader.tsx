@@ -27,6 +27,12 @@ interface PageHeaderProps {
    * to the title above it. 'standard' is the site's page rhythm and stays the default.
    */
   spaceAfter?: 'standard' | 'tight';
+  /*
+   * The title's step, separated from `compact` so a page can take the shorter header padding without
+   * also dropping its headline a size — Contact, where the hero has to stay the largest type on the page
+   * while the form sits close under it. Left unset it follows `compact`, so nothing else moves.
+   */
+  titleSize?: 'compact' | 'standard';
 }
 
 // Title block for inner pages (the home page has the video hero instead). Top padding clears the fixed navbar.
@@ -39,8 +45,10 @@ export default function PageHeader({
   align = 'left',
   note,
   spaceAfter = 'standard',
+  titleSize,
 }: PageHeaderProps) {
   const centred = align === 'center';
+  const titleScale = titleSize ?? (compact ? 'compact' : 'standard');
   return (
     <section
       className={`relative overflow-hidden bg-background ${spaceAfter === 'tight' ? '' : 'border-b border-border'} ${
@@ -56,7 +64,7 @@ export default function PageHeader({
               masthead treatment the home page's section headings use, one step larger. */}
           <h1
             className={`text-text-primary text-balance ${
-              compact
+              titleScale === 'compact'
                 ? 'mt-4 text-[clamp(2.125rem,7.5vw,2.5rem)] sm:text-[clamp(3rem,5vw,4.25rem)]'
                 : 'mt-6 text-[clamp(2.5rem,9vw,3rem)] sm:text-[clamp(3.5rem,6vw,5rem)]'
             }`}
