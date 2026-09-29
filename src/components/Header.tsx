@@ -1,5 +1,6 @@
 "use client";
 
+import Wordmark from './Wordmark';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -67,7 +68,7 @@ export default function Header() {
             href="/"
             className="justify-self-start whitespace-nowrap font-display text-[15px] font-semibold uppercase tracking-[0.2em] text-white transition-opacity duration-300 hover:opacity-70 sm:text-[17px] sm:tracking-[0.24em] lg:text-[18px] lg:tracking-[0.22em] xl:tracking-[0.24em]"
           >
-            Print<span className="text-accent-primary">Warriors</span>
+            <Wordmark />
           </Link>
 
           {/* Desktop navigation — no menu button at any laptop/desktop width. Link gaps widen with the screen:

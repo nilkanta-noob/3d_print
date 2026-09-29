@@ -168,6 +168,49 @@
   letter-spacing: 0.12em;
 }
 
+/*
+ * The W of the wordmark, cut into three layers.
+ *
+ * 1.2em with line-height 1 so it rises above the other letters without dropping below the baseline or
+ * changing the line box, and weight 500 — one step under the wordmark's 600 — so its stroke matches the
+ * smaller letters rather than reading as bolder at the larger size.
+ *
+ * The gaps are a mask, not drawn glyphs, so the letter stays real text: it is selectable, searchable and
+ * read aloud as part of "PrintWarriors". The whole treatment sits behind @supports for text-box, which
+ * is what trims the half-leading above the cap; where that is unsupported the W simply renders solid at
+ * the larger size, which is a perfectly reasonable fallback.
+ */
+.layered-w {
+  display: inline-block;
+  font-size: 1.2em;
+  font-weight: inherit;
+  line-height: 1;
+  margin-right: -0.07em;
+}
+
+@supports (text-box: trim-both cap alphabetic) {
+  .layered-w {
+    text-box: trim-both cap alphabetic;
+    --g: 0.026em;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 calc(33.333% - var(--g)),
+      transparent calc(33.333% - var(--g)) calc(33.333% + var(--g)),
+      #000 calc(33.333% + var(--g)) calc(66.666% - var(--g)),
+      transparent calc(66.666% - var(--g)) calc(66.666% + var(--g)),
+      #000 calc(66.666% + var(--g))
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      #000 calc(33.333% - var(--g)),
+      transparent calc(33.333% - var(--g)) calc(33.333% + var(--g)),
+      #000 calc(33.333% + var(--g)) calc(66.666% - var(--g)),
+      transparent calc(66.666% - var(--g)) calc(66.666% + var(--g)),
+      #000 calc(66.666% + var(--g))
+    );
+  }
+}
+
 @layer base {
   body {
     background: var(--background);
@@ -203,6 +246,7 @@
     line-height: 1.1;
   }
 }
+
 
 
 

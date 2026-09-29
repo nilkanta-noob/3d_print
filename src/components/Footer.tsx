@@ -1,3 +1,4 @@
+import Wordmark from './Wordmark';
 import React from 'react';
 import Link from 'next/link';
 import { SITE } from './content/site';
@@ -54,7 +55,7 @@ export default function Footer() {
 
           <div>
             <p className="font-display text-[19px] font-semibold uppercase tracking-[0.2em] text-text-primary">
-              Print<span className="text-accent-primary">Warriors</span>
+              <Wordmark />
             </p>
             <p className="mt-3 max-w-[30ch] text-[15px]">
               Precision 3D printing for prototypes and functional parts.
