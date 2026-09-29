@@ -2,7 +2,6 @@ import React from 'react';
 import HomeHero from '@/components/HomeHero';
 import ServicesSection from '@/components/ServicesSection';
 import MaterialsSection from '@/components/MaterialsSection';
-import ExplorePreview from '@/components/ExplorePreview';
 import PricingSection from '@/components/PricingSection';
 import TrustTicker from '@/components/TrustTicker';
 import CtaBanner from '@/components/CtaBanner';
@@ -20,7 +19,6 @@ export default function HomePage() {
       <ServicesSection />
       <MaterialsSection />
       <PricingSection />
-      <ExplorePreview />
       <CtaBanner
         title="Turn Your Design Into Something Real."
         description="Upload your CAD file and receive a quote within hours."

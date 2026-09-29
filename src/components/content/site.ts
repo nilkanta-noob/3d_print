@@ -15,9 +15,25 @@ export const SITE = {
   phone: '+91 8335910068',
 };
 
+/*
+ * WhatsApp, in one place: the number, how it is written for a reader, and the message a chat opens with.
+ * Both footer links — the text one and the icon — build their href from WHATSAPP_HREF, so the number and
+ * the greeting are only ever set here.
+ *
+ * encodeURIComponent leaves an apostrophe alone, since it is an unreserved mark; WhatsApp's own links
+ * escape it, so it is replaced explicitly and the URL matches the one they generate.
+ */
+export const WHATSAPP = {
+  number: '918335910068',
+  display: '+91 83359 10068',
+  message: "Hi PrintWarriors, I'd like a quote for a 3D print.",
+};
+
+export const WHATSAPP_HREF = `https://wa.me/${WHATSAPP.number}?text=${encodeURIComponent(WHATSAPP.message).replace(/'/g, '%27')}`;
+
 export const QUOTE_HREF = '/get-quote';
 
-// The accent ticker between Pricing and Explore runs these after the service names.
+// The accent ticker under the hero runs these after the service names.
 export const TRUST_ITEMS: string[] = [
   'Pan-India Delivery',
   '3–4 Day Turnaround',
@@ -35,7 +51,6 @@ export const NAV_LINKS: { href: string; label: string }[] = [
   // The materials write-up lives in the home page section, not on a page of its own.
   { href: '/#materials', label: 'Materials' },
   { href: '/#pricing', label: 'Pricing' },
-  { href: '/explore', label: 'Explore' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/contact', label: 'Contact' },
 ];

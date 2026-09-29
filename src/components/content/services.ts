@@ -78,3 +78,14 @@ export const SERVICES: Service[] = [
     image: '/all-images/product-imgs/productdevelopment.webp',
   },
 ];
+
+/*
+ * The options for the quote form's "Project type" field: the four services, in the order they appear on
+ * the home page, plus an escape hatch that exists only in the form. Derived from SERVICES rather than
+ * retyped, so a slug can only be changed in one place — the "Get a quote for this" links build their
+ * ?service= value from the same array, which is what lets the form pre-select from it.
+ */
+export const PROJECT_TYPES: { slug: string; label: string }[] = [
+  ...SERVICES.map((service) => ({ slug: service.slug, label: service.title })),
+  { slug: 'other', label: 'Other / Not sure' },
+];
