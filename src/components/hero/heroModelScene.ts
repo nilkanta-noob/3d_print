@@ -26,7 +26,22 @@ const INITIAL_PITCH = 0;
 
 const MAX_DPR = 2;
 const AUTO_SPIN = 0.16; // radians per second — one turn takes ~39s
-const PITCH_LIMIT = Math.PI / 3; // ±60°, so the object can never be flipped over
+// How long after the drag ends before the spin picks up again. Short enough that a stopped object does
+// not look broken, long enough that it is not fighting someone who is still lining up a second drag.
+const AUTO_SPIN_RESUME_MS = 3000;
+/*
+ * The vertical range of the drag, as the object's own pitch.
+ *
+ * It is asymmetric because the interesting quantity is not the object's tilt but where the camera ends
+ * up looking from. The camera sits 15° above the horizon and 30° round, so pitching the part by p puts
+ * the apparent elevation at asin(0.876 * sin(p + 17.2°)). At -0.2 rad that is 5° — a hair above the
+ * plate, so the floor is never seen from underneath — and at 1.05 rad it is 59°, which is within a
+ * couple of degrees of the highest this camera can reach at any pitch at all.
+ *
+ * The old symmetric ±60° ran to an apparent -37°: below the build surface, looking up through it.
+ */
+const PITCH_MIN = -0.2;
+const PITCH_MAX = 1.05;
 const DRAG_SPEED = 0.0075; // radians per pixel dragged
 
 // Camera. A long lens rather than the default 50° — less distortion across a part this close to frame.
@@ -42,16 +57,20 @@ const DEFAULT_MODEL_FILL = 0.7;
 // the part sitting on it gets bigger or smaller. A heavier line falls every fourth cell.
 const GRID_CELL = 0.2613;
 const GRID_MAJOR_EVERY = 4;
-const GRID_MINOR_OPACITY = 0.12;
-const GRID_MAJOR_OPACITY = 0.19;
+const GRID_MINOR_OPACITY = 0.08;
+const GRID_MAJOR_OPACITY = 0.13;
 // A desaturated blue-grey, tuned to the brand accent's hue but far duller. Never the accent itself: that
 // belongs to the CTA, the wordmark and the headline, and four blue things in one screen is three too many.
 // The *rendered* line is what should sit just above the page, and these opacities are small — at 7% a
 // colour only slightly lighter than the background moves the pixel by two or three values, which is
-// nothing. So the source colour is well clear of the page and the alpha brings it back down: 12% of
-// this lands around #262B34 against the page, 19% around #2D333F.
+// nothing. So the source colour is well clear of the page and the alpha brings it back down: 8% of
+// this lands around #1A1E26 against the page, 13% around #20252E — present, but well behind the part,
+// which is the whole point of a build surface.
 const GRID_COLOUR = '#93A6C4';
-const PART_COLOUR = '#F2F4F7';
+// Light grey, not near-white. Against a #0F1218 page an almost-white part clips its own lit faces to a
+// single flat value and loses its edges; backing off to this leaves headroom for the lighting below to
+// separate the faces, and the part reads brighter for it rather than dimmer.
+const PART_COLOUR = '#C9CED6';
 
 // The plate is 12D across, and its grid dissolves radially long before that. The fade is in UV space:
 // it starts at 0.15 (1.8D from the part) and is fully gone by 0.38 (4.6D), which leaves 1.4D of empty
@@ -72,12 +91,22 @@ const SHADOW_SIZE = 0.9;
 // How many poses the framing solve tries around a full turn. 24 is every 15°, which for a convex part is
 // close enough to the true worst case that the error is under a pixel.
 const YAW_SAMPLES = 24;
-// …and how many pitches across the range the vertical drag allows, from -PITCH_LIMIT to +PITCH_LIMIT.
-// 9 is every 15°, which lands exactly on ±45° — where a box is at its tallest.
+// …and how many pitches across the range the vertical drag allows, from PITCH_MIN to PITCH_MAX.
+// 9 samples over that 71.6° span is every 9°, fine enough that the widest pose between two samples is
+// under a pixel wider than the wider of the two.
 const PITCH_SAMPLES = 9;
-// The most of the canvas the part may cover in its widest pose, on either axis. The 6% left over is the
-// margin that stops a rounded pixel or an antialiased edge touching the frame.
-const POSE_LIMIT = 0.94;
+/*
+ * The most of the canvas the part may cover in its widest pose, on either axis — the default, when the
+ * host does not say otherwise. The 6% left over is the margin that stops a rounded pixel or an
+ * antialiased edge touching the frame.
+ *
+ * It is a *pose* limit, not a size: the solve frames the worst case across the whole drag, and the part
+ * at rest then lands at whatever fraction of that worst case its resting silhouette happens to be —
+ * about 0.59 for this one. On a wide canvas that is generous. On a narrow upright one it is not: the
+ * same 0.94 that fills a desktop hero leaves the part at a quarter of the width of a phone's. Hence
+ * --pose-limit, below.
+ */
+const DEFAULT_POSE_LIMIT = 0.94;
 const probe = new THREE.Vector3(); // reused by the solve, which runs a few thousand projections
 
 export interface HeroSceneOptions {
@@ -265,6 +294,36 @@ function modelFill(host: HTMLElement): number {
   return Number.isFinite(raw) ? Math.min(Math.max(raw, 0.1), 1) : DEFAULT_MODEL_FILL;
 }
 
+/**
+ * The same measurement across the canvas instead of down it, read from the host's `--model-scale-x`.
+ * Null when the breakpoint does not set it, which is how `--model-scale` stays in charge everywhere it
+ * already is.
+ *
+ * It exists because on a phone the canvas has no fixed height — it is whatever the copy above it did not
+ * use — so framing on height makes the part's size depend on the length of the screen. The same
+ * `--model-scale` that put the part at 74% of the width of a 390x844 canvas put it at 67% of a 360x740
+ * one, purely because the second box is shorter. The width is the stable dimension there, so that is
+ * what the phone breakpoint measures against.
+ */
+function modelFillX(host: HTMLElement): number | null {
+  const raw = parseFloat(getComputedStyle(host).getPropertyValue('--model-scale-x'));
+  return Number.isFinite(raw) ? Math.min(Math.max(raw, 0.1), 1) : null;
+}
+
+/**
+ * How much of the canvas the part's WIDEST pose may cover, read from the host's `--pose-limit`.
+ *
+ * This is the knob that decides how big the part actually looks, because on any canvas near or above
+ * square the pose solve is what the camera obeys and `--model-scale` goes unused. A value above 1 is not
+ * a mistake: it says the part may run past the frame in poses this breakpoint cannot reach. On a phone
+ * that is most of them — touch drag is horizontal only, by design, so the entire pitched half of the
+ * sweep is unreachable there and framing for it only shrinks the part.
+ */
+function poseLimit(host: HTMLElement): number {
+  const raw = parseFloat(getComputedStyle(host).getPropertyValue('--pose-limit'));
+  return Number.isFinite(raw) ? Math.min(Math.max(raw, 0.2), 4) : DEFAULT_POSE_LIMIT;
+}
+
 export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroScene> {
   const { host, url, color, scaleFactor = 0.9, rotation: modelRotation = [-Math.PI / 2, 0, 0], reducedMotion, onReady, onFirstInteraction } = options;
 
@@ -346,7 +405,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   const euler = new THREE.Euler();
   for (let y = 0; y < YAW_SAMPLES; y += 1) {
     for (let p = 0; p < PITCH_SAMPLES; p += 1) {
-      const pitch = -PITCH_LIMIT + (2 * PITCH_LIMIT * p) / (PITCH_SAMPLES - 1);
+      const pitch = PITCH_MIN + ((PITCH_MAX - PITCH_MIN) * p) / (PITCH_SAMPLES - 1);
       rotation.setFromEuler(euler.set(pitch, (y / YAW_SAMPLES) * Math.PI * 2, 0));
       for (const corner of corners) poses.push(corner.clone().applyQuaternion(rotation));
     }
@@ -389,23 +448,34 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   // No fog. The plate fades itself, in alpha, which is the only kind of fade that reaches nothing on a
   // transparent canvas — see buildPlate().
 
-  // One directional light from the upper front-left, one ambient so the shadow side is not black.
-  // The brief asked for 1.2 and 0.5. In this renderer — three r186, sRGB output, no tone mapping — those
-  // sum to 1.32 on the faces meeting the key most squarely, which clips to flat white and takes the
-  // part's edges with it. Scaled down keeping the brief's ratio: the brightest face now lands at 0.95,
-  // just under the clip and close to the specified #B8BCB8, and the shadow side holds at 0.45 — dark,
-  // but not black. Raise both together if tone mapping is ever turned on.
-  const key = new THREE.DirectionalLight(0xffffff, 0.6);
+  // Three lights: a soft key from the upper front-left, an ambient so the shadow side is not black, and
+  // a rim from behind to cut the silhouette away from the page.
+  //
+  // The ceiling on the first two is set by clipping, and it moved when the part stopped being near-white.
+  // In this renderer — three r186, sRGB output, no tone mapping — key + ambient multiply the albedo on
+  // the faces meeting the key most squarely, so the sum must stay under 1/albedo or those faces flatten
+  // to one value and take the part's edges with them. At the old #F2F4F7 that ceiling was 1.05; at
+  // #C9CED6 it is 1.27, and 0.68 + 0.55 spends most of it. The brightest face lands at 0.96 and the
+  // shadow side holds at 0.55 — a full stop brighter than before against the same dark page.
+  const key = new THREE.DirectionalLight(0xffffff, 0.68);
   key.position.set(-2.2, 3, 2.4);
   scene.add(key);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+
+  // The rim is behind and slightly above, nearly opposite the camera, so it grazes the far edges and
+  // barely touches the faces the key already owns — which is why it can be this bright without joining
+  // the clipping budget above. The one place the accent colour is allowed near the part: at this
+  // intensity on a grey albedo it is a cool edge rather than a blue object.
+  const rim = new THREE.DirectionalLight(0xa4c4f4, 0.38);
+  rim.position.set(1.8, 1.4, -2.6);
+  scene.add(rim);
 
   // Neutral grey, never the accent: the part is machined metal, not a brand element. Cool rather than warm
   // so it reads as brushed aluminium or titanium against a blue-accented page. flatShading stays off — STL geometry is non-indexed with per-face normals, so
   // the facets are already hard without it.
   const material = new THREE.MeshStandardMaterial({
     color: new THREE.Color(color || PART_COLOUR),
-    roughness: 0.75,
+    roughness: 0.6,
     metalness: 0,
   });
 
@@ -520,35 +590,41 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
       camera.updateMatrixWorld();
     };
 
-    // One: the distance that puts the part at `fill` of the canvas height in its resting pose. This is
-    // what the number in --model-scale means, and what the static fallback image is sized to, so the
-    // handover from the still to the live scene does not jump.
+    // One: the distance that puts the part at `fill` of the canvas in its resting pose, measured down
+    // the canvas or across it depending on which of the two variables the breakpoint set. This is what
+    // the number in --model-scale / --model-scale-x means, and what the static fallback image is sized
+    // to, so the handover from the still to the live scene does not jump.
     const resting = new THREE.Quaternion().setFromEuler(
       new THREE.Euler(INITIAL_PITCH, INITIAL_YAW, 0),
     );
-    const restingHeight = (distance: number) => {
+    const fillX = modelFillX(host);
+    // Clip space spans -1…1 on both axes, with the aspect ratio already folded into x, so half the
+    // extent on either one is that axis's fraction of the canvas directly.
+    const restingExtent = (distance: number) => {
       place(distance);
-      let lowest = Infinity;
-      let highest = -Infinity;
+      let low = Infinity;
+      let high = -Infinity;
       for (const corner of corners) {
         probe.copy(corner).applyQuaternion(resting).multiplyScalar(part).project(camera);
-        lowest = Math.min(lowest, probe.y);
-        highest = Math.max(highest, probe.y);
+        const value = fillX === null ? probe.y : probe.x;
+        low = Math.min(low, value);
+        high = Math.max(high, value);
       }
-      return (highest - lowest) / 2; // clip space spans -1…1, so half the extent is the canvas fraction
+      return (high - low) / 2;
     };
 
+    const restingTarget = fillX ?? fill;
     let tooClose = 0.5;
     let farEnough = 50;
     for (let pass = 0; pass < 20; pass += 1) {
       const midpoint = (tooClose + farEnough) / 2;
-      if (restingHeight(midpoint) > fill) tooClose = midpoint;
+      if (restingExtent(midpoint) > restingTarget) tooClose = midpoint;
       else farEnough = midpoint;
     }
     const forFill = farEnough;
 
 
-    // Two: the distance that keeps the part inside POSE_LIMIT of the frame in every pose it can be
+    // Two: the distance that keeps the part inside --pose-limit of the frame in every pose it can be
     // dragged into, on both axes of the canvas. This is what the bounding box on its own could never
     // tell us — a box is half again as wide across its diagonal as across its face, so framing on the
     // box let the part clip as it came round to 45°.
@@ -576,11 +652,12 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
       return worst / 2;
     };
 
+    const limit = poseLimit(host);
     tooClose = 0.5;
     farEnough = 50;
     for (let pass = 0; pass < 20; pass += 1) {
       const midpoint = (tooClose + farEnough) / 2;
-      if (sweep(midpoint) > POSE_LIMIT) tooClose = midpoint;
+      if (sweep(midpoint) > limit) tooClose = midpoint;
       else farEnough = midpoint;
     }
 
@@ -626,12 +703,42 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   let lastX = 0;
   let lastY = 0;
   let interacted = false;
+  let resumeTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const stopAutoSpin = () => {
-    if (interacted) return;
-    interacted = true;
-    spinning = false; // permanently — it never resumes
-    onFirstInteraction();
+  const clearResume = () => {
+    if (resumeTimer === null) return;
+    clearTimeout(resumeTimer);
+    resumeTimer = null;
+  };
+
+  /** Hands the object over to the drag. Any pending resume is dropped — the clock restarts on release. */
+  const pauseAutoSpin = () => {
+    clearResume();
+    spinning = false;
+    if (!interacted) {
+      interacted = true;
+      onFirstInteraction();
+    }
+  };
+
+  /*
+   * …and hands it back, three seconds after the last release. It used to stop for good on the first
+   * touch, which left the object frozen in whatever half-turn the drag ended on for the rest of the
+   * visit.
+   *
+   * reducedMotion is checked here rather than only at startup, so the spin cannot come back through this
+   * path on a machine that asked for no motion at all.
+   */
+  const resumeAutoSpinLater = () => {
+    if (reducedMotion) return;
+    clearResume();
+    resumeTimer = setTimeout(() => {
+      resumeTimer = null;
+      if (disposed || dragging) return;
+      spinning = true;
+      lastFrameTime = 0; // or the three-second pause is applied as one rotation step
+      requestRender();
+    }, AUTO_SPIN_RESUME_MS);
   };
 
   const onPointerDown = (event: PointerEvent) => {
@@ -648,7 +755,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     } catch {
       /* no capture — pointermove still arrives while the pointer is over the canvas */
     }
-    stopAutoSpin();
+    pauseAutoSpin();
     schedule();
   };
 
@@ -664,8 +771,8 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     // and a diagonal drag should not tilt the object on the way past.
     if (event.pointerType !== 'touch') {
       pivot.rotation.x = Math.min(
-        PITCH_LIMIT,
-        Math.max(-PITCH_LIMIT, pivot.rotation.x + deltaY * DRAG_SPEED),
+        PITCH_MAX,
+        Math.max(PITCH_MIN, pivot.rotation.x + deltaY * DRAG_SPEED),
       );
     }
     requestRender();
@@ -682,6 +789,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     if (renderer.domElement.hasPointerCapture(event.pointerId)) {
       renderer.domElement.releasePointerCapture(event.pointerId);
     }
+    resumeAutoSpinLater();
     requestRender();
   };
 
@@ -711,6 +819,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   return {
     dispose() {
       disposed = true;
+      clearResume();
       if (raf) cancelAnimationFrame(raf);
       observer.disconnect();
       resizeObserver.disconnect();

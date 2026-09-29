@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import Eyebrow from '@/components/Eyebrow';
 import { QuoteFormCore } from '@/components/QueryForm';
 
 export const metadata: Metadata = {
@@ -22,7 +23,7 @@ export default function GetQuotePage() {
     <section className="bg-background">
       <div className="site-frame pb-28 pt-[calc(var(--nav-h)+2rem)] md:pb-36">
         <header className="max-w-[46rem]">
-          <p className="label-micro text-accent-primary">Get a quote</p>
+          <Eyebrow>Get a quote</Eyebrow>
           <h1 className="mt-4 text-[clamp(2rem,4vw,3rem)] text-text-primary">Start your print</h1>
           <p className="mt-4 text-[17px] leading-[1.6] text-text-secondary">
             Upload your file, pick your settings, and we&apos;ll email you the exact price within the hour.

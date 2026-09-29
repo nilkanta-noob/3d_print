@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
 import type { HeroScene } from './heroModelScene';
 
 /*
@@ -17,15 +16,22 @@ import type { HeroScene } from './heroModelScene';
  * is a fixed aspect ratio at every breakpoint, so nothing moves when the live model takes over.
  */
 
-const MODELS = [
-  { url: '/hero/benchy.glb', color: '#F2F4F7', scaleFactor: 0.9 },
-  { url: '/hero/C17.glb', color: '#F2F4F7', scaleFactor: 0.7, rotation: [0, 0, 0] as [number, number, number] } // no X rotation so it sits level
-];
+// The one object in the hero. It used to be a pair with an arrow to cycle between them; the second
+// model and its control are gone, so there is no index to track and nothing to swap.
+const MODEL = { url: '/hero/benchy.glb', color: '#C9CED6', scaleFactor: 0.9 };
 const FALLBACK_IMAGE = '/hero/model-fallback.png';
-// The fallback PNG is cropped tight to the part's own height and rendered from the scene's camera, so
-// reading the same --model-scale the scene reads puts the still and the live part at the same size and
-// the same angle. Its width follows from the image's own aspect.
-const FALLBACK_SIZE = 'calc(var(--model-scale, 0.7) * 100%)';
+/*
+ * The fallback PNG is cropped tight to the part and rendered from the scene's camera in the scene's
+ * resting pose, so sizing it from the same variable the scene frames itself with puts the still and the
+ * live part at the same size and the same angle, and the handover is a straight cut.
+ *
+ * Two variables, because the scene frames on one axis or the other — see modelFillX in heroModelScene.
+ * The breakpoint that measures across the canvas sets --fallback-w to its own --model-scale-x as a
+ * percentage and --fallback-h to auto; everywhere else these are unset and the height leads, as it
+ * always has, with the width following from the image's own aspect.
+ */
+const FALLBACK_HEIGHT = 'var(--fallback-h, calc(var(--model-scale, 0.7) * 100%))';
+const FALLBACK_WIDTH = 'var(--fallback-w, auto)';
 
 function supportsWebGL(): boolean {
   try {
@@ -47,47 +53,31 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
   // WebGL, a chunk that will not load, a missing STL — simply leaves this false, which keeps the static
   // image on screen and the drag hint hidden. There is nothing to drag, so there is nothing to say.
   const [live, setLive] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextModel = () => {
-    setCurrentIndex((prev) => (prev + 1) % MODELS.length);
-  };
 
   /*
-   * The scene currently on screen. It is held in a ref rather than torn down by the effect's cleanup,
-   * because mountHeroModel has to fetch and parse a multi-megabyte GLB before it can draw anything.
-   * Disposing on cleanup removed the old canvas the instant the model changed and left the hero empty —
-   * no part, no build plate, no grid — for as long as the next file took to arrive.
-   *
-   * So the outgoing scene keeps rendering until the incoming one reports that it has drawn its first
-   * frame, and only then is it retired. The canvases are absolutely positioned and overlap for that
-   * moment, so the swap is a straight cut with nothing missing in between.
+   * The scene once it is mounted, held only so the unmount effect below can dispose of it. Nothing
+   * swaps it any more: there is a single object, mounted once.
    */
-  const liveSceneRef = useRef<HeroScene | null>(null);
+  const sceneRef = useRef<HeroScene | null>(null);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host || !supportsWebGL()) return;
 
     let cancelled = false;
-    // Captured now: whatever is on screen when this effect starts is what this mount replaces.
-    const outgoing = liveSceneRef.current;
 
     import('./heroModelScene')
       .then(({ mountHeroModel }) =>
         mountHeroModel({
           host,
-          url: MODELS[currentIndex].url,
-          color: MODELS[currentIndex].color,
-          scaleFactor: MODELS[currentIndex].scaleFactor,
-          rotation: MODELS[currentIndex].rotation,
+          url: MODEL.url,
+          color: MODEL.color,
+          scaleFactor: MODEL.scaleFactor,
           reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
           onReady: () => {
-            if (cancelled) return;
             // Fires synchronously from inside mountHeroModel, after its first draw — the earliest
-            // moment the new scene has something on screen, and so the right moment to drop the old one.
-            outgoing?.dispose();
-            setLive(true);
+            // moment the live object has something on screen, and so the moment to fade the still out.
+            if (!cancelled) setLive(true);
           },
           // Nothing listens for the first drag any more — the prompt that used to disappear on it is
           // gone — but the scene still announces it, so this absorbs the call.
@@ -99,23 +89,24 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
           mounted.dispose();
           return;
         }
-        liveSceneRef.current = mounted;
+        sceneRef.current = mounted;
       })
       .catch(() => {
-        // A failed chunk, a missing model, a WebGL context that refuses to come up: the scene on screen
-        // is left alone, so a failed swap keeps the previous model rather than emptying the hero.
+        // A failed chunk, a missing model, a WebGL context that refuses to come up: the static image
+        // stays on screen, which is the whole point of having it.
       });
 
     return () => {
       cancelled = true;
     };
-  }, [currentIndex]);
+  }, []);
 
-  // Teardown on unmount only — the swap path above retires scenes itself.
+  // Teardown on unmount. Kept out of the effect above so a re-run of that effect in development does
+  // not tear down the canvas it is still bringing up.
   useEffect(
     () => () => {
-      liveSceneRef.current?.dispose();
-      liveSceneRef.current = null;
+      sceneRef.current?.dispose();
+      sceneRef.current = null;
     },
     [],
   );
@@ -138,23 +129,14 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
         draggable={false}
         fetchPriority="high"
         decoding="async"
-        className="pointer-events-none absolute top-1/2 w-auto max-w-none -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-700"
+        className="pointer-events-none absolute top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-700"
         style={{
           left: 'calc(var(--focus-x, 0.5) * 100%)',
-          height: FALLBACK_SIZE,
-          opacity: (live || currentIndex !== 0) ? 0 : 1,
+          height: FALLBACK_HEIGHT,
+          width: FALLBACK_WIDTH,
+          opacity: live ? 0 : 1,
         }}
       />
-
-      {live && (
-        <button
-          onClick={nextModel}
-          aria-label="Next 3D model"
-          className="pointer-events-auto absolute right-4 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full bg-background/50 p-3 text-text-primary backdrop-blur-sm transition-colors hover:bg-accent-primary hover:text-on-accent md:right-8"
-        >
-          <ArrowRight className="h-6 w-6" />
-        </button>
-      )}
     </div>
   );
 }
