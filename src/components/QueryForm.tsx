@@ -8,9 +8,20 @@ import { WHATSAPP_HREF } from './content/site';
 import { useUploadThing } from '@/lib/uploadthing';
 
 // Sentence case, Inter, 14px. Uppercase is kept for the eyebrow and the buttons only.
-const LABEL = 'mb-2 block text-[14px] font-medium text-text-secondary';
+const LABEL = 'mb-2.5 block text-[14px] font-medium text-text-secondary';
+
+/*
+ * The card keeps the page's own colour. Only its edge is lifted: a white hairline rather than the 8%
+ * --border, so the panels are drawn by their outline instead of by a change of tone.
+ */
+const CARD = 'border border-white/[0.12] bg-background p-6 lg:p-12';
+
+/*
+ * Fields carry no fill at all. Against a card this faint, a filled control was the heaviest thing on the
+ * page; an outline on the card's own surface is enough to say where to type.
+ */
 const FIELD =
-  'w-full rounded-control border border-border bg-background px-4 py-3 font-sans text-text-primary outline-none transition-colors focus:border-accent-primary focus:ring-1 focus:ring-accent-primary';
+  'w-full rounded-control border border-white/[0.12] bg-transparent px-4 py-3 font-sans text-text-primary outline-none transition-colors placeholder:text-text-muted hover:border-white/20 focus:border-accent-primary focus:ring-[3px] focus:ring-accent-primary/20';
 const HINT = 'mt-2 text-[13px] text-text-muted';
 
 /*
@@ -20,7 +31,7 @@ const HINT = 'mt-2 text-[13px] text-text-muted';
 const ACTION =
   'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-control border px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.12em] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary';
 const ACTION_ON = 'cursor-pointer border-accent-primary text-accent-primary hover:bg-accent-primary hover:text-on-accent';
-const ACTION_OFF = 'cursor-not-allowed border-border text-text-muted';
+const ACTION_OFF = 'cursor-not-allowed border-white/[0.12] text-text-muted';
 
 function Spinner() {
   return <span aria-hidden="true" className="size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />;
@@ -39,14 +50,36 @@ const FINISH_LABELS: Record<string, string> = {
   Painting: 'Painted',
 };
 
-function Step({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
+/*
+ * A step is a card, carrying the same hairline and square corners as the summary panel beside it.
+ *
+ * The number is swapped for a check once the step is satisfied, in a slot wide enough for either, so
+ * the title never shifts as the marks appear. It goes back to the number if a field is emptied again.
+ */
+function Step({
+  number,
+  title,
+  complete,
+  children,
+}: {
+  number: string;
+  title: string;
+  complete: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <section>
+    <section className={CARD}>
       <h3 className="flex items-baseline gap-4">
-        <span className="font-mono text-[13px] tabular-nums text-text-muted">{number}</span>
+        <span className="w-[1.25rem] shrink-0 font-mono text-[13px] tabular-nums text-text-muted">
+          {complete ? (
+            <Check className="size-4 text-accent-primary" strokeWidth={3} aria-label="Step complete" />
+          ) : (
+            number
+          )}
+        </span>
         <span className="text-[22px] font-semibold text-text-primary">{title}</span>
       </h3>
-      <div className="mt-6 space-y-5">{children}</div>
+      <div className="mt-8 space-y-7">{children}</div>
     </section>
   );
 }
@@ -88,6 +121,16 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   const [infill, setInfill] = useState('20%');
   const [finish, setFinish] = useState('Standard');
   const [fileSize, setFileSize] = useState<number | null>(null);
+  const [notes, setNotes] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  /*
+   * Mirrors of the four uncontrolled text fields in step 03, kept only so the step can show whether it
+   * is complete. The inputs stay uncontrolled — they have no value prop — so the form still submits
+   * straight from the DOM and nothing about the payload changes.
+   */
+  const [details, setDetails] = useState({ name: '', state: '', city: '', pincode: '' });
+  const track = (field: keyof typeof details) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setDetails((current) => ({ ...current, [field]: e.target.value }));
 
   const [isSuccess, setIsSuccess] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -315,6 +358,11 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
 
       formData.append('fileUrl', uploadedFileUrl);
 
+      // set, not append: both fields carry a name attribute, so the constructor has already put them in
+      // the payload. Appending would send each one twice, and the server reads the first entry.
+      formData.set('notes', notes.trim());
+      formData.set('projectType', projectType);
+
       if (isStudent) {
         if (!studentIdUrl) {
           if (isStudentIdUploading) {
@@ -359,6 +407,10 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
         <button
           onClick={() => {
             setIsSuccess(false);
+            // These two are the only fields held in state rather than by the DOM, so resetting the form
+            // does not clear them on its own.
+            setNotes('');
+            setProjectType('');
             if (onSuccess) onSuccess();
           }}
           className="hover-lift whitespace-nowrap rounded-control border border-accent-primary/50 bg-accent-primary/10 px-7 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-accent-primary [transition-property:transform,background-color,color] hover:bg-accent-primary hover:text-on-accent"
@@ -371,6 +423,15 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
 
   const projectLabel = PROJECT_TYPES.find((type) => type.slug === projectType)?.label ?? 'Not chosen yet';
 
+  const stepOneDone = Boolean(uploadedFileUrl);
+  const stepTwoDone = Boolean(projectType) && Boolean(material);
+  const stepThreeDone =
+    Boolean(details.name.trim()) &&
+    isOtpVerified &&
+    Boolean(details.state.trim()) &&
+    Boolean(details.city.trim()) &&
+    Boolean(details.pincode.trim());
+
   return (
     <form onSubmit={handleSubmit} className="relative">
       {/*
@@ -379,9 +440,9 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
         where it was asked to sit. From 1024px the summary takes the second column and spans both rows, so
         it can stick while the steps scroll past it.
       */}
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,62fr)_minmax(0,38fr)] lg:items-start lg:gap-16">
-        <div className="space-y-14 lg:col-start-1 lg:row-start-1">
-          <Step number="01" title="Your file">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,62fr)_minmax(0,38fr)] lg:items-start lg:gap-x-16 lg:gap-y-8">
+        <div className="space-y-10 lg:col-start-1 lg:row-start-1">
+          <Step number="01" title="Your file" complete={stepOneDone}>
             {/*
               One area, two states. Before a file is chosen it is the drop target; after, the preview
               renders inside the same box, so nothing appears or disappears around it. The input covers
@@ -389,8 +450,18 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
               and "Replace file" is the way back.
             */}
             <div
-              className={`relative rounded-control border border-dashed transition-colors ${
-                fileUrl ? 'border-border' : 'min-h-[220px] border-border hover:border-accent-primary/50'
+              // Drag state is tracked by hand because :hover does not fire while a file is being
+              // dragged, and the drop target should answer to the drag, not to the pointer alone.
+              onDragEnter={() => setIsDragging(true)}
+              onDragOver={() => setIsDragging(true)}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={() => setIsDragging(false)}
+              className={`relative rounded-control border border-dashed bg-transparent transition-colors ${
+                fileUrl
+                  ? 'border-white/[0.15]'
+                  : `min-h-[220px] hover:border-accent-primary hover:bg-accent-primary/5 ${
+                      isDragging ? 'border-accent-primary bg-accent-primary/5' : 'border-white/[0.15]'
+                    }`
               }`}
             >
               <input
@@ -442,8 +513,8 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
             </div>
           </Step>
 
-          <Step number="02" title="Print settings">
-            <div className="grid gap-5 md:grid-cols-2">
+          <Step number="02" title="Print settings" complete={stepTwoDone}>
+            <div className="grid gap-x-6 gap-y-7 md:grid-cols-2">
               <div>
                 <label htmlFor="q-project" className={LABEL}>Project type</label>
                 <select
@@ -523,9 +594,20 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 id="q-notes"
                 name="notes"
                 rows={3}
+                maxLength={1000}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 placeholder="Colour, deadline, tolerances, anything we should know"
                 className={`${FIELD} resize-y placeholder:text-text-muted`}
               />
+              {/* Amber near the ceiling rather than only at it, so the limit is visible before it bites. */}
+              <p
+                className={`mt-2 text-right font-mono text-[12px] ${
+                  notes.length >= 900 ? 'text-[#D9A441]' : 'text-text-muted'
+                }`}
+              >
+                {notes.length} / 1000
+              </p>
             </div>
 
             <label className="flex cursor-pointer items-start gap-3">
@@ -581,11 +663,11 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
             )}
           </Step>
 
-          <Step number="03" title="Your details">
-            <div className="grid gap-5 md:grid-cols-2">
+          <Step number="03" title="Your details" complete={stepThreeDone}>
+            <div className="grid gap-x-6 gap-y-7 md:grid-cols-2">
               <div>
                 <label htmlFor="q-name" className={LABEL}>Name</label>
-                <input id="q-name" name="name" type="text" required placeholder="Your name" className={`${FIELD} placeholder:text-text-muted`} />
+                <input id="q-name" name="name" type="text" required onChange={track('name')} placeholder="Your name" className={`${FIELD} placeholder:text-text-muted`} />
               </div>
 
               <div>
@@ -695,18 +777,18 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 )}
             </div>
 
-            <div className="grid gap-5 md:grid-cols-3">
+            <div className="grid gap-x-6 gap-y-7 md:grid-cols-3">
               <div>
                 <label htmlFor="q-state" className={LABEL}>State</label>
-                <input id="q-state" name="state" type="text" required className={FIELD} />
+                <input id="q-state" name="state" type="text" required onChange={track('state')} className={FIELD} />
               </div>
               <div>
                 <label htmlFor="q-city" className={LABEL}>City</label>
-                <input id="q-city" name="city" type="text" required className={FIELD} />
+                <input id="q-city" name="city" type="text" required onChange={track('city')} className={FIELD} />
               </div>
               <div>
                 <label htmlFor="q-pincode" className={LABEL}>PIN</label>
-                <input id="q-pincode" name="pincode" type="text" required className={FIELD} />
+                <input id="q-pincode" name="pincode" type="text" required onChange={track('pincode')} className={FIELD} />
               </div>
             </div>
           </Step>
@@ -715,7 +797,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
         {/* The panel sticks below the navbar rather than at the top of the viewport, which is what the
             24px on top of --nav-h is for. */}
         <aside className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-[calc(var(--nav-h)+1.5rem)]">
-          <div className="border border-border p-6">
+          <div className={CARD}>
             <h3 className="text-[16px] font-semibold text-text-primary">Your print</h3>
 
             <div className="mt-5 flex items-center gap-3">
