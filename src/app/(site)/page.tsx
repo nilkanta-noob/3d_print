@@ -15,10 +15,11 @@ export default function HomePage() {
 
       {/* The hero used to pin its footage to the viewport as a fixed z-0 layer, and everything below it
           needed its own stacking layer to cover that. The footage is gone, and so is the wrapper. */}
+      {/* Directly under the hero, so it is the first thing a scroll reveals. */}
+      <TrustTicker />
       <ServicesSection />
       <MaterialsSection />
       <PricingSection />
-      <TrustTicker />
       <ExplorePreview />
       <CtaBanner
         title="Turn Your Design Into Something Real."

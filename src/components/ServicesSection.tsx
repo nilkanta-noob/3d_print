@@ -6,7 +6,7 @@ import ServicesList from './ServicesList';
 // Home page Services. There are no service pages, so each row opens in place and links to the quote form.
 export default function ServicesSection() {
   return (
-    <Section id="services" tone="band" afterHero>
+    <Section id="services" tone="band">
       <SectionHeading
         size="display"
         eyebrow="Services"

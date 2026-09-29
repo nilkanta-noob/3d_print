@@ -20,6 +20,9 @@ export interface Material {
   tag: string; // tier, shown as a capsule on the home page card
   highlighted?: boolean; // picks the tier capsule out in the accent
   summary: string; // one line on the home page card
+  // The opening phrase of `summary`, set semi-bold on the card so the line leads with what the material
+  // is for. Must be a prefix of `summary` — the card renders the rest of the string after it.
+  summaryLead: string;
   useCases: string[]; // "Best for" on the home page card — short, outcome-focused
   description: string;
   advantages: string[];
@@ -38,6 +41,7 @@ export const MATERIALS: Material[] = [
     name: 'PLA',
     tag: 'Standard',
     summary: 'Visual prototypes and display models.',
+    summaryLead: 'Visual prototypes',
     useCases: ['Concept models', 'Props and décor', 'Student projects'],
     description: 'The industry standard for high-detail visual models and rapid non-functional prototyping. Excellent dimensional accuracy.',
     advantages: ['Crisp detail and clean surfaces', 'Good dimensional accuracy', 'Lowest cost — student rate available'],
@@ -58,6 +62,7 @@ export const MATERIALS: Material[] = [
     tag: 'Engineering',
     highlighted: true,
     summary: 'Functional prototypes and engineering parts.',
+    summaryLead: 'Functional prototypes',
     useCases: ['Brackets and mounts', 'Jigs', 'Light-load parts'],
     description: 'A step up in toughness and layer adhesion from standard PLA, while staying easy to print — the middle ground before PETG.',
     advantages: ['Tougher and less brittle than standard PLA', 'Stronger layer adhesion', 'Keeps PLA’s fine detail'],
@@ -77,6 +82,7 @@ export const MATERIALS: Material[] = [
     name: 'PETG',
     tag: 'Durable',
     summary: 'Durable mechanical parts and enclosures.',
+    summaryLead: 'Durable mechanical parts',
     useCases: ['Snap-fits', 'Water-resistant parts', 'Outdoor use'],
     description: 'More impact-resistant and flexible than PLA, better dimensional stability than ABS. Ideal for parts needing real durability.',
     advantages: ['Impact-resistant, with some flex', 'Water- and moisture-resistant', 'Handles more heat than PLA'],

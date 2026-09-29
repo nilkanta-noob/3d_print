@@ -1,71 +1,79 @@
-"use client";
-
-import React, { useState } from 'react';
+import React from 'react';
+import { Check } from 'lucide-react';
+import CornerSteps from './CornerSteps';
 import Section from './Section';
 import SectionHeading from './SectionHeading';
-import { MATERIALS, type Material } from './content/materials';
+import { MATERIALS, formatRate, type Material } from './content/materials';
 
-// One material as a rectangular specimen card: the tag, the name at display size, one line on what it's
-// for, and best uses. The card used to close on a link to that material's write-up on the Materials
-// page; with that page gone the card is the whole of what the site says about the material, so it ends
-// on its specification rather than on an invitation to read more.
-//
-// The three cards share one continuous hairline grid — a single rectangle divided twice, rather than
-// three boxes with gaps between them. No radius, no shadow, no fill change: the only hover signal is a
-// accent rule that draws itself across the top of the card, which is enough on a surface this quiet.
-function MaterialCard({
-  material,
-  activeMaterial,
-  setActiveMaterial
-}: {
-  material: Material;
-  activeMaterial: string;
-  setActiveMaterial: (slug: string) => void;
-}) {
-  const isActive = activeMaterial === material.slug;
+/*
+ * One material as a card.
+ *
+ * Three separate cards with air between them rather than one rectangle divided twice. The featured card
+ * carries its emphasis entirely in the colour inversion — it is filled with the accent and its type is
+ * the page's own dark navy. It is not lifted, not scaled and casts nothing; it is the same box as the
+ * other two, inverted.
+ *
+ * The mono face is the site's IBM Plex Mono, already loaded, and it is used for two things only: the
+ * category label and the rate. Everything else stays on the sans.
+ */
+function MaterialCard({ material }: { material: Material }) {
+  const featured = material.highlighted === true;
+  const muted = featured ? 'text-on-accent/70' : 'text-text-muted';
 
   return (
     <article
-      onMouseEnter={() => setActiveMaterial(material.slug)}
-      className="relative flex h-full w-full min-w-0 flex-col bg-surface p-8 lg:p-10"
+      className={`relative flex w-full min-w-0 flex-col p-7 lg:p-10 ${
+        featured ? 'bg-accent-primary text-on-accent' : 'border border-text-primary/10'
+      }`}
     >
-      {/* The active rule: 2px of copper along the top edge of the card, drawn from the left */}
-      <span
-        aria-hidden="true"
-        className={`absolute inset-x-0 top-0 h-0.5 origin-left bg-accent-primary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          isActive ? 'scale-x-100' : 'scale-x-0'
-        }`}
-      />
+      {featured && <CornerSteps />}
 
-      {/* Spec label, set flush with the copy rather than boxed into a corner badge */}
-      <p className={`label-micro transition-colors duration-300 ${isActive ? 'text-accent-primary' : 'text-text-muted'}`}>
-        {material.tag}
-      </p>
+      <p className={`font-mono text-[11px] uppercase tracking-[0.15em] ${muted}`}>{material.tag}</p>
 
-      <h3 className="mt-8 text-[2.5rem] text-text-primary lg:text-[3rem]">
+      {/* The name is the hero of the card and keeps the size it has always had. */}
+      <h3 className={`mt-8 text-[2.5rem] lg:text-[3rem] ${featured ? 'text-on-accent' : 'text-text-primary'}`}>
         {material.name}
       </h3>
 
-      {/* On phones the stacked cards reserve two lines so they stay the same height; wider stacked cards (tablets)
-          fit everything on one line, and side by side (1024px+) the grid row equalises them */}
-      <p className="mt-6 min-h-[2lh] pb-10 text-base text-text-secondary md:min-h-0">{material.summary}</p>
+      {/* The rate sits directly under the name at roughly 45% of its size and a lighter weight, so it
+          reads as a figure attached to the name rather than as a second heading. */}
+      <p className="mt-4 flex items-baseline gap-1 font-mono">
+        <span className={`text-[1.375rem] font-medium ${featured ? 'text-on-accent' : 'text-text-primary'}`}>
+          {formatRate(material.pricePerGram.standard)}
+        </span>
+        <span className={`text-[13px] ${muted}`}>/g</span>
+      </p>
 
-      {/* mt-auto holds this block to the foot of the card so the three rules sit on one line across the
-          row however long the summaries above them run — and the use-case line keeps its two-line floor
-          at every width, because one card's list wraps where the other two do not and the rules would
-          otherwise sit a line apart from each other. */}
-      <div className="mt-auto border-t border-border pt-6">
-        <p className="label-micro text-text-muted">Best for</p>
-        <p className="mt-3 min-h-[2lh] text-[15px] leading-[1.7] text-text-primary">{material.useCases.join(' · ')}</p>
-      </div>
+      <p className={`mt-6 text-[15px] leading-[1.7] ${featured ? 'text-on-accent/80' : 'text-text-secondary'}`}>
+        <strong className={`font-semibold ${featured ? 'text-on-accent' : 'text-text-primary'}`}>
+          {material.summaryLead}
+        </strong>
+        {material.summary.slice(material.summaryLead.length)}
+      </p>
+
+      {/* The checklist replaces the old "Best for" label and the rule above it: each use gets its own
+          row, which is what the label and the dot-separated line were standing in for. */}
+      <ul className="mt-7 space-y-2.5">
+        {material.useCases.map((use) => (
+          <li
+            key={use}
+            className={`flex items-start gap-3 text-[15px] ${featured ? 'text-on-accent' : 'text-text-secondary'}`}
+          >
+            <Check
+              aria-hidden="true"
+              strokeWidth={2.5}
+              className={`mt-[5px] size-3 shrink-0 ${featured ? 'text-on-accent/70' : 'text-accent-primary'}`}
+            />
+            {use}
+          </li>
+        ))}
+      </ul>
     </article>
   );
 }
 
-// Home page materials preview. id="materials" is the target of the hero's "Explore Materials" button.
+// Home page materials preview. id="materials" is the target of the navbar's Materials link.
 export default function MaterialsSection() {
-  const [activeMaterial, setActiveMaterial] = useState("pla-plus");
-
   return (
     <Section id="materials">
       <SectionHeading
@@ -74,20 +82,17 @@ export default function MaterialsSection() {
         description="Each filament is stocked for what it is actually good at — fine detail, impact strength or heat and water resistance. Choose by what the part has to survive."
       />
 
-      <ul
-        className="mt-16 grid divide-y divide-border border border-border md:mt-20 lg:mt-24 lg:grid-cols-3 lg:divide-x lg:divide-y-0"
-        onMouseLeave={() => setActiveMaterial("pla-plus")}
-      >
+      <div className="mt-16 grid gap-5 md:mt-20 lg:mt-24 lg:grid-cols-3">
         {MATERIALS.map((material) => (
-          <li key={material.slug} className="flex">
-            <MaterialCard
-              material={material}
-              activeMaterial={activeMaterial}
-              setActiveMaterial={setActiveMaterial}
-            />
-          </li>
+          <MaterialCard key={material.slug} material={material} />
         ))}
-      </ul>
+      </div>
+
+      {/* Reading text rather than another micro-label: the labels inside the cards are there to name
+          fields, and a sentence set the same way would read as one more of them. */}
+      <p className="mt-6 text-[15px] leading-[1.6] text-text-secondary">
+        Priced per gram of printed part. Final cost confirmed in your quote.
+      </p>
     </Section>
   );
 }

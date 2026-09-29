@@ -26,19 +26,21 @@ export default function ServicesList() {
 
   const headerRefs = useRef(new Map<string, HTMLButtonElement>());
 
-  // If a taller row above collapses, the row you just opened can be dragged up past the navbar. Only that
-  // case scrolls — a tall open row whose bottom runs past the fold is left alone, since scrolling the page
-  // for it would feel like the list jumping out from under the click.
-  const settled = useRef(false);
+  // If a taller row above collapses, the row you just opened can be dragged up past the navbar. Only
+  // that case scrolls — a tall open row whose bottom runs past the fold is left alone, since scrolling
+  // the page for it would feel like the list jumping out from under the click.
+  //
+  // The correction is armed by the click itself rather than guarded against the first run. A boolean
+  // "have we mounted yet" ref cannot do this job: React invokes effects twice on mount in development,
+  // so the first run set the flag and the second run sailed past it — and since row 01 is open on
+  // arrival, any load that began further down the page found its header above the viewport and scrolled
+  // there. Reloading inside Materials threw the visitor back up into Services, 420ms after the page had
+  // already settled. Keyed to the click, the effect cannot fire for a row nobody touched.
+  const scrollWhenOpened = useRef<string | null>(null);
   useEffect(() => {
-    // …but not for the row that is open on arrival. That one was never clicked, so there is nothing to
-    // correct for, and scrolling the page on load would yank the visitor down to a section they have not
-    // reached yet.
-    if (!settled.current) {
-      settled.current = true;
-      return;
-    }
-    if (!activeSlug) return;
+    if (!activeSlug || scrollWhenOpened.current !== activeSlug) return;
+    scrollWhenOpened.current = null;
+
     const header = headerRefs.current.get(activeSlug);
     if (!header) return;
 
@@ -54,7 +56,10 @@ export default function ServicesList() {
   // A row opens on click/tap/Enter/Space only — never on hover or on being tabbed onto — so the list
   // never changes under the pointer. Clicking the open row closes it again, which is what the × offers.
   const handleSelect = (slug: string) => {
-    setActiveSlug((current) => (current === slug ? null : slug));
+    const next = activeSlug === slug ? null : slug;
+    // Arms the correction above. Nothing else in the component ever sets this, so nothing else scrolls.
+    scrollWhenOpened.current = next;
+    setActiveSlug(next);
   };
 
   return (

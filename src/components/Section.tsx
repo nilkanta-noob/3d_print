@@ -16,8 +16,13 @@ interface SectionProps {
   children: React.ReactNode;
 }
 
-// Page section with the site's spacing system and container. The scroll margin keeps anchor jumps clear of the
-// fixed navbar (64px on phones and tablets, 80px from 1024px).
+// Page section with the site's spacing system and container.
+//
+// No scroll margin. It used to carry the navbar's own height, which is the usual way to stop a fixed bar
+// covering an anchor's target — but every section here opens with 96px to 160px of top padding, so the
+// bar has nothing to cover. All the margin did was park the jump 80px above the section, leaving the
+// previous section's last 80px on screen and pushing the heading 278px down the viewport, which made
+// "Materials" in the navbar look like it had landed back in Services.
 //
 // Vertical rhythm — the site's single largest source of whitespace. 96px on phones, 128px on tablets and
 // 160px from 1024px, top and bottom, so two adjacent sections are separated by 320px of empty space on a
@@ -35,7 +40,7 @@ export default function Section({ id, tone = 'base', afterHero = false, compact 
       : 'py-24 md:py-32 lg:py-40';
 
   return (
-    <section id={id} className={`scroll-mt-16 lg:scroll-mt-20 ${toneClass} ${className}`}>
+    <section id={id} className={`scroll-mt-0 ${toneClass} ${className}`}>
       {/* site-frame, not the Tailwind `container`: the container caps at 1024px all the way up to a
           1279px screen, which parked ~118px of dead margin on each side of a laptop and left every
           section heading indented well inside the navbar's wordmark. Sharing the navbar's frame puts

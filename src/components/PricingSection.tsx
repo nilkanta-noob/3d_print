@@ -1,84 +1,132 @@
 import React from 'react';
+import CornerSteps from './CornerSteps';
 import Section from './Section';
 import SectionHeading from './SectionHeading';
+import { MATERIALS, formatRate } from './content/materials';
 
-// Per-gram rates. Kept as data so the table below is pure layout.
-const ROWS = [
-  { material: 'PLA', note: null, standard: '₹3.5', student: '₹2.5', studentIsPrice: true },
-  { material: 'PLA+', note: 'Engineering', standard: '₹4', student: 'To be discussed', studentIsPrice: false },
-  { material: 'PETG', note: null, standard: '₹5.5', student: 'To be discussed', studentIsPrice: false },
-] as const;
+/*
+ * The rate card.
+ *
+ * It stays a real table — three materials against two rates is a comparison, and a comparison belongs
+ * in rows and columns with headers a screen reader can announce. What it borrows from the material
+ * cards above is the surface: one hairline rectangle, square corners, rules between rows, and the
+ * Student column filled in the accent exactly as the PLA+ card is, down to the corner steps.
+ *
+ * Every figure is read from MATERIALS, which is also what the cards read, so a rate can only ever be
+ * changed in one place.
+ *
+ * Fixed layout with declared column widths: left to itself the browser would size the columns from
+ * their content, which makes the Material column wide enough for "PLA+" and nothing else, and moves
+ * the rates around as the copy changes.
+ */
+// Inter, matching the section eyebrow rather than the mono used for the figures: the column heads name
+// the table's parts, which is the eyebrow's job elsewhere on the page, while mono is reserved for rates.
+const HEAD = 'font-semibold uppercase text-[10px] tracking-[0.08em] sm:text-[12px] sm:tracking-[0.12em]';
+const CELL = 'px-3 py-3 align-middle sm:px-6 sm:py-4';
 
-// Pricing as a rate card, not a set of plan cards: one rectangular table, hairline rules, and the
-// numbers set large enough to be read as the content rather than as table cells.
+// The muted token measures 4.02:1 on the Student column's accent tint, which is below AA. Inside those
+// cells the secondary tone carries the small print instead.
+const FINE = 'font-mono text-[11px] uppercase tracking-[0.08em] text-text-secondary sm:tracking-[0.15em]';
+
+// leading-none: these spans would otherwise inherit the body's 1.7, which makes a 20px figure occupy
+// 34px and pushes the one row that also carries a "save" line past the row height.
+function Rate({ amount, tone }: { amount: number; tone: 'standard' | 'student' }) {
+  return (
+    <span className="flex items-baseline gap-1 font-mono leading-none">
+      <span
+        className={`text-[16px] font-medium sm:text-[1.25rem] ${
+          tone === 'student' ? 'text-accent-primary' : 'text-text-primary'
+        }`}
+      >
+        {formatRate(amount)}
+      </span>
+      <span className={`text-[12px] sm:text-[13px] ${tone === 'student' ? 'text-accent-primary/70' : 'text-text-muted'}`}>
+        /g
+      </span>
+    </span>
+  );
+}
+
 export default function PricingSection() {
-  // Page background: Materials above it is the raised band, so this sits back and the two stay apart
   return (
     <Section id="pricing" tone="emphasis">
-      <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
+      {/* Two columns from 1024px: the argument on the left, the rate card beside it. items-start puts
+          the table's top edge on the same line as the eyebrow rather than centring it against a much
+          taller heading block. Below that the two stack with a 40px gap. */}
+      <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-x-[4.5rem] lg:gap-y-0">
         <SectionHeading
           className="lg:col-span-5"
           eyebrow="Pricing"
-          /* nowrap on "per-gram": in the narrow heading column the line would otherwise break at the
-             hyphen, leaving "per-" hanging at the end of a line */
+          /* nowrap on "per-gram": the line would otherwise break at the hyphen, leaving "per-" hanging */
           title={<>Simple, <span className="whitespace-nowrap">per-gram</span> pricing</>}
-          description="You pay for the material your part actually uses. No setup fee, no minimum order, no per-file charge."
+          description="You pay for the material your part actually uses."
         />
 
         <div className="lg:col-span-7">
-          {/* The rate card. Column heads are micro-labels; the rates are display type. */}
-          <table className="w-full border-collapse text-left">
-            <caption className="sr-only">Per-gram printing rates by material</caption>
-            <thead>
-              <tr className="border-y border-border">
-                <th scope="col" className="label-micro py-5 pr-6 text-text-muted">Material</th>
-                <th scope="col" className="label-micro py-5 pr-12 text-text-muted">Standard</th>
-                {/* The Student column is the offer this section exists to make, so it is picked out as a
-                    closed box rather than an open band: a 6% accent wash with a hairline all the way
-                    round. A table cannot carry one border across a whole column, so the box is assembled
-                    from the cells — sides on every cell, a cap on the head and a base on the last row. */}
-                <th
-                  scope="col"
-                  className="label-micro border-x border-t border-accent-primary/[0.18] bg-accent-primary/[0.06] px-8 py-5 text-text-secondary"
-                >
-                  Student
+      <table className="w-full table-fixed border-collapse border border-text-primary/10 text-left">
+        <caption className="sr-only">Per-gram printing rates by material, standard and student</caption>
+        <colgroup>
+          <col className="w-[36%]" />
+          <col className="w-[32%]" />
+          <col className="w-[32%]" />
+        </colgroup>
+        <thead>
+          <tr className="h-14">
+            <th scope="col" className={`${HEAD} ${CELL} text-text-muted`}>Material</th>
+            <th scope="col" className={`${HEAD} ${CELL} text-text-muted`}>Standard</th>
+            <th scope="col" className={`${HEAD} ${CELL} relative bg-accent-primary text-on-accent`}>
+              Student
+              {/* Hidden on phones: at 6px in a 12px-padded cell it sits on top of the label. */}
+              <CornerSteps size={6} className="hidden sm:block" />
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {MATERIALS.map((material) => {
+            const { standard, student } = material.pricePerGram;
+            // h-[72px] sets the row; the cells keep only the padding the spec asks for, since a table
+            // row grows past a height set on it once its content plus padding exceeds that height.
+            return (
+              <tr key={material.slug} className="h-[72px] border-t border-text-primary/10">
+                <th scope="row" className={`${CELL} font-display text-[17px] font-bold tracking-[-0.03em] text-text-primary sm:text-[1.375rem]`}>
+                  {material.name}
                 </th>
-              </tr>
-            </thead>
-            <tbody>
-              {ROWS.map((row, index) => (
-                <tr key={row.material} className="border-b border-border align-baseline">
-                  <th scope="row" className="py-8 pr-6 font-display text-2xl font-bold tracking-[-0.03em] text-text-primary">
-                    {row.material}
-                    {row.note && <span className="label-micro mt-2 block text-text-muted">{row.note}</span>}
-                  </th>
-                  <td className="py-8 pr-12 font-display text-2xl font-bold tracking-[-0.03em] text-text-primary">
-                    {row.standard}
-                    <span className="text-base text-text-muted">/g</span>
-                  </td>
-                  <td
-                    className={`border-x border-accent-primary/[0.18] bg-accent-primary/[0.06] px-8 ${
-                      index === ROWS.length - 1 ? 'border-b' : ''
-                    } ${
-                      row.studentIsPrice
-                        ? 'py-8 font-display text-2xl font-bold tracking-[-0.03em] text-accent-primary'
-                        : 'py-8 text-sm text-text-muted'
-                    }`}
-                  >
-                    {row.student}
-                    {row.studentIsPrice && <span className="text-base text-accent-primary/70">/g</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
 
-          {/* Footnote, set as fine print under the rule rather than boxed into an alert panel */}
-          <div className="mt-10 grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8">
-            <h3 className="label-micro text-text-muted sm:pt-1">Student rate</h3>
-            <p className="max-w-[60ch] text-[15px] text-text-secondary">
-              Requires a valid college ID or referral at checkout. The student rate currently applies to PLA only —
-              PLA+ and PETG student pricing will be added later.
+                <td className={CELL}>
+                  <Rate amount={standard} tone="standard" />
+                </td>
+
+                <td className={`${CELL} bg-accent-primary/[0.06]`}>
+                  {student !== null ? (
+                    <>
+                      <Rate amount={student} tone="student" />
+                      <span className={`${FINE} mt-1.5 block leading-none`}>Save {formatRate(standard - student)}/g</span>
+                    </>
+                  ) : (
+                    <>
+                      {/* One word on a phone: "— Coming soon" wraps in a 32% column at 360px, and a
+                          wrapped placeholder reads as missing data rather than as a note. */}
+                      <span className={`${FINE} sm:hidden`}>Soon</span>
+                      <span className="hidden items-baseline gap-2 sm:flex">
+                        <span aria-hidden="true" className="text-[1.25rem] text-text-secondary">—</span>
+                        <span className={FINE}>Coming soon</span>
+                      </span>
+                    </>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+          {/* Under the table and on its left edge: the label names the condition, the sentence states
+              it. "per-file" is held together — broken across a line it reads as two words. */}
+          <div className="mt-6">
+            <h3 className="label-micro text-text-muted">Student rate</h3>
+            <p className="mt-2 max-w-[60ch] text-[15px] leading-[1.6] text-text-secondary">
+              Requires a valid college ID or referral. No setup fee, no minimum order, no{' '}
+              <span className="whitespace-nowrap">per-file</span> charge.
             </p>
           </div>
         </div>

@@ -48,8 +48,8 @@ const SOCIAL = [
  */
 export default function Footer() {
   return (
-    <footer className="relative z-10 bg-surface-deep pb-8 pt-14 text-text-secondary">
-      <div className="site-frame">
+  <footer className="relative z-10 border-t border-white/5 bg-[#0D1118] pb-8 pt-14 text-text-secondary">      
+  <div className="site-frame">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-12">
 
           <div>
