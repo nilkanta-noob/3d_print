@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import Eyebrow from '@/components/Eyebrow';
+import PageTrail from '@/components/PageTrail';
 import { QuoteFormCore } from '@/components/QueryForm';
 
 export const metadata: Metadata = {
@@ -23,14 +23,14 @@ export default function GetQuotePage() {
     <section className="bg-background">
       <div className="site-frame pb-28 pt-[calc(var(--nav-height,72px)+2rem)] md:pb-36">
         <header className="max-w-[46rem]">
-          <Eyebrow>Get a quote</Eyebrow>
-          <h1 className="mt-4 text-[clamp(2rem,4vw,3rem)] text-text-primary">Start your print</h1>
-          <p className="mt-4 text-[17px] leading-[1.6] text-text-secondary">
+          <PageTrail eyebrow="Get a quote" page="Get a quote" />
+          <h1 className="mt-3 min-[760px]:mt-4 text-[clamp(2rem,4vw,3rem)] text-text-primary">Start your print</h1>
+          <p className="mt-3 min-[760px]:mt-4 text-[17px] leading-[1.6] text-text-secondary">
             Upload your file, pick your settings, and we&apos;ll email you the exact price within the hour.
           </p>
         </header>
 
-        <div className="mt-12">
+        <div className="mt-7 min-[760px]:mt-12">
           <QuoteFormCore />
         </div>
       </div>

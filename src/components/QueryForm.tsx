@@ -8,20 +8,22 @@ import { WHATSAPP_HREF } from './content/site';
 import { useUploadThing } from '@/lib/uploadthing';
 
 // Sentence case, Inter, 14px. Uppercase is kept for the eyebrow and the buttons only.
-const LABEL = 'mb-2.5 block text-[14px] font-medium text-text-secondary';
+const LABEL = 'mb-2 block text-[14px] font-medium text-text-secondary min-[760px]:mb-2.5';
 
 /*
  * The card keeps the page's own colour. Only its edge is lifted: a white hairline rather than the 8%
  * --border, so the panels are drawn by their outline instead of by a change of tone.
  */
-const CARD = 'border border-white/[0.12] bg-background p-6 lg:p-12';
+const CARD =
+  'border-y border-white/[0.12] bg-background px-5 py-7 -mx-[var(--frame-gutter)] ' +
+  'min-[760px]:mx-0 min-[760px]:border min-[760px]:p-6 lg:p-12';
 
 /*
  * Fields carry no fill at all. Against a card this faint, a filled control was the heaviest thing on the
  * page; an outline on the card's own surface is enough to say where to type.
  */
 const FIELD =
-  'w-full rounded-control border border-white/[0.12] bg-transparent px-4 py-3 font-sans text-text-primary outline-none transition-colors placeholder:text-text-muted hover:border-white/20 focus:border-accent-primary focus:ring-[3px] focus:ring-accent-primary/20';
+  'w-full rounded-control border border-white/[0.12] bg-transparent px-4 py-3 text-[16px] h-[50px] min-[760px]:h-auto font-sans text-text-primary outline-none transition-colors placeholder:text-text-muted hover:border-white/20 focus:border-accent-primary focus:ring-[3px] focus:ring-accent-primary/20';
 const HINT = 'mt-2 text-[13px] text-text-muted';
 
 /*
@@ -87,9 +89,9 @@ function Step({
             number
           )}
         </span>
-        <span className="text-[22px] font-semibold text-text-primary">{title}</span>
+        <span className="text-[20px] font-semibold text-text-primary min-[760px]:text-[22px]">{title}</span>
       </h3>
-      <div className="mt-8 space-y-7">{children}</div>
+      <div className="mt-5 space-y-[22px] min-[760px]:mt-8 min-[760px]:space-y-7">{children}</div>
     </section>
   );
 }
@@ -450,8 +452,8 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
         where it was asked to sit. From 1024px the summary takes the second column and spans both rows, so
         it can stick while the steps scroll past it.
       */}
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,62fr)_minmax(0,38fr)] lg:items-start lg:gap-x-16 lg:gap-y-8">
-        <div className="space-y-10 lg:col-start-1 lg:row-start-1">
+      <div className="grid gap-4 min-[760px]:gap-8 lg:grid-cols-[minmax(0,62fr)_minmax(0,38fr)] lg:items-start lg:gap-x-16 lg:gap-y-8">
+        <div className="space-y-4 min-[760px]:space-y-10 lg:col-start-1 lg:row-start-1">
           <Step number="01" title="Your file" complete={stepOneDone}>
             {/*
               One area, two states. Before a file is chosen it is the drop target; after, the preview
@@ -469,7 +471,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
               className={`relative rounded-control border border-dashed bg-transparent transition-colors ${
                 fileUrl
                   ? 'border-white/[0.15]'
-                  : `min-h-[220px] hover:border-accent-primary hover:bg-accent-primary/5 ${
+                  : `min-h-[160px] min-[760px]:min-h-[220px] hover:border-accent-primary hover:bg-accent-primary/5 ${
                       isDragging ? 'border-accent-primary bg-accent-primary/5' : 'border-white/[0.15]'
                     }`
               }`}
@@ -511,12 +513,18 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                   )}
                 </div>
               ) : (
-                <div className="pointer-events-none flex min-h-[220px] flex-col items-center justify-center p-8 text-center">
+                <div className="pointer-events-none flex min-h-[160px] min-[760px]:min-h-[220px] flex-col items-center justify-center p-8 text-center">
+                  {/* A finger cannot drop a file and has nothing to hover, so a touch device is told
+                      what it can actually do: the whole zone is the target. */}
                   <p className="text-[16px] text-text-primary">
-                    Drop your file here, or <span className="underline underline-offset-4">browse</span>
+                    <span className="[@media(hover:none)_and_(pointer:coarse)]:hidden">
+                      Drop your file here, or <span className="underline underline-offset-4">browse</span>
+                    </span>
+                    <span className="hidden [@media(hover:none)_and_(pointer:coarse)]:inline">Tap to choose a file</span>
                   </p>
+                  {/* Non-breaking spaces so the size never wraps to leave "MB" alone on its own line. */}
                   <p className="mt-2 text-[13px] text-text-muted">
-                    STL, OBJ, STEP, IGES, 3MF or ZIP · up to 100 MB
+                    STL, OBJ, STEP, IGES, 3MF or ZIP · up to 100 MB
                   </p>
                 </div>
               )}
@@ -524,7 +532,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           </Step>
 
           <Step number="02" title="Print settings" complete={stepTwoDone}>
-            <div className="grid gap-x-6 gap-y-7 md:grid-cols-2">
+            <div className="grid gap-x-6 gap-y-[22px] min-[760px]:gap-y-7 md:grid-cols-2">
               <div>
                 <label htmlFor="q-project" className={LABEL}>Project type</label>
                 {/* The only select on the page that starts empty, so the only one that needs the closed
@@ -613,7 +621,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Colour, deadline, tolerances, anything we should know"
-                className={`${FIELD} resize-y placeholder:text-text-muted`}
+                className={`${FIELD} h-auto resize-y placeholder:text-text-muted`}
               />
               {/* Amber near the ceiling rather than only at it, so the limit is visible before it bites. */}
               <p
@@ -679,7 +687,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           </Step>
 
           <Step number="03" title="Your details" complete={stepThreeDone}>
-            <div className="grid gap-x-6 gap-y-7 md:grid-cols-2">
+            <div className="grid gap-x-6 gap-y-[22px] min-[760px]:gap-y-7 md:grid-cols-2">
               <div>
                 <label htmlFor="q-name" className={LABEL}>Name</label>
                 <input id="q-name" name="name" type="text" required onChange={track('name')} placeholder="Your name" className={`${FIELD} placeholder:text-text-muted`} />
@@ -792,7 +800,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                 )}
             </div>
 
-            <div className="grid gap-x-6 gap-y-7 md:grid-cols-3">
+            <div className="grid gap-x-6 gap-y-[22px] min-[760px]:gap-y-7 md:grid-cols-3">
               <div>
                 <label htmlFor="q-state" className={LABEL}>State</label>
                 <input id="q-state" name="state" type="text" required onChange={track('state')} className={FIELD} />
@@ -866,7 +874,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           </div>
         </aside>
 
-        <div className="lg:col-start-1 lg:row-start-2">
+        <div className="-mx-[var(--frame-gutter)] mt-6 px-5 min-[760px]:mx-0 min-[760px]:mt-0 min-[760px]:px-0 lg:col-start-1 lg:row-start-2">
           {/*
             One button. Until the address is verified it sends the code and the input appears under it;
             after that the same button submits. The old second button that only said "verify email to
@@ -875,7 +883,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="hover-lift group inline-flex w-full items-center justify-center gap-2.5 rounded-control bg-accent-primary px-10 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="hover-lift group inline-flex h-[52px] w-full items-center justify-center gap-2.5 rounded-control bg-accent-primary px-10 min-[760px]:h-auto min-[760px]:py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {isSubmitting || isUploading || isStudentIdUploading ? (
               <>

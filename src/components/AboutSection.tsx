@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Eyebrow from './Eyebrow';
+import PageTrail from './PageTrail';
 
 // The claims that sit under the argument, at caption size. Three short ones on one line rather than a
 // fourth paragraph: they are the terms of trade, not part of the prose.
@@ -9,7 +9,7 @@ const CLAIMS = ['No minimum order', 'Manual review', 'Fast delivery'];
 const FACTS = [
   { label: 'Based in', value: 'Kolkata', accent: false },
   { label: 'Delivery', value: '3–4 days', accent: true },
-  { label: 'Student rate', value: '₹2.5/g', accent: true },
+  { label: 'Student rate', value: '₹3/g', accent: true },
 ];
 
 /*
@@ -51,7 +51,7 @@ export default function AboutSection() {
               two columns open together and the section has one top edge rather than two. */}
           <div className="grid gap-14 lg:grid-cols-[minmax(0,620px)_minmax(0,1fr)] lg:items-start lg:gap-24 xl:gap-32">
             <div className="max-w-[620px]">
-              <Eyebrow>About</Eyebrow>
+              <PageTrail eyebrow="About" page="About" />
 
               {/* Set to match the Mission heading further down the page exactly — the same size ramp,
                   and the h2 scale's weight, tracking and leading rather than the h1 scale's. The element

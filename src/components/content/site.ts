@@ -39,8 +39,7 @@ export const TRUST_ITEMS: string[] = [
   '3–4 Day Turnaround',
   'Student Discounts',
   'No Minimum Order',
-  // PLACEHOLDER: awaiting the confirmed wording for the accepted file formats.
-  '[File formats — I will confirm]',
+  'STL · STEP · 3MF Accepted',
   'Transparent Per-Gram Pricing',
 ];
 

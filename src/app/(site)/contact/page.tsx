@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import ContactForm from '@/components/ContactForm';
-import Eyebrow from '@/components/Eyebrow';
+import PageTrail from '@/components/PageTrail';
 
 export const metadata: Metadata = {
   title: 'Contact | PrintWarriors',
@@ -35,7 +35,7 @@ export default function ContactPage() {
         <div className="flex items-start lg:flex-1 lg:items-center lg:py-10">
           <div className="grid w-full gap-10 lg:grid-cols-[minmax(0,34fr)_minmax(0,66fr)] lg:items-start lg:gap-20">
             <div>
-              <Eyebrow>Project enquiry</Eyebrow>
+              <PageTrail eyebrow="Project enquiry" page="Contact" />
               <h1 className="mt-4 text-[clamp(2.75rem,5.5vw,4.5rem)] text-text-primary text-balance">Let&apos;s talk.</h1>
             </div>
 

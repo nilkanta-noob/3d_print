@@ -58,7 +58,7 @@ export default function Header() {
       >
         <div className="mx-auto w-full max-w-[120rem]">
           <div
-            className={`flex h-[var(--nav-bar-h)] items-center justify-between gap-4 rounded-control border px-5 lg:px-7 [transition-property:background-color,border-color] duration-300 lg:grid lg:grid-cols-[1fr_auto_1fr] ${
+            className={`flex h-[var(--nav-bar-h)] items-center justify-between gap-1 min-[760px]:gap-4 rounded-control border px-2 min-[760px]:px-5 lg:px-7 [transition-property:background-color,border-color] duration-300 lg:grid lg:grid-cols-[1fr_auto_1fr] ${
               scrolled ? 'border-border bg-surface' : 'border-transparent bg-transparent'
             }`}
           >
@@ -66,9 +66,9 @@ export default function Header() {
               A touch smaller on 1024–1279px laptops so the centred links keep their room. */}
           <Link
             href="/"
-            className="justify-self-start whitespace-nowrap font-display text-[15px] font-semibold uppercase tracking-[0.2em] text-white transition-opacity duration-300 hover:opacity-70 sm:text-[17px] sm:tracking-[0.24em] lg:text-[18px] lg:tracking-[0.22em] xl:tracking-[0.24em]"
+            className="justify-self-start whitespace-nowrap font-display font-semibold uppercase text-white transition-opacity duration-300 hover:opacity-70"
           >
-            <Wordmark />
+            <Wordmark size="nav" />
           </Link>
 
           {/* Desktop navigation — no menu button at any laptop/desktop width. Link gaps widen with the screen:
@@ -98,11 +98,11 @@ export default function Header() {
           </nav>
 
           {/* Get Quote — the navbar's one solid CTA — and, on phones and tablets only, the menu button */}
-          <div className="flex shrink-0 items-center gap-3 justify-self-end">
+          <div className="flex shrink-0 items-center gap-0.5 min-[760px]:gap-3 justify-self-end">
             <Link
               href={QUOTE_HREF}
               aria-current={isActive(pathname, QUOTE_HREF) ? 'page' : undefined}
-              className="hover-lift inline-flex h-8 items-center whitespace-nowrap rounded-control bg-accent-primary px-3.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary sm:px-4 lg:h-9 lg:px-5 lg:text-xs"
+              className="hover-lift inline-flex h-10 items-center whitespace-nowrap rounded-control bg-accent-primary px-3.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary min-[760px]:h-8 min-[760px]:px-4 lg:h-9 lg:px-5 lg:text-xs"
             >
               Get Quote
             </Link>
@@ -112,7 +112,7 @@ export default function Header() {
               aria-expanded={menuOpen}
               aria-controls="mobile-nav"
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              className="-mr-2 p-2 text-text-secondary transition-colors hover:text-text-primary lg:hidden"
+              className="-mr-2.5 grid size-11 shrink-0 place-items-center text-text-secondary transition-colors hover:text-text-primary lg:hidden"
             >
               {/* The two icons are stacked in one box and swapped by opacity rather than by replacing the
                   node. Swapping the element makes the glyph appear at full strength on the same frame the

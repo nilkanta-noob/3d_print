@@ -60,10 +60,10 @@ export default function Footer() {
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-12">
 
           <div>
-            <p className="font-display text-[19px] font-semibold uppercase tracking-[0.2em] text-text-primary">
-              <Wordmark />
+            <p className="font-display font-semibold uppercase text-text-primary">
+              <Wordmark size="footer" />
             </p>
-            <p className="mt-3 max-w-[30ch] text-[15px]">
+            <p className="mt-4 max-w-[30ch] text-[15px]">
               Precision 3D printing for prototypes and functional parts.
             </p>
           </div>

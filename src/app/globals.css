@@ -63,8 +63,8 @@
      browser's font-size setting — it did not really, the bar height has always been fixed, but the
      reserved space used to. Change all three together. */
   --nav-inset: 12px;
-  --nav-bar-h: 52px;
-  --nav-height: 64px; /* = 12 + 52, the measured height of the rendered bar plus its top offset */
+  --nav-bar-h: 64px;
+  --nav-height: 76px; /* = 12 + 64, the measured height of the rendered bar plus its top offset */
 
   /* The page gutter, named so the floating navbar can subtract its own inset from it and still land its
      wordmark on the same line as the hero headline and every section heading. site-frame uses it too. */

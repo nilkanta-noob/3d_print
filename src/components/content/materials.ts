@@ -54,7 +54,7 @@ export const MATERIALS: Material[] = [
       flexibility: { level: 1, label: 'Stiff' },
     },
     recommendedUse: 'Visual prototypes, display models',
-    pricePerGram: { standard: 3.5, student: 2.5 },
+    pricePerGram: { standard: 4, student: 3 },
   },
   {
     slug: 'pla-plus',

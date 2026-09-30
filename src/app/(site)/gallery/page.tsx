@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import CtaBanner from '@/components/CtaBanner';
-import Eyebrow from '@/components/Eyebrow';
+import PageTrail from '@/components/PageTrail';
 import MasonryGallery from '@/components/MasonryGallery';
 import { GALLERY_ITEMS } from '@/components/content/gallery';
 import { QUOTE_HREF } from '@/components/content/site';
@@ -24,7 +24,7 @@ export default function GalleryPage() {
     <section className="bg-background">
       <div className="site-frame pb-28 pt-[calc(var(--nav-height,72px)+2rem)] md:pb-36">
         <header className="max-w-[46rem]">
-          <Eyebrow>Gallery</Eyebrow>
+          <PageTrail eyebrow="Gallery" page="Gallery" />
           <h1 className="mt-4 text-[clamp(2rem,4vw,3rem)] text-text-primary">Things we&apos;ve printed</h1>
           <p className="mt-4 text-[17px] leading-[1.6] text-text-secondary">
             Every photo here is a real print from our team.

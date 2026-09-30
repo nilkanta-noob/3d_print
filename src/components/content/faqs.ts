@@ -18,7 +18,7 @@ export const FAQS: Faq[] = [
   },
   {
     question: "Can students get a discount?",
-    answer: "Yes — PLA is ₹2.5/g instead of ₹3.5/g with a valid college ID or referral. Tick \"Apply Student Discount\" in the quote form and upload your ID."
+    answer: "Yes — PLA is ₹3/g instead of ₹4/g with a valid college ID or referral. Tick \"Apply Student Discount\" in the quote form and upload your ID."
   },
   {
     question: "What materials do you offer?",
