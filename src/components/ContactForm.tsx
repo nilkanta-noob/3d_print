@@ -36,21 +36,39 @@ const FIELD =
 
 const ROW = 'flex flex-wrap items-baseline gap-x-12 gap-y-3';
 
-// There is no contact endpoint on the server, so the form opens the visitor's email app with the message filled in
-// (a mailto: link). Nothing is sent anywhere by the page itself.
+// The form sends a POST request to the /api/contact route which uses Resend to deliver the email.
 export default function ContactForm() {
-  const [opened, setOpened] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setStatus('loading');
+    
     const data = new FormData(event.currentTarget);
     const read = (key: string) => String(data.get(key) ?? '').trim();
-    const name = read('name');
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: read('name'),
+          email: read('email'),
+          phone: read('phone'),
+          project: read('project'),
+        }),
+      });
 
-    const subject = `Quote request from ${name}`;
-    const body = `${read('project')}\n\n— ${name}\n${read('email')}`;
-    window.location.href = `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setOpened(true);
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      setStatus('success');
+      (event.target as HTMLFormElement).reset();
+    } catch (error) {
+      console.error(error);
+      setStatus('error');
+    }
   };
 
   return (
@@ -63,6 +81,11 @@ export default function ContactForm() {
       <div className={ROW}>
         <label htmlFor="contact-email" className={LABEL}>Email</label>
         <input id="contact-email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" className={FIELD} />
+      </div>
+
+      <div className={ROW}>
+        <label htmlFor="contact-phone" className={LABEL}>Phone</label>
+        <input id="contact-phone" name="phone" type="tel" autoComplete="tel" placeholder="e.g. +91 9876543210" className={FIELD} />
       </div>
 
       <div className={ROW}>
@@ -83,10 +106,11 @@ export default function ContactForm() {
       <div className="pt-4">
         <button
           type="submit"
-          className="group inline-flex items-center gap-2.5 text-[14px] font-semibold uppercase tracking-[0.12em] text-text-primary transition-colors duration-200 hover:text-accent-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary"
+          disabled={status === 'loading'}
+          className="group inline-flex items-center gap-2.5 text-[14px] font-semibold uppercase tracking-[0.12em] text-text-primary transition-colors duration-200 hover:text-accent-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="underline decoration-accent-primary decoration-1 underline-offset-[10px] transition-colors duration-200 group-hover:decoration-accent-primary">
-            Send enquiry
+            {status === 'loading' ? 'Sending...' : 'Send enquiry'}
           </span>
           <ArrowUpRight
             className="size-4 text-accent-primary transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:translate-x-0.5"
@@ -95,9 +119,15 @@ export default function ContactForm() {
           />
         </button>
 
-        {opened && (
-          <p className="mt-5 text-[13px] text-text-secondary" role="status">
-            If your email app didn&apos;t open, write to us at{' '}
+        {status === 'success' && (
+          <p className="mt-5 text-[13px] text-green-500 font-medium" role="status">
+            Thanks! Your message has been sent successfully. We will get back to you soon.
+          </p>
+        )}
+        
+        {status === 'error' && (
+          <p className="mt-5 text-[13px] text-red-500 font-medium" role="status">
+            Something went wrong. Please try again or email us directly at{' '}
             <a href={`mailto:${SITE.email}`} className="text-text-primary underline decoration-accent-primary underline-offset-4">{SITE.email}</a>.
           </p>
         )}
