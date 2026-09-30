@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     `;
 
     const emailPayload = {
-      to: process.env.ADMIN_EMAIL || 'hello@printwarriors.com',
+      to: process.env.ADMIN_EMAIL || 'printwarriors.in@gmail.com',
       subject: `New Quote Request: ${order.orderNumber}`,
       text: `New quote request received from ${name} (${email}). Phone: ${phone}. Material: ${material}. Download Link: ${fileUrl}`,
       html: emailHtml,

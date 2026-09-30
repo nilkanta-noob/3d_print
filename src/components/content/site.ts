@@ -4,7 +4,7 @@ type Icon = React.ComponentType<{ className?: string; strokeWidth?: number }>;
 
 export const SITE = {
   name: 'PrintWarriors',
-  email: 'hello@printwarriors.com',
+  email: 'printwarriors.in@gmail.com',
   // PLACEHOLDER: no WhatsApp number is published anywhere yet. Add it here as digits with the country code
   // (e.g. '919876543210') and the Contact page button and footer link appear automatically.
   whatsappNumber: null as string | null,

@@ -3,6 +3,7 @@ import HomeHero from '@/components/HomeHero';
 import ServicesSection from '@/components/ServicesSection';
 import MaterialsSection from '@/components/MaterialsSection';
 import PricingSection from '@/components/PricingSection';
+import GalleryPreview from '@/components/GalleryPreview';
 import TrustTicker from '@/components/TrustTicker';
 import CtaBanner from '@/components/CtaBanner';
 import { QUOTE_HREF } from '@/components/content/site';
@@ -19,6 +20,7 @@ export default function HomePage() {
       <ServicesSection />
       <MaterialsSection />
       <PricingSection />
+      <GalleryPreview />
       <CtaBanner
         title="Turn Your Design Into Something Real."
         description="Upload your CAD file and receive a quote within hours."

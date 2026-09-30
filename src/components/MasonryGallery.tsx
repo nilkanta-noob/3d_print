@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import GalleryTile from './GalleryTile';
 import { BLUR, altFor, captionFor, type GalleryItem } from './content/gallery';
 
 /*
@@ -14,15 +15,6 @@ import { BLUR, altFor, captionFor, type GalleryItem } from './content/gallery';
  *
  * The crop is only the tile. The lightbox shows each photograph whole, uncropped, at its own ratio.
  */
-function Caption({ item }: { item: GalleryItem }) {
-  return (
-    <figcaption className="mt-3">
-      <span className="block text-[18px] font-medium text-text-primary">{item.title}</span>
-      <span className="mt-1 block text-[14px] text-text-muted">{captionFor(item)}</span>
-    </figcaption>
-  );
-}
-
 export default function MasonryGallery({ items }: { items: GalleryItem[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [shot, setShot] = useState(0);
@@ -99,37 +91,19 @@ export default function MasonryGallery({ items }: { items: GalleryItem[] }) {
       {/* Uniform grid. Items flow left to right and the last row is simply short — nothing stretches
           to fill it, which is what a grid does by default and what a flex row would not. */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((entry, index) => {
-          const cover = entry.images[0];
-          return (
-            <figure key={entry.slug}>
-              <button
-                type="button"
-                ref={(el) => {
-                  if (el) triggers.current.set(index, el);
-                  else triggers.current.delete(index);
-                }}
-                onClick={() => open(index)}
-                aria-label={`Open ${entry.title}`}
-                className="group relative block w-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary"
-              >
-                <span className="relative block aspect-[4/3] w-full overflow-hidden border border-border">
-                  <Image
-                    src={cover.src}
-                    alt={altFor(entry)}
-                    fill
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    placeholder="blur"
-                    blurDataURL={BLUR}
-                    style={{ objectPosition: cover.objectPosition ?? 'center' }}
-                    className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.02]"
-                  />
-                </span>
-              </button>
-              <Caption item={entry} />
-            </figure>
-          );
-        })}
+        {items.map((entry, index) => (
+          <GalleryTile
+            key={entry.slug}
+            item={entry}
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            label={`Open ${entry.title}`}
+            onClick={() => open(index)}
+            buttonRef={(el) => {
+              if (el) triggers.current.set(index, el);
+              else triggers.current.delete(index);
+            }}
+          />
+        ))}
       </div>
 
       {item && (

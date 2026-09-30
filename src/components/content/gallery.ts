@@ -26,6 +26,12 @@ export interface GalleryItem {
   material: string;
   note?: string;
   images: GalleryImage[]; // images[0] is the cover
+  /*
+   * Show this one in the home page's preview row, using its cover. The home page renders the items
+   * carrying this flag in the order they appear below, so reordering the preview means reordering them
+   * here rather than keeping a second list somewhere that has to be kept in step with this one.
+   */
+  showOnHome?: boolean;
 }
 
 const SHOT = '/all-images/3d-print-our-gallery';
@@ -35,10 +41,13 @@ const landscape = (file: string): GalleryImage => ({ src: `${SHOT}/${file}`, wid
 
 export const GALLERY_ITEMS: GalleryItem[] = [
   {
-    slug: 'print-in-place-bearing',
-    title: 'Print-in-place bearing',
+    slug: 'multi-part-bearing',
+    showOnHome: true,
+    title: 'Multi-part bearing',
     material: 'PLA', // TODO: confirm material
-    note: 'Printed assembled, no supports.', // TODO: confirm note
+    // The note appears on /gallery only — the home page's preview caption is one line and carries the
+    // material instead.
+    note: 'Rings and balls printed separately, then assembled.',
     images: [
       { src: `${SHOT}/functionalparts1_result.webp`, width: 1199, height: 1600 },
       // The file on disk is spelled "paers", not "parts". Left as found rather than renamed, so the
@@ -48,16 +57,18 @@ export const GALLERY_ITEMS: GalleryItem[] = [
   },
   {
     slug: 'oval-tray',
+    showOnHome: true,
     title: 'Oval tray',
     material: 'PLA', // TODO: confirm material
     images: [
+      landscape('IMG-20260920-WA0014_result.webp'),
       landscape('IMG-20260920-WA0003_result.webp'),
       landscape('IMG-20260920-WA0006_result.webp'),
-      landscape('IMG-20260920-WA0014_result.webp'),
     ],
   },
   {
     slug: 'box-with-lid',
+    showOnHome: true,
     title: 'Box with lid',
     material: 'PLA', // TODO: confirm material
     images: [landscape('IMG-20260920-WA0011_result.webp')],

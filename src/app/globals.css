@@ -225,6 +225,13 @@
   }
 }
 
+/* The home page's gallery row fills its active progress segment over one advance interval. Paused by
+   animation-play-state whenever the row is not running — see GalleryCarousel. */
+@keyframes gallery-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 @layer base {
   body {
     background: var(--background);

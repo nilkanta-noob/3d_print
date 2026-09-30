@@ -49,7 +49,10 @@ function Rate({ amount, tone }: { amount: number; tone: 'standard' | 'student' }
 
 export default function PricingSection() {
   return (
-    <Section id="pricing" tone="emphasis">
+    // The bottom padding is cut to meet the gallery preview's top padding below it, instead of
+    // Section's own 96/128/160 meeting the next section's and leaving twice the air after the student
+    // rate note than there is above the heading.
+    <Section id="pricing" tone="emphasis" className="[&>div]:pb-16 md:[&>div]:pb-24">
       {/* Two columns from 1024px: the argument on the left, the rate card beside it. items-start puts
           the table's top edge on the same line as the eyebrow rather than centring it against a much
           taller heading block. Below that the two stack with a 40px gap. */}

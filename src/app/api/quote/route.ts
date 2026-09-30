@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
     `;
 
     const emailPayload = {
-      to: process.env.ADMIN_EMAIL || 'hello@printwarriors.com',
+      to: process.env.ADMIN_EMAIL || 'printwarriors.in@gmail.com',
       subject: `New Query: ${order.orderNumber}`,
       text: [
         `New query received from ${name} (${email}).`,
