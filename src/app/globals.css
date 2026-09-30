@@ -45,14 +45,26 @@
   --on-accent: #121417; /* near-black on the blue — 10.4:1 */
 
   /* The header floats: a contained bar inset from the top and sides rather than a band welded to the
-     edges of the screen. Three values, one source of truth — Header.tsx sizes its bar from them and the
-     hero pads itself by --nav-h, so the two cannot drift apart.
-       --nav-inset  the gap between the bar and the edges of the viewport
-       --nav-bar-h  the bar's own height
-       --nav-h      what the whole thing occupies from the top of the page, which is what content clears */
-  --nav-inset: 0.75rem;
-  --nav-bar-h: 3.25rem;
-  --nav-h: calc(var(--nav-inset) + var(--nav-bar-h));
+     edges of the screen. Three values, one source of truth — Header.tsx sizes its bar from them, and
+     every page's top padding clears it by --nav-height, so the two cannot drift apart.
+       --nav-inset   the gap between the bar and the edges of the viewport
+       --nav-bar-h   the bar's own height
+       --nav-height  the two together: everything the bar occupies measured from the top of the page,
+                     which is the number page content has to clear. This is the ONLY name for that
+                     measurement — a second variable meaning the same thing is how the bar and the
+                     content that clears it drift apart. Every page top padding is
+                     calc(var(--nav-height, 72px) + its own breathing room), and every one of those
+                     carries the fallback so a page still clears the bar if the variable ever fails to
+                     reach it.
+
+     All three are plain pixels, not rem. --nav-height is a real measured length rather than a calc so
+     that anything reading it gets a number; the other two follow it into px so the bar cannot end up a
+     different height from the space reserved for it. The trade is that the bar no longer grows with a
+     browser's font-size setting — it did not really, the bar height has always been fixed, but the
+     reserved space used to. Change all three together. */
+  --nav-inset: 12px;
+  --nav-bar-h: 52px;
+  --nav-height: 64px; /* = 12 + 52, the measured height of the rendered bar plus its top offset */
 
   /* The page gutter, named so the floating navbar can subtract its own inset from it and still land its
      wordmark on the same line as the hero headline and every section heading. site-frame uses it too. */
@@ -60,11 +72,13 @@
 }
 
 /* The bar grows at the lg breakpoint — see Header.tsx, which reads these rather than setting its own.
-   --nav-h is a calc over the two, so it follows without being restated. */
+   --nav-height is restated here rather than left as a calc, for the reason given above: it is a real
+   length, and every one of the three has to be edited together. */
 @media (min-width: 64rem) {
   :root {
-    --nav-inset: 1.25rem;
-    --nav-bar-h: 3.75rem;
+    --nav-inset: 20px;
+    --nav-bar-h: 60px;
+    --nav-height: 80px; /* = 20 + 60, measured the same way */
   }
 }
 
@@ -244,6 +258,28 @@
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.1;
+  }
+
+  /*
+   * The option list of a native <select>.
+   *
+   * color-scheme: dark on :root above is what actually does the job in Chrome and Edge, where the popup
+   * is drawn by the OS and CSS cannot reach inside it — it is the only reason those two render a dark
+   * list rather than white-on-white. These rules are the fallback for the engines that DO style options,
+   * chiefly Firefox, which otherwise paints a light list inside a dark field.
+   *
+   * --elevated rather than --surface: the list floats above the card, and the palette's rule is that
+   * anything sitting on top of a surface goes up a step.
+   */
+  select option {
+    background-color: var(--elevated);
+    color: var(--text);
+  }
+
+  /* The placeholder row — "Select project type" and its like. Muted, the same as a text input's
+     placeholder, so the two kinds of empty field read the same. */
+  select option:disabled {
+    color: var(--text-muted);
   }
 }
 

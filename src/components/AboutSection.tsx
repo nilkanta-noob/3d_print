@@ -42,7 +42,10 @@ const PORTRAIT = {
 export default function AboutSection() {
   return (
     <section id="story" className="bg-surface">
-      <div className="site-frame pb-24 pt-[calc(var(--nav-h)+4rem)] md:pb-32 md:pt-[calc(var(--nav-h)+5.5rem)]">
+      {/* 48px of air at each end on a phone. The top figure is 48px ON TOP OF --nav-height, not
+          instead of it: the bar is fixed, so whatever this section reserves for it is the only thing
+          keeping the heading out from under it. */}
+      <div className="site-frame pb-12 pt-[calc(var(--nav-height,72px)+48px)] min-[760px]:pb-24 min-[760px]:pt-[calc(var(--nav-height,72px)+4rem)] md:pb-32 md:pt-[calc(var(--nav-height,72px)+5.5rem)]">
         <div className="mx-auto w-full max-w-[1400px]">
           {/* Tops aligned, not centres: the photograph starts on the same line as the eyebrow, so the
               two columns open together and the section has one top edge rather than two. */}
@@ -107,14 +110,30 @@ export default function AboutSection() {
           {/* The three figures that back the argument above. They are the only concrete claims on the
               page, so they are set at display size with the label underneath, and the two a visitor is
               actually weighing up carry the accent. */}
-          <dl className="mt-20 grid grid-cols-1 gap-10 border-t border-border pt-10 sm:grid-cols-3 md:mt-24">
-            {FACTS.map((fact) => (
+          {/* Three columns at every width. On a phone they are held apart by a hairline between them
+              rather than by a gap, which is what lets three figures share 312px of frame at 360px wide
+              without any of them wrapping; from 760px the rule goes and the 40px gap comes back.
+              24px of the 48px above them sits over the border and 24px under it, so the rule lands in
+              the middle of the space rather than against the figures. */}
+          <dl className="mt-6 grid grid-cols-3 border-t border-border pt-6 min-[760px]:mt-20 min-[760px]:gap-10 min-[760px]:pt-10 md:mt-24">
+            {FACTS.map((fact, index) => (
               // Reversed, so the figure reads first and its label sits underneath — while the markup keeps
               // the term before its definition, which is the order a description list has to be written in.
-              <div key={fact.label} className="flex flex-col-reverse items-start">
-                <dt className="label-micro mt-3 text-text-muted">{fact.label}</dt>
+              <div
+                key={fact.label}
+                className={`flex flex-col-reverse items-center px-3 text-center min-[760px]:items-start min-[760px]:px-0 min-[760px]:text-left ${
+                  index > 0 ? 'border-l border-border min-[760px]:border-l-0' : ''
+                }`}
+              >
+                {/* The properties are written out rather than taken from label-micro, because two of them
+                    have to change on a phone and a utility competing with label-micro for font-size would
+                    be settled by the order of the stylesheet rather than by this line. From 760px the
+                    values are label-micro's own, so nothing moves there. */}
+                <dt className="mt-1.5 text-[10px] font-medium uppercase leading-[1.2] tracking-[0.08em] text-text-muted min-[760px]:mt-3 min-[760px]:text-[11px] min-[760px]:tracking-[0.12em]">
+                  {fact.label}
+                </dt>
                 <dd
-                  className={`font-display text-[clamp(1.875rem,2.8vw,2.375rem)] font-semibold leading-[1.05] tracking-[-0.035em] ${
+                  className={`font-display text-[20px] font-bold leading-[1.05] tracking-[-0.035em] min-[760px]:text-[clamp(1.875rem,2.8vw,2.375rem)] min-[760px]:font-semibold ${
                     fact.accent ? 'text-accent-primary' : 'text-text-primary'
                   }`}
                 >

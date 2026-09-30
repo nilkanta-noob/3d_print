@@ -62,7 +62,20 @@ export const SERVICES: Service[] = [
     turnaround: STANDARD_TURNAROUND,
     materials: 'PLA+ for everyday parts; PETG for outdoor, wet or load-bearing use',
     illustration: 'bracket',
-    image: '/all-images/product-imgs/custom-pt-1.jpg',
+    /*
+     * The print-in-place bearing, which is the clearest thing we have a photo of that reads as a custom
+     * part: it is obviously a made object rather than a render, and its function is legible at a glance.
+     *
+     * It survives every frame this appears in without a custom object-position. The part is a circle of
+     * 781x784px centred at (0.498, 0.517) of a 1600x1199 photo, and the frames run from 0.85 (the
+     * floating tile on tablets) to 1.78 (the panel on phones), so cover crops it differently in each.
+     * The tightest is the phone panel, which shows the middle 75% of the photo's height against a part
+     * 65% tall — 4.8% of clearance top and bottom. Re-measure that if the frames ever change shape.
+     *
+     * Shared with the gallery rather than copied: it is the same file the "Print-in-place bearing" item
+     * uses, so a visitor who sees both pages downloads it once.
+     */
+    image: '/all-images/3d-print-our-gallery/functionalparts1_result.webp',
   },
   {
     slug: 'product-development',

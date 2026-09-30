@@ -114,47 +114,81 @@ export default function Header() {
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               className="-mr-2 p-2 text-text-secondary transition-colors hover:text-text-primary lg:hidden"
             >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {/* The two icons are stacked in one box and swapped by opacity rather than by replacing the
+                  node. Swapping the element makes the glyph appear at full strength on the same frame the
+                  old one vanishes, which reads as a click even though the button itself has not moved;
+                  crossing them over the same 300ms as the panel keeps the whole bar on one clock. */}
+              <span className="relative block h-5 w-5" aria-hidden="true">
+                <Menu
+                  className={`absolute inset-0 h-5 w-5 transition-opacity duration-300 motion-reduce:transition-none ${menuOpen ? 'opacity-0' : 'opacity-100'}`}
+                />
+                <X
+                  className={`absolute inset-0 h-5 w-5 transition-opacity duration-300 motion-reduce:transition-none ${menuOpen ? 'opacity-100' : 'opacity-0'}`}
+                />
+              </span>
             </button>
           </div>
           </div>
         </div>
       </header>
 
-      {/* Full-screen mobile menu, beneath the bar so the close button stays reachable */}
-      {menuOpen && (
-        <nav id="mobile-nav" aria-label="Main" className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-background pt-16 lg:hidden">
-          <ul className="site-frame py-8">
-            {NAV_LINKS.map((link, index) => {
-              const active = isActive(pathname, link.href);
-              return (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    onClick={closeMenu}
-                    aria-current={active ? 'page' : undefined}
-                    className={`flex items-baseline gap-4 border-b border-border py-6 font-display text-3xl font-medium tracking-[-0.035em] transition-colors ${active ? 'text-accent-primary' : 'text-text-primary hover:text-text-secondary'}`}
-                  >
-                    <span className={`label-micro w-6 shrink-0 ${active ? 'text-accent-primary' : 'text-text-muted'}`} aria-hidden="true">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="site-frame mt-auto pb-8 pt-4">
-            <Link
-              href={QUOTE_HREF}
-              onClick={closeMenu}
-              className="flex w-full items-center justify-center rounded-control bg-accent-primary px-6 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent transition-colors hover:bg-accent-hover"
-            >
-              Get a quote
-            </Link>
-          </div>
-        </nav>
-      )}
+      {/*
+        Full-screen mobile menu, beneath the bar so the close button stays reachable.
+
+        It is always mounted and hidden with opacity instead of being conditionally rendered. Mounting it
+        on open is what made it snap: the panel arrived fully painted on a single frame, with no state to
+        transition from, so there was nothing for a duration to apply to. Kept in the tree it simply
+        cross-fades, which is the whole of the effect — it does not slide, scale or wipe, and the links do
+        not stagger. They are laid out at their final positions before the fade begins, so nothing moves
+        while it plays and there is no reflow to go wrong.
+
+        visibility rather than display, because display cannot be transitioned: it would cut the fade off
+        at the first frame. visibility also takes the closed panel out of hit-testing, so it cannot
+        swallow a tap on the page behind it, and inert plus aria-hidden take it out of the tab order and
+        the accessibility tree — none of which a plain opacity-0 would do.
+
+        300ms, the same as the bar's own colour transition above, so the bar and the panel move on one
+        clock. That single shared duration is what the whole thing rests on.
+      */}
+      <nav
+        id="mobile-nav"
+        aria-label="Main"
+        aria-hidden={!menuOpen}
+        inert={!menuOpen}
+        className={`fixed inset-0 z-40 flex flex-col overflow-y-auto bg-background pt-16 [transition-property:opacity,visibility] duration-300 motion-reduce:transition-none lg:hidden ${
+          menuOpen ? 'visible opacity-100' : 'invisible opacity-0'
+        }`}
+      >
+        <ul className="site-frame py-8">
+          {NAV_LINKS.map((link, index) => {
+            const active = isActive(pathname, link.href);
+            return (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={closeMenu}
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex items-baseline gap-4 border-b border-border py-6 font-display text-3xl font-medium tracking-[-0.035em] transition-colors ${active ? 'text-accent-primary' : 'text-text-primary hover:text-text-secondary'}`}
+                >
+                  <span className={`label-micro w-6 shrink-0 ${active ? 'text-accent-primary' : 'text-text-muted'}`} aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  {link.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="site-frame mt-auto pb-8 pt-4">
+          <Link
+            href={QUOTE_HREF}
+            onClick={closeMenu}
+            className="flex w-full items-center justify-center rounded-control bg-accent-primary px-6 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent transition-colors hover:bg-accent-hover"
+          >
+            Get a quote
+          </Link>
+        </div>
+      </nav>
     </MotionConfig>
   );
 }

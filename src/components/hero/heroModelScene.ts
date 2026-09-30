@@ -29,6 +29,17 @@ const AUTO_SPIN = 0.16; // radians per second — one turn takes ~39s
 // How long after the drag ends before the spin picks up again. Short enough that a stopped object does
 // not look broken, long enough that it is not fighting someone who is still lining up a second drag.
 const AUTO_SPIN_RESUME_MS = 3000;
+// The part holds its resting pose until the still has finished fading out over it. Starting the spin on
+// the first frame instead means the two images are already a few degrees apart by the time the crossfade
+// is halfway, and the handover reads as a jump rather than as one picture replacing another. Matches the
+// 300ms crossfade in HeroModel.
+const FIRST_SPIN_DELAY_MS = 300;
+// How long the canvas takes to come up over the still. HeroModel fades the still out on the same clock.
+const CROSSFADE_MS = 300;
+// The fraction of the square capture's WIDTH the part is framed at. Nothing reads it at runtime — it is
+// the phone breakpoint's --model-scale-x, restated here so captureStill produces the same square
+// whatever width the browser generating it happens to be at.
+const CAPTURE_FILL_X = 0.8;
 /*
  * The vertical range of the drag, as the object's own pitch.
  *
@@ -84,6 +95,27 @@ const FADE_TO = 0.38;
 // canvas boundary still at full strength and get cut off by it. This dissolves them into the page.
 const EDGE_FADE = 0.12;
 
+/*
+ * …and a third, which is the one that actually stops the grid reaching the frame: a fade with distance
+ * FROM THE CAMERA, so the floor dissolves into the page a couple of model-lengths behind the part
+ * instead of running to the horizon and being cut off by whatever gets there first.
+ *
+ * Measured from the camera's own distance to the part rather than in absolute world units, because that
+ * distance is the framing solve's output and differs at every breakpoint — a fixed pair of numbers would
+ * put the fade in a different place relative to the part on every screen. These are offsets from it:
+ * fading begins 0.4 behind the part, which is about where its own back edge is, and is complete at 3.0,
+ * comfortably inside the 4.56 at which the radial fade above would have finished.
+ *
+ * This is the scene.fog idea, done in alpha instead. Real fog blends toward an opaque colour, and this
+ * canvas is transparent — on it "the page colour at full strength" is still something rather than
+ * nothing, so a fogged line thins to a tint and then stops rather than disappearing. Fading the alpha
+ * reaches actual nothing. It also leaves the part alone, which scene.fog would not: fog applies to every
+ * material in the scene that has it enabled, and MeshStandardMaterial does by default, so the part would
+ * have washed out along with its floor.
+ */
+const FOG_NEAR_OFFSET = 0.4;
+const FOG_FAR_OFFSET = 3.0;
+
 // Contact shadow: a flat disc of radial alpha just above the plate, so the part reads as resting on it
 // rather than floating. No shadow maps — they cost frames and buy nothing at this scale.
 const SHADOW_SIZE = 0.9;
@@ -122,6 +154,11 @@ export interface HeroSceneOptions {
   scaleFactor?: number;
   /** Optional custom rotation [x, y, z] to apply before scaling (defaults to [-Math.PI / 2, 0, 0]) */
   rotation?: [number, number, number];
+  /**
+   * Development only: build the renderer so a single frame can be read back out of it. It costs a
+   * preserved drawing buffer, which is why it is not on by default — see captureStill.
+   */
+  capture?: boolean;
   /** Fired once the first frame is on screen, so the static image can be faded out. */
   onReady: () => void;
   /** Fired on the first drag, so the "Drag to rotate" hint can be retired. */
@@ -130,6 +167,13 @@ export interface HeroSceneOptions {
 
 export interface HeroScene {
   dispose: () => void;
+  /**
+   * Development only, and only with `capture: true`. Renders one square frame of the part alone — no
+   * build plate, no contact shadow, transparent background — in the resting pose, and hands back a PNG
+   * data URL. This is what public/hero/model-fallback.png is made from, which is the only way the still
+   * and the live part can be guaranteed to agree: the still IS a frame of this scene.
+   */
+  captureStill: (size: number) => string;
 }
 
 /** A soft round gradient, drawn once into a canvas, used as the contact shadow's alpha. */
@@ -179,12 +223,19 @@ function buildPlate(): THREE.Mesh {
       uFadeTo: { value: FADE_TO },
       uEdgeFade: { value: EDGE_FADE },
       uResolution: { value: new THREE.Vector2(1, 1) },
+      uFogNear: { value: 0 },
+      uFogFar: { value: 0 },
     },
     vertexShader: `
       varying vec2 vUv;
+      varying float vDepth;
       void main() {
         vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+        // Distance along the camera's line of sight. Interpolating it per-vertex is exact here because
+        // the plate is two triangles of a flat plane; there is no curvature for it to cut across.
+        vDepth = -viewPosition.z;
+        gl_Position = projectionMatrix * viewPosition;
       }
     `,
     fragmentShader: `
@@ -194,6 +245,7 @@ function buildPlate(): THREE.Mesh {
       #define LINE_EDGE 0.6   // how far past it the antialiasing reaches
 
       varying vec2 vUv;
+      varying float vDepth;
       uniform vec3 uColour;
       uniform float uExtent;
       uniform float uCell;
@@ -204,6 +256,8 @@ function buildPlate(): THREE.Mesh {
       uniform float uFadeTo;
       uniform float uEdgeFade;
       uniform vec2 uResolution;
+      uniform float uFogNear;
+      uniform float uFogFar;
 
       // Coverage of the nearest line of a grid of the given pitch: 1 on the line, 0 between. Dividing the
       // distance by fwidth() measures it in device pixels rather than in world units, which is what holds
@@ -232,6 +286,14 @@ function buildPlate(): THREE.Mesh {
         // The dissolve. Distance is measured in UV space, where 0.5 is the middle of an edge and 0.707 a
         // corner, so a fade that ends at uFadeTo < 0.5 is gone everywhere before the plane runs out.
         alpha *= 1.0 - smoothstep(uFadeFrom, uFadeTo, distance(vUv, vec2(0.5)));
+
+        // …and the fade with depth, which is what keeps the floor from ever reaching the back of the
+        // frame. Guarded the same way as the edge fade below: until layout() has published a real
+        // camera distance both uniforms are 0, and smoothstep across a zero-width range would take
+        // every fragment to 1 and erase the plate entirely.
+        if (uFogFar > uFogNear) {
+          alpha *= 1.0 - smoothstep(uFogNear, uFogFar, vDepth);
+        }
 
         // Second dissolve, against the canvas border, so nothing is ever cut off by the edge of the
         // frame either. On desktop the canvas is wider than the viewport and its right-hand edge is
@@ -325,7 +387,7 @@ function poseLimit(host: HTMLElement): number {
 }
 
 export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroScene> {
-  const { host, url, color, scaleFactor = 0.9, rotation: modelRotation = [-Math.PI / 2, 0, 0], reducedMotion, onReady, onFirstInteraction } = options;
+  const { host, url, color, scaleFactor = 0.9, rotation: modelRotation = [-Math.PI / 2, 0, 0], reducedMotion, capture = false, onReady, onFirstInteraction } = options;
 
   let geometry: THREE.BufferGeometry | null = null;
   if (url.toLowerCase().endsWith('.gltf') || url.toLowerCase().endsWith('.glb')) {
@@ -411,7 +473,9 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     }
   }
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  // preserveDrawingBuffer only under the capture flag: keeping the buffer around costs memory and can
+  // cost a copy per frame, and nothing but captureStill ever reads it.
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: capture });
   // No clear colour: with alpha the canvas stays transparent and the page background shows through,
   // which is what lets the object read as sitting on the page rather than inside a panel.
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_DPR));
@@ -440,6 +504,12 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   renderer.domElement.style.position = 'absolute';
   renderer.domElement.style.inset = '0';
   renderer.domElement.style.zIndex = '1';
+  // Both halves of the handover are a fade now. The canvas used to be opaque from the moment it existed
+  // and only the still moved, which meant the still was fading out over a picture that was already at
+  // full strength — any disagreement between the two was at its most visible exactly then. Crossing
+  // them takes the difference to half strength at the midpoint and hides the seam.
+  renderer.domElement.style.opacity = '0';
+  renderer.domElement.style.transition = `opacity ${CROSSFADE_MS}ms`;
   host.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -510,7 +580,11 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   let raf = 0;
   let lastFrameTime = 0;
   let visible = true;
-  let spinning = !reducedMotion;
+  let spinning = false; // see FIRST_SPIN_DELAY_MS below; reducedMotion never turns it on at all
+  // Holds whichever hand-off is pending: the one that starts the spin after the opening crossfade, or
+  // the one that picks it back up after a drag. Declared here because both the mount path below and the
+  // pointer handlers further down assign it.
+  let resumeTimer: ReturnType<typeof setTimeout> | null = null;
   let dragging = false;
   let dirty = true;
   let disposed = false;
@@ -555,12 +629,32 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   // size later changed, so draw() retries while this is false.
   let laidOut = false;
 
-  const layout = () => {
-    const { clientWidth, clientHeight } = host;
-    if (!clientWidth || !clientHeight) return;
-    laidOut = true;
+  /*
+   * Everything layout() normally reads off the host, so a caller can ask for a framing that has nothing
+   * to do with the box on screen. Only captureStill passes this: the still has to be the same square
+   * whichever breakpoint it happens to be generated at, or the asset would depend on the width of the
+   * window that produced it.
+   */
+  interface LayoutOverride {
+    width: number;
+    height: number;
+    pixelRatio: number;
+    fill: number;
+    fillX: number | null;
+    limit: number;
+    part: number;
+    focus: number;
+  }
 
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+  const layout = (override?: LayoutOverride) => {
+    const clientWidth = override?.width ?? host.clientWidth;
+    const clientHeight = override?.height ?? host.clientHeight;
+    if (!clientWidth || !clientHeight) return;
+    // An override is a one-off render at a size the host does not have, so it must not be taken as
+    // evidence that the host has been measured.
+    if (!override) laidOut = true;
+
+    const pixelRatio = override?.pixelRatio ?? Math.min(window.devicePixelRatio || 1, MAX_DPR);
     renderer.setPixelRatio(pixelRatio);
     renderer.setSize(clientWidth, clientHeight, false);
 
@@ -574,8 +668,8 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     // world, and scaling the part alone would leave them behind.
     //
     // Two distances are worked out and the camera takes whichever is further back.
-    const fill = modelFill(host);
-    const part = partScale(host);
+    const fill = override?.fill ?? modelFill(host);
+    const part = override?.part ?? partScale(host);
     pivot.scale.setScalar(part);
     contactShadow.scale.setScalar(part); // the shadow belongs to the object, so it grows with it
     const target = sphereCentre;
@@ -597,7 +691,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     const resting = new THREE.Quaternion().setFromEuler(
       new THREE.Euler(INITIAL_PITCH, INITIAL_YAW, 0),
     );
-    const fillX = modelFillX(host);
+    const fillX = override ? override.fillX : modelFillX(host);
     // Clip space spans -1…1 on both axes, with the aspect ratio already folded into x, so half the
     // extent on either one is that axis's fraction of the canvas directly.
     const restingExtent = (distance: number) => {
@@ -652,7 +746,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
       return worst / 2;
     };
 
-    const limit = poseLimit(host);
+    const limit = override?.limit ?? poseLimit(host);
     tooClose = 0.5;
     farEnough = 50;
     for (let pass = 0; pass < 20; pass += 1) {
@@ -666,7 +760,7 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
 
     // Slide the whole set sideways to the focus point, in the view's own units at the part's depth.
     const viewHeightAtTarget = 2 * Math.tan((FOV * Math.PI) / 360) * distance;
-    frame.position.x = (focusX(host) - 0.5) * viewHeightAtTarget * camera.aspect;
+    frame.position.x = ((override?.focus ?? focusX(host)) - 0.5) * viewHeightAtTarget * camera.aspect;
 
     // Near and far bracket the sphere with room to spare, so nothing is ever cut by a clip plane as it
     // turns. Near is held above zero — at zero a perspective projection loses all depth precision.
@@ -690,12 +784,28 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
     camera.far = trueDistance + PLATE_SIZE;
     camera.updateProjectionMatrix();
 
+    plateUniforms.uFogNear.value = trueDistance + FOG_NEAR_OFFSET;
+    plateUniforms.uFogFar.value = trueDistance + FOG_FAR_OFFSET;
+
     requestRender();
   };
 
   layout();
   draw();
+  // The first frame is drawn, so the canvas can come up and the still can go down over the same 300ms.
+  renderer.domElement.style.opacity = '1';
   onReady();
+
+  // The first frame is up, so the still can start fading. The spin joins once that has finished.
+  if (!reducedMotion) {
+    resumeTimer = setTimeout(() => {
+      resumeTimer = null;
+      if (disposed || dragging) return;
+      spinning = true;
+      lastFrameTime = 0;
+      requestRender();
+    }, FIRST_SPIN_DELAY_MS);
+  }
 
   // ── Interaction ────────────────────────────────────────────────────────────────────────────────
   // One axis of control on touch, two on a mouse, and nothing else: no zoom, no pan, no OrbitControls.
@@ -703,7 +813,6 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   let lastX = 0;
   let lastY = 0;
   let interacted = false;
-  let resumeTimer: ReturnType<typeof setTimeout> | null = null;
 
   const clearResume = () => {
     if (resumeTimer === null) return;
@@ -813,10 +922,86 @@ export async function mountHeroModel(options: HeroSceneOptions): Promise<HeroSce
   });
   observer.observe(host);
 
-  const resizeObserver = new ResizeObserver(layout);
+  const resizeObserver = new ResizeObserver(() => layout());
   resizeObserver.observe(host);
 
   return {
+    /*
+     * One square frame of the part alone, as a PNG data URL. Development only — it needs the preserved
+     * drawing buffer that `capture` turns on.
+     *
+     * The plate and the contact shadow are hidden for it. They are world-space objects: the still gets
+     * scaled to whatever size a breakpoint needs the PART to be, and a grid scaled by the same factor
+     * would be a grid at the wrong pitch. The part is the only thing in the frame that survives being
+     * resized, so the part is the only thing in the frame.
+     *
+     * Every framing input is passed explicitly rather than read off the host, so the asset is the same
+     * square whatever width the browser that generated it was at.
+     */
+    captureStill(size: number) {
+      const wasSpinning = spinning;
+      const pitch = pivot.rotation.x;
+      const yaw = pivot.rotation.y;
+
+      spinning = false;
+      clearResume();
+      pivot.rotation.set(INITIAL_PITCH, INITIAL_YAW, 0);
+      plate.visible = false;
+      contactShadow.visible = false;
+      renderer.setClearColor(0x000000, 0); // explicit, so the PNG carries a real alpha channel
+
+      layout({
+        width: size,
+        height: size,
+        pixelRatio: 1,
+        fill: DEFAULT_MODEL_FILL,
+        fillX: CAPTURE_FILL_X,
+        limit: 4,
+        part: 1,
+        focus: 0.5,
+      });
+      renderer.render(scene, camera);
+
+      /*
+       * The buffer reads back linear-light, not sRGB, so it has to be encoded on the way out or the
+       * still lands about 40% too dark and the handover flashes.
+       *
+       * Checked rather than assumed: the raw readback averages 102/255 across the part, and encoding it
+       * brings that to 170 — which is what the lighting works out to on this albedo (0.788 albedo at
+       * ambient 0.55 + key 0.68), and what the last hand-checked version of this asset measured at
+       * 171.5. Alpha is left alone; it was never gamma-encoded.
+       */
+      const flat = document.createElement('canvas');
+      flat.width = size;
+      flat.height = size;
+      const ctx = flat.getContext('2d');
+      let dataUrl = renderer.domElement.toDataURL('image/png');
+      if (ctx) {
+        ctx.drawImage(renderer.domElement, 0, 0, size, size);
+        const image = ctx.getImageData(0, 0, size, size);
+        const pixels = image.data;
+        for (let i = 0; i < pixels.length; i += 4) {
+          for (let channel = 0; channel < 3; channel += 1) {
+            const linear = pixels[i + channel] / 255;
+            const encoded =
+              linear <= 0.0031308 ? linear * 12.92 : 1.055 * Math.pow(linear, 1 / 2.4) - 0.055;
+            pixels[i + channel] = Math.round(255 * encoded);
+          }
+        }
+        ctx.putImageData(image, 0, 0);
+        dataUrl = flat.toDataURL('image/png');
+      }
+
+      plate.visible = true;
+      contactShadow.visible = true;
+      pivot.rotation.set(pitch, yaw, 0);
+      spinning = wasSpinning;
+      layout();
+      draw();
+
+      return dataUrl;
+    },
+
     dispose() {
       disposed = true;
       clearResume();

@@ -22,7 +22,7 @@ export default function GalleryPage() {
   return (
     <>
     <section className="bg-background">
-      <div className="site-frame pb-28 pt-[calc(var(--nav-h)+2rem)] md:pb-36">
+      <div className="site-frame pb-28 pt-[calc(var(--nav-height,72px)+2rem)] md:pb-36">
         <header className="max-w-[46rem]">
           <Eyebrow>Gallery</Eyebrow>
           <h1 className="mt-4 text-[clamp(2rem,4vw,3rem)] text-text-primary">Things we&apos;ve printed</h1>

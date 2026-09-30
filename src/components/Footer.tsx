@@ -40,9 +40,9 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
 // WhatsApp leads: it is the number people actually reach us on, so it takes the first box.
 const SOCIAL = [
   { label: 'Chat with PrintWarriors on WhatsApp', Icon: WhatsappIcon, href: WHATSAPP_HREF, external: true },
-  { label: 'Instagram', Icon: InstagramIcon, href: '#', external: false },
-  { label: 'LinkedIn', Icon: LinkedinIcon, href: '#', external: false },
-  { label: 'YouTube', Icon: YoutubeIcon, href: '#', external: false },
+  { label: 'Instagram', Icon: InstagramIcon, href: 'https://www.instagram.com/___izts.nil___/', external: true },
+  { label: 'LinkedIn', Icon: LinkedinIcon, href: 'https://www.linkedin.com/in/nilkanta-dinda/', external: true },
+  { label: 'YouTube', Icon: YoutubeIcon, href: 'https://www.youtube.com/channel/UCMAHetZ_k6MWnGYiVCYhuKg', external: true },
 ];
 
 /*

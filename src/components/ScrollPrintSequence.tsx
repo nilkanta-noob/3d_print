@@ -41,18 +41,20 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
       {/* overflow-hidden is what crops the object at the right edge of the viewport on desktop.
           The padding, not a margin, reserves the fixed header's height — so the section still starts at
           the top of the page and its background runs full-bleed behind the bar, while nothing inside it
-          can sit underneath. --nav-h is defined in globals.css and the header sizes itself from it.
+          can sit underneath. --nav-height is defined in globals.css and the header sizes itself from it.
           svh rather than vh: on mobile browsers vh is the height with the address bar collapsed, which is
           taller than what you can actually see, and the hero would be cut off until you scrolled. */}
-      <section className="relative w-full overflow-hidden bg-background pt-[var(--nav-h)]">
+      <section className="relative w-full overflow-hidden bg-background pt-[var(--nav-height,72px)]">
         {/* Two layouts in one container. Below 760px it is a flex column and what is on screen is the
             order of the source: headline, subtext, CTA, object, hint. From 760px it is the two-column
             grid it has always been, and both children are placed explicitly — col-start-1 for the copy,
             col-start-2 for the object, same row — so the source order stops mattering there and the
             object returns to the right-hand column.
-            The column is a full screen tall minus the bar, and the object takes whatever the copy leaves
-            of it, which is what puts the object on the first screen of a phone rather than below it. */}
-        <div className="site-frame flex min-h-[calc(100svh-var(--nav-h))] flex-col pb-10 pt-8 min-[760px]:grid min-[760px]:grid-cols-[45fr_55fr] min-[760px]:items-center min-[760px]:gap-x-8 min-[760px]:gap-y-10 min-[760px]:pb-20 min-[760px]:pt-12">
+            The top padding is the one number that keeps the headline clear of the bar: --nav-height is
+            everything the bar occupies, and 48px (64 from 760px) is the breathing room under it. The
+            section itself pads by --nav-height as well, so the background still runs full-bleed behind
+            the bar while nothing inside it can sit underneath. */}
+        <div className="site-frame flex flex-col pb-14 pt-10 min-[760px]:grid min-[760px]:min-h-[calc(100svh-var(--nav-height,72px))] min-[760px]:grid-cols-[45fr_55fr] min-[760px]:items-center min-[760px]:gap-x-8 min-[760px]:gap-y-10 min-[760px]:pb-20 min-[760px]:pt-16">
 
           <motion.div
             variants={reveal}
@@ -91,21 +93,26 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
               variants={rise}
               /* 34ch is what holds it to two lines on a phone. It goes to one line from 1100px, where the
                  column is wide enough for the sentence, and wraps in between, where it is not. */
-              className="mt-4 max-w-[34ch] font-sans text-[17px] text-text-secondary min-[760px]:mt-[clamp(1.25rem,3vh,1.75rem)] min-[1100px]:max-w-none"
+              className="mt-5 max-w-[34ch] font-sans text-[17px] text-text-secondary min-[760px]:mt-[clamp(1.25rem,3vh,1.75rem)] min-[1100px]:max-w-none"
             >
               Turn your CAD files into precision-engineered parts.
             </motion.p>
 
+            {/* The hero's one call to action. It shrink-wraps rather than running the full width: at
+                52px tall with 24px either side it is already a comfortable target, and a button stretched
+                across the screen reads as a form control rather than as an invitation. */}
             <motion.div variants={rise} className="mt-8 min-[760px]:mt-[clamp(2.5rem,6vh,4rem)]">
-              {/* Full width and 52px tall on a phone, where it is the only thing on the screen to press
-                  and a thumb should not have to aim for it. It shrink-wraps again from 760px, under a
-                  headline that no longer runs the full width of the screen. */}
               <button
                 type="button"
                 onClick={onOpenQuery}
-                className="hover-lift group flex min-h-[52px] w-full items-center justify-center gap-2.5 whitespace-nowrap rounded-control bg-accent-primary px-7 py-3.5 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary min-[760px]:inline-flex min-[760px]:min-h-0 min-[760px]:w-auto"
+                className="hover-lift group inline-flex h-[52px] items-center justify-center gap-2.5 whitespace-nowrap rounded-control bg-accent-primary px-6 text-[14px] font-semibold uppercase tracking-[0.08em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary min-[760px]:h-auto min-[760px]:px-7 min-[760px]:py-3.5 min-[760px]:text-[13px] min-[760px]:tracking-[0.12em]"
               >
-                Get Instant Quote
+                {/* Short on a phone, where the bar above it already says GET QUOTE and the longer wording
+                    was the only thing on the screen set in sentence case. Both are in the DOM and the one
+                    that does not apply is display:none, which keeps it out of the accessible name as well
+                    as off the screen — so the button is named by whichever label is actually showing. */}
+                <span className="min-[760px]:hidden">Get quote</span>
+                <span className="hidden min-[760px]:inline">Get instant quote</span>
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" />
               </button>
             </motion.div>
@@ -114,9 +121,13 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
           {/* --focus-x is where the object sits across the canvas: centred while the canvas is confined
               to its column, then pulled in toward the middle of the screen on desktop, where the canvas
               is wide enough that the object still runs past the right edge and is cropped there.
-              On a phone the box has no fixed size at all — flex-1 hands it the height the copy did not
-              use, with a 320px floor so a short screen cannot squeeze it to nothing. From 760px it goes
-              back to the measured 4:5 box, and from 1024px to the full bleed described below. */}
+              On a phone the box is a square: its height follows its width rather than whatever height
+              the copy happened to leave over, which is what lets one still line up with the live part
+              at every phone size instead of only the one it was measured at. From 760px it is the 4:5
+              box, and from 1024px the full bleed described below.
+              --fallback-scale is how tall the still has to be for the PART inside it to come out at
+              --model-scale of the box — see CAPTURE_FILL in HeroModel. On the phone the box is square
+              and the still is square, so it is 1 and the image simply fills the box. */}
           {/* From lg the box stops being a grid cell and becomes the hero itself: absolutely positioned across
               all four edges, so the canvas is exactly as tall as the section and the build plate
               can run to the bottom border instead of stopping in mid-air two hundred pixels above it.
@@ -135,26 +146,28 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
               match. */}
           <HeroModel
             className="
-              mt-8 min-h-[320px] w-full flex-1 [--focus-x:0.5]
-              max-[759.98px]:[--model-scale-x:0.8] max-[759.98px]:[--fallback-w:80%]
-              max-[759.98px]:[--fallback-h:auto] max-[759.98px]:[--pose-limit:4]
-              min-[760px]:mt-0 min-[760px]:aspect-[4/5] min-[760px]:min-h-0 min-[760px]:w-full
-              min-[760px]:flex-none min-[760px]:self-center
+              mt-10 aspect-square w-full [--focus-x:0.5]
+              max-[759.98px]:[--model-scale-x:0.8] max-[759.98px]:[--pose-limit:4]
+              min-[760px]:mt-0 min-[760px]:aspect-[4/5] min-[760px]:w-full min-[760px]:self-center
               min-[760px]:col-start-2 min-[760px]:row-start-1 min-[760px]:[--model-scale:0.7]
               min-[760px]:[--pose-limit:0.94]
+              min-[760px]:[--fallback-scale:calc(0.7/var(--capture-fill))]
               min-[1024px]:pointer-events-none min-[1024px]:absolute min-[1024px]:inset-0
               min-[1024px]:aspect-auto min-[1024px]:h-auto min-[1024px]:w-auto
               min-[1024px]:self-stretch
               min-[1024px]:[--focus-x:0.72] min-[1024px]:[--model-scale:0.462]
+              min-[1024px]:[--fallback-scale:calc(0.462/var(--capture-fill))]
               min-[1024px]:[--part-scale:1.4676]
             "
           />
 
           {/* Phones only. On a pointer device the cursor over the canvas already says it — it is a grab
               hand — and from 1024px the canvas covers the whole hero, so a line of text under it would be
-              a line of text stranded in the middle of the page. */}
-          <p className="mt-3 text-center text-[13px] text-text-muted min-[760px]:hidden">
-            Drag to rotate
+              a line of text stranded in the middle of the page.
+              Mono, because the first half of it is the part's name rather than an instruction, and the
+              site sets specimen labels in mono everywhere else. */}
+          <p className="mt-3 text-center font-mono text-[12px] text-text-muted min-[760px]:hidden">
+            3DBenchy · drag to rotate
           </p>
 
         </div>

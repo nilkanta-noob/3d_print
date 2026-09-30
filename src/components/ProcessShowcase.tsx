@@ -43,7 +43,17 @@ export default function ProcessShowcase({ steps, eyebrow, title, description, ac
 
         <div className="mt-10 lg:mt-auto lg:pt-16">
           <p className="max-w-[46ch] text-base text-text-secondary md:text-[17px]">{description}</p>
-          <ButtonLink href={action.href} className="mt-8">
+          {/* Phones already have the bar's own GET QUOTE on screen and a closing CTA band at the foot
+              of the page; a third one in the middle was the same offer three times. display:none rather
+              than a hidden-but-present element, so its 32px top margin goes with it and the paragraph
+              does not end up with a gap under it that nothing fills.
+
+              max-[759.98px]:hidden rather than `hidden min-[760px]:inline-flex`: BUTTON_BASE already
+              sets inline-flex, and two display utilities on one element are settled by their order in
+              the generated stylesheet, not by the order of the class attribute. Tailwind emits
+              .inline-flex after .hidden, so the plain `hidden` lost and the button stayed on screen. A
+              media-query variant is emitted after every unvariant utility, so this one cannot lose. */}
+          <ButtonLink href={action.href} className="mt-8 max-[759.98px]:hidden">
             {action.label}
           </ButtonLink>
         </div>

@@ -23,7 +23,13 @@ export default function AboutPage() {
       {/* Mission and process, merged. One section: the aim on the left, the four steps beside it.
           Tones alternate down the page — header base, story band, this base, FAQ band — using the site's
           own three surfaces rather than a set of colours particular to this page. */}
-      <Section id="process">
+      {/* Section keeps its padding on the inner frame rather than on the <section>, so a phone-only
+          override has to reach that child. Scoped to below 760px and left alone above it, where the
+          site's standard 96/128/160 rhythm still applies. */}
+      <Section
+        id="process"
+        className="max-[759.98px]:[&>div]:pb-12 max-[759.98px]:[&>div]:pt-14"
+      >
         <ProcessShowcase
           steps={PROCESS_STEPS}
           eyebrow="Mission"

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X, UploadCloud, CheckCircle, Check, ShieldCheck } from 'lucide-react';
+import { X, UploadCloud, CheckCircle, Check, ShieldCheck, ArrowRight } from 'lucide-react';
 import ModelViewer from './ModelViewer';
 import { PROJECT_TYPES } from './content/services';
 import { WHATSAPP_HREF } from './content/site';
@@ -23,6 +23,16 @@ const CARD = 'border border-white/[0.12] bg-background p-6 lg:p-12';
 const FIELD =
   'w-full rounded-control border border-white/[0.12] bg-transparent px-4 py-3 font-sans text-text-primary outline-none transition-colors placeholder:text-text-muted hover:border-white/20 focus:border-accent-primary focus:ring-[3px] focus:ring-accent-primary/20';
 const HINT = 'mt-2 text-[13px] text-text-muted';
+
+/*
+ * FIELD with its text colour swapped, for a select that has nothing chosen yet.
+ *
+ * Swapped rather than appended. Adding text-text-muted after FIELD would leave two text-colour utilities
+ * on one element, and those resolve by their order in the generated stylesheet — not by the order they
+ * appear in the class attribute — so which one lands would not be something this file decides. Replacing
+ * the token means there is only ever one.
+ */
+const FIELD_EMPTY = FIELD.replace('text-text-primary', 'text-text-muted');
 
 /*
  * The verify controls. Outlined at the same height as the field beside them, and only lit once there is
@@ -517,15 +527,20 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
             <div className="grid gap-x-6 gap-y-7 md:grid-cols-2">
               <div>
                 <label htmlFor="q-project" className={LABEL}>Project type</label>
+                {/* The only select on the page that starts empty, so the only one that needs the closed
+                    field to read as a placeholder rather than as an answer. text-text-muted while the
+                    value is "", the field's normal colour once something real is chosen. */}
                 <select
                   id="q-project"
                   name="projectType"
                   required
                   value={projectType}
                   onChange={(e) => setProjectType(e.target.value)}
-                  className={`${FIELD} appearance-none`}
+                  className={`${projectType ? FIELD : FIELD_EMPTY} appearance-none`}
                 >
-                  <option value="" disabled>Select project type</option>
+                  {/* hidden as well as disabled: disabled alone still lists it as a greyed row that
+                      cannot be picked, which is just clutter once the real options are on screen. */}
+                  <option value="" disabled hidden>Select project type</option>
                   {PROJECT_TYPES.map((type) => (
                     <option key={type.slug} value={type.slug}>{type.label}</option>
                   ))}
@@ -795,8 +810,8 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
         </div>
 
         {/* The panel sticks below the navbar rather than at the top of the viewport, which is what the
-            24px on top of --nav-h is for. */}
-        <aside className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-[calc(var(--nav-h)+1.5rem)]">
+            24px on top of --nav-height is for. */}
+        <aside className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-[calc(var(--nav-height,72px)+1.5rem)]">
           <div className={CARD}>
             <h3 className="text-[16px] font-semibold text-text-primary">Your print</h3>
 
@@ -860,7 +875,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="hover-lift inline-flex w-full items-center justify-center gap-2.5 rounded-control bg-accent-primary px-10 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="hover-lift group inline-flex w-full items-center justify-center gap-2.5 rounded-control bg-accent-primary px-10 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {isSubmitting || isUploading || isStudentIdUploading ? (
               <>
@@ -870,7 +885,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
             ) : (
               <>
                 Send for review
-                <span aria-hidden="true">→</span>
+                <ArrowRight className="size-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" aria-hidden="true" />
               </>
             )}
           </button>
