@@ -98,7 +98,7 @@ export default function ServicesList() {
               >
                 <ImageSlot
                   image={service.image}
-                  alt=""
+                  alt={service.title}
                   variant={service.illustration}
                   surface="elevated"
                   badge={false}
@@ -201,7 +201,7 @@ export default function ServicesList() {
                   <div aria-hidden="true" className="mt-5 aspect-[16/9] w-full overflow-hidden border border-white/[0.08] md:hidden">
                     <ImageSlot
                       image={service.image}
-                      alt=""
+                      alt={service.title}
                       variant={service.illustration}
                       surface="elevated"
                       badge={false}
