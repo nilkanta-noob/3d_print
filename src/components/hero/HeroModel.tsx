@@ -178,7 +178,7 @@ export default function HeroModel({ className = '' }: HeroModelProps) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={FALLBACK_IMAGE}
-        alt=""
+        alt="3D printed Benchy model"
         aria-hidden="true"
         draggable={false}
         fetchPriority="high"
