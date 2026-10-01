@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { SITE } from './content/site';
 
@@ -39,6 +39,25 @@ const ROW = 'flex flex-wrap items-baseline gap-x-12 gap-y-3';
 // The form sends a POST request to the /api/contact route which uses Resend to deliver the email.
 export default function ContactForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  // Held so the grown height can be cleared when the form resets itself after a send.
+  const projectRef = useRef<HTMLTextAreaElement>(null);
+
+  /*
+   * Grow the project field to fit what has been typed.
+   *
+   * Height goes to auto first so scrollHeight reports what the content actually needs rather than the
+   * height it is already holding — without that the box can grow but never shrink again.
+   *
+   * The border is added back on. scrollHeight counts content and padding but not the border, while the
+   * field is border-box and so measures its height including it — assigning scrollHeight straight
+   * across loses exactly the 1px of the bottom rule, which shows as the field twitching shorter on the
+   * first keystroke.
+   */
+  const fitToContent = (el: HTMLTextAreaElement) => {
+    el.style.height = 'auto';
+    const border = el.offsetHeight - el.clientHeight;
+    el.style.height = `${el.scrollHeight + border}px`;
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,6 +84,9 @@ export default function ContactForm() {
 
       setStatus('success');
       (event.target as HTMLFormElement).reset();
+      // reset() empties the text but leaves the inline height this field grew to, which would hold a
+      // tall empty box over the placeholder. Clearing it hands the height back to rows/min-height.
+      if (projectRef.current) projectRef.current.style.height = '';
     } catch (error) {
       console.error(error);
       setStatus('error');
@@ -85,18 +107,24 @@ export default function ContactForm() {
 
       <div className={ROW}>
         <label htmlFor="contact-phone" className={LABEL}>Phone</label>
-        <input id="contact-phone" name="phone" type="tel" autoComplete="tel" placeholder="e.g. +91 9876543210" className={FIELD} />
+        <input id="contact-phone" name="phone" type="tel" autoComplete="tel" placeholder="10-digit mobile" className={FIELD} />
       </div>
 
       <div className={ROW}>
         <label htmlFor="contact-project" className={`${LABEL} self-start`}>Project Details</label>
+        {/* rows={2} sets the height it opens at; min-h repeats that as a floor so the field never
+            shrinks below its starting size once the inline height takes over. overflow-hidden keeps a
+            scrollbar from flashing in the moment between a new line and the resize. The field keeps
+            resize-none from FIELD: it sizes itself, so a drag handle would only fight it. */}
         <textarea
+          ref={projectRef}
           id="contact-project"
           name="project"
           required
           rows={2}
           placeholder="Material, quantity, deadline"
-          className={`${FIELD} leading-[1.6]`}
+          onInput={(event) => fitToContent(event.currentTarget)}
+          className={`${FIELD} min-h-[calc(2*1.6em+1rem+1px)] overflow-hidden leading-[1.6]`}
         />
       </div>
 

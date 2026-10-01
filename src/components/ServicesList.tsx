@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Plus } from 'lucide-react';
+import { ArrowRight, Plus } from 'lucide-react';
 import ImageSlot from './ImageSlot';
 import useMediaQuery from './useMediaQuery';
 import { SERVICES } from './content/services';
@@ -213,18 +213,24 @@ export default function ServicesList() {
 
                   {/* An action, not a block: on a band that is already one flat colour, a filled button
                       was a second rectangle inside the first. The rule under the words carries it
-                      instead, and the arrow leaves the line on hover.
-                      TODO: the quote form has no service field yet, so ?service= is only carried in the
-                      URL. Read it in QueryForm (and preselect a material) when that field exists. */}
+                      instead, and the arrow slides right on hover. QueryForm reads the ?service= slug
+                      off the router and preselects the matching project type. */}
                   <Link
                     href={`${QUOTE_HREF}?service=${service.slug}`}
                     tabIndex={active ? undefined : -1}
                     className="group/quote pointer-events-auto -my-[11px] mt-[13px] inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap py-[11px] text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-on-accent md:mt-5"
                   >
-                    <span className="underline decoration-1 underline-offset-[10px]">Get a quote for this</span>
-                    <ArrowUpRight
+                    {/* The underline is the link's own colour, inherited rather than set, so it stays
+                        right on whichever band this card is sitting on. */}
+                    <span className="underline decoration-[1.5px] underline-offset-[6px] transition-[text-decoration-thickness] duration-150 group-hover/quote:decoration-[2px] group-focus-visible/quote:decoration-[2px]">
+                      Get a quote for this
+                    </span>
+                    {/* An arrow that goes right, not up and out: this lands on our own quote page, and
+                        the diagonal is what the rest of the site uses for links that leave it. The
+                        motion-safe prefix drops the travel entirely for prefers-reduced-motion. */}
+                    <ArrowRight
                       aria-hidden="true"
-                      className="size-4 transition-transform duration-300 motion-safe:group-hover/quote:-translate-y-0.5 motion-safe:group-hover/quote:translate-x-0.5"
+                      className="size-4 transition-transform duration-150 motion-safe:group-hover/quote:translate-x-[3px] motion-safe:group-focus-visible/quote:translate-x-[3px]"
                     />
                   </Link>
                   </div>

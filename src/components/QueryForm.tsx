@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { X, UploadCloud, CheckCircle, Check, ShieldCheck, ArrowRight } from 'lucide-react';
 import ModelViewer from './ModelViewer';
 import { PROJECT_TYPES } from './content/services';
@@ -119,18 +120,33 @@ function formatSize(bytes: number) {
 
 export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // The service a visitor arrived from, when they came through a "Get a quote for this" link. Read from
-  // the query string in an effect rather than with useSearchParams, which would force this form — and so
-  // the whole page — behind a Suspense boundary for a value that is only a convenience.
-  const [projectType, setProjectType] = useState(() => {
-    // Lazy initialiser rather than an effect. Setting state from an effect body renders the form once
-    // empty and again with the service filled in, which React flags as a cascading render; reading it
-    // here means the first render already has the value. window is absent while this is prerendered on
-    // the server, so the empty string stands until it hydrates in the browser.
-    if (typeof window === 'undefined') return '';
-    const slug = new URLSearchParams(window.location.search).get('service');
-    return slug && PROJECT_TYPES.some((type) => type.slug === slug) ? slug : '';
-  });
+  /*
+   * The service a visitor arrived from, when they came through a "Get a quote for this" link.
+   *
+   * This has to come from the router rather than from window.location. On a client-side navigation Next
+   * renders the new route's tree before it commits the new URL, so anything reading window at first
+   * render sees the page the visitor is leaving — from the home page that URL carries no ?service at
+   * all, and a value read once at mount never corrects itself. useSearchParams is fed by the router, so
+   * it is right on the first render and stays right if the query changes underneath a mounted form.
+   * It also makes this subtree depend on the request, which is why the page wraps it in <Suspense>.
+   *
+   * An unknown or absent slug leaves the field on its placeholder; it is a convenience, not an input to
+   * validate, so there is nothing to report.
+   */
+  const serviceParam = useSearchParams().get('service');
+  const preselected = PROJECT_TYPES.some((type) => type.slug === serviceParam) ? (serviceParam as string) : '';
+
+  const [projectType, setProjectType] = useState(preselected);
+  // Adjusting state during render — React's own pattern for "a value changed and some state derives
+  // from it". The alternative is an effect, which would paint the empty field first and overwrite
+  // whatever the visitor had already picked on every unrelated re-render. Tracking the slug we last
+  // applied means a visitor's own choice survives, and only an actual change of ?service moves the
+  // field again.
+  const [appliedService, setAppliedService] = useState(preselected);
+  if (appliedService !== preselected) {
+    setAppliedService(preselected);
+    setProjectType(preselected);
+  }
 
   // Controlled only so the summary panel can read them. The name attributes are unchanged, so what the
   // form submits is exactly what it submitted before.

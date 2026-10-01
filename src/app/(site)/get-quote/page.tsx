@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
 import PageTrail from '@/components/PageTrail';
 import { QuoteFormCore } from '@/components/QueryForm';
@@ -42,7 +42,11 @@ export default function GetQuotePage() {
         </header>
 
         <div className="mt-7 min-[760px]:mt-12">
-          <QuoteFormCore />
+          {/* The form reads ?service= through useSearchParams, which cannot be resolved while the page
+              is prerendered — this boundary is what lets the rest of the page stay static around it. */}
+          <Suspense fallback={<div className="min-h-[60svh]" />}>
+            <QuoteFormCore />
+          </Suspense>
         </div>
       </div>
     </section>
