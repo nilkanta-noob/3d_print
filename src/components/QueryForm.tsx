@@ -66,18 +66,18 @@ const FINISH_LABELS: Record<string, string> = {
 /*
  * A step is a card, carrying the same hairline and square corners as the summary panel beside it.
  *
- * The number is swapped for a check once the step is satisfied, in a slot wide enough for either, so
- * the title never shifts as the marks appear. It goes back to the number if a field is emptied again.
+ * Each step keeps its number. A check used to replace it once the step was satisfied, but the number
+ * is what the eye follows down the form, and a step that arrives already satisfied — print settings
+ * does, with a material chosen by default and a project type filled in from the service link — would
+ * announce itself complete before the visitor had touched it.
  */
 function Step({
   number,
   title,
-  complete,
   children,
 }: {
   number: string;
   title: string;
-  complete: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -85,11 +85,7 @@ function Step({
       {/* h2, not h3: these sit directly under the page h1 and a jump to h3 skips a level. */}
       <h2 className="flex items-baseline gap-4">
         <span className="w-[1.25rem] shrink-0 font-mono text-[13px] tabular-nums text-text-muted">
-          {complete ? (
-            <Check className="size-4 text-accent-primary" strokeWidth={3} aria-label="Step complete" />
-          ) : (
-            number
-          )}
+          {number}
         </span>
         <span className="text-[20px] font-semibold text-text-primary min-[760px]:text-[22px]">{title}</span>
       </h2>
@@ -456,15 +452,6 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
 
   const projectLabel = PROJECT_TYPES.find((type) => type.slug === projectType)?.label ?? 'Not chosen yet';
 
-  const stepOneDone = Boolean(uploadedFileUrl);
-  const stepTwoDone = Boolean(projectType) && Boolean(material);
-  const stepThreeDone =
-    Boolean(details.name.trim()) &&
-    isOtpVerified &&
-    Boolean(details.state.trim()) &&
-    Boolean(details.city.trim()) &&
-    Boolean(details.pincode.trim());
-
   return (
     <form onSubmit={handleSubmit} className="relative">
       {/*
@@ -475,7 +462,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       */}
       <div className="grid gap-4 min-[760px]:gap-8 lg:grid-cols-[minmax(0,62fr)_minmax(0,38fr)] lg:items-start lg:gap-x-16 lg:gap-y-8">
         <div className="space-y-4 min-[760px]:space-y-10 lg:col-start-1 lg:row-start-1">
-          <Step number="01" title="Your file" complete={stepOneDone}>
+          <Step number="01" title="Your file">
             {/*
               One area, two states. Before a file is chosen it is the drop target; after, the preview
               renders inside the same box, so nothing appears or disappears around it. The input covers
@@ -555,7 +542,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
             </div>
           </Step>
 
-          <Step number="02" title="Print settings" complete={stepTwoDone}>
+          <Step number="02" title="Print settings">
             <div className="grid gap-x-6 gap-y-[22px] min-[760px]:gap-y-7 md:grid-cols-2">
               <div>
                 <label htmlFor="q-project" className={LABEL}>Project type</label>
@@ -710,7 +697,7 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
             )}
           </Step>
 
-          <Step number="03" title="Your details" complete={stepThreeDone}>
+          <Step number="03" title="Your details">
             <div className="grid gap-x-6 gap-y-[22px] min-[760px]:gap-y-7 md:grid-cols-2">
               <div>
                 <label htmlFor="q-name" className={LABEL}>Name</label>
