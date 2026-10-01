@@ -44,18 +44,18 @@ const ibmPlexMono = IBM_Plex_Mono({
  */
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "PrintWarriors | 3D Printing Service in Kolkata, India",
+  title: "PrintWarriors | Cheapest 3D Printing Service in Kolkata",
   description:
-    "3D printing service in Kolkata delivering across India. Prototypes, engineering parts and custom components from your CAD file, quoted within the hour.",
+    "Looking for an affordable 3D printing service in Kolkata? We offer the cheapest and high-quality 3D printing with pan-India delivery. Get a quote today!",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: "PrintWarriors",
     locale: "en_IN",
     url: SITE_URL,
-    title: "PrintWarriors | 3D Printing Service in Kolkata, India",
+    title: "PrintWarriors | Cheapest 3D Printing Service in Kolkata",
     description:
-      "3D printing service in Kolkata delivering across India. Prototypes, engineering parts and custom components from your CAD file.",
+      "Looking for an affordable 3D printing service in Kolkata? We offer the cheapest and high-quality 3D printing with pan-India delivery.",
   },
   // Card type only. With no title or description here, Next falls each page's twitter:title and
   // twitter:description back to its own openGraph values — set a title here and every page would
