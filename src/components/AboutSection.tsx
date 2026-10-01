@@ -1,6 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
 import PageTrail from './PageTrail';
+import { formatRate, getMaterial } from './content/materials';
+
+const PLA = getMaterial('pla');
 
 // The claims that sit under the argument, at caption size. Three short ones on one line rather than a
 // fourth paragraph: they are the terms of trade, not part of the prose.
@@ -9,7 +12,8 @@ const CLAIMS = ['No minimum order', 'Manual review', 'Fast delivery'];
 const FACTS = [
   { label: 'Based in', value: 'Kolkata', accent: false },
   { label: 'Delivery', value: '3–4 days', accent: true },
-  { label: 'Student rate', value: '₹3/g', accent: true },
+  // Read from the materials data so the badge cannot disagree with the pricing section below it.
+  { label: 'Student rate', value: `${formatRate(PLA.pricePerGram.student ?? PLA.pricePerGram.standard)}/g`, accent: true },
 ];
 
 /*

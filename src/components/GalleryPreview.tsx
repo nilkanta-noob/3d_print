@@ -20,7 +20,7 @@ function HeaderLink() {
   return (
     <Link
       href="/gallery"
-      className="group inline-flex items-center gap-2 text-[14px] text-text-primary underline underline-offset-4 transition-colors hover:text-accent-primary focus-visible:text-accent-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary"
+      className="group -my-[10px] inline-flex items-center gap-2 py-[10px] text-[14px] text-text-primary underline underline-offset-4 transition-colors hover:text-accent-primary focus-visible:text-accent-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary"
     >
       <span className="min-[760px]:hidden">See all</span>
       <span className="max-[759.98px]:hidden">See all prints</span>

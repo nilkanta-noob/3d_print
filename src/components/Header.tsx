@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MotionConfig } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
-import { NAV_LINKS, QUOTE_HREF } from './content/site';
+import { ArrowRight, Menu, X } from 'lucide-react';
+import { HERO_CTA_ID, NAV_LINKS, QUOTE_HREF } from './content/site';
 
 function isActive(pathname: string, href: string) {
   if (href.includes('#')) return false; // home page sections, not pages
@@ -20,6 +20,38 @@ export default function Header() {
   const [menuOpenOn, setMenuOpenOn] = useState<string | null>(null);
   const menuOpen = menuOpenOn === pathname;
   const closeMenu = () => setMenuOpenOn(null);
+
+  /*
+   * Whether the bar carries its own quote button. Phones only — from 760px it is always there, and
+   * these classes simply do not apply.
+   *
+   * A phone's bar has room for about two things, so the button earns its place rather than holding it:
+   * on the home page it is the hero button's understudy and appears exactly when the hero's own leaves
+   * the screen, so the same offer is never on screen twice; elsewhere there is no hero button to
+   * watch, so it arrives once the page has clearly been scrolled; and on the quote page itself it
+   * never appears, because the page IS the offer.
+   */
+  const onQuotePage = pathname === QUOTE_HREF;
+  const [showQuote, setShowQuote] = useState(false);
+
+  useEffect(() => {
+    // Nothing to watch on the quote page: the class list hides the button there outright, so the
+    // state it would read is never consulted.
+    if (onQuotePage) return;
+
+    const heroCta = document.getElementById(HERO_CTA_ID);
+    if (heroCta) {
+      const observer = new IntersectionObserver(([entry]) => setShowQuote(!entry.isIntersecting));
+      observer.observe(heroCta);
+      return () => observer.disconnect();
+    }
+
+    // No hero button on this page — fall back to distance scrolled.
+    const onScroll = () => setShowQuote(window.scrollY > 400);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [pathname, onQuotePage]);
 
   // The bar is invisible over the top of the hero and materialises as a card once the page moves. 8px
   // rather than 0 so a trackpad's rubber-band at the top of the page does not flicker it on and off.
@@ -98,13 +130,25 @@ export default function Header() {
           </nav>
 
           {/* Get Quote — the navbar's one solid CTA — and, on phones and tablets only, the menu button */}
-          <div className="flex shrink-0 items-center gap-0.5 min-[760px]:gap-3 justify-self-end">
+          <div className="flex shrink-0 items-center gap-3 justify-self-end">
             <Link
               href={QUOTE_HREF}
               aria-current={isActive(pathname, QUOTE_HREF) ? 'page' : undefined}
-              className="hover-lift inline-flex h-10 items-center whitespace-nowrap rounded-control bg-accent-primary px-3.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary min-[760px]:h-8 min-[760px]:px-4 lg:h-9 lg:px-5 lg:text-xs"
+              /*
+                It keeps its place in the row whether or not it is showing, so nothing moves when it
+                arrives: the right-hand group grows leftward and the menu icon stays on the bar's edge.
+                visibility rather than opacity alone, so a button nobody can see is also a button nobody
+                can tab to. `translate` rather than a transform, because hover-lift owns the transform.
+              */
+              className={`hover-lift inline-flex h-9 items-center whitespace-nowrap rounded-control bg-accent-primary px-2.5 min-[400px]:px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-on-accent [transition-property:translate,opacity,visibility,transform,background-color] duration-200 motion-reduce:transition-none hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary min-[760px]:visible min-[760px]:h-8 min-[760px]:px-4 min-[760px]:opacity-100 min-[760px]:[translate:0_0] lg:h-9 lg:px-5 lg:text-xs ${
+                onQuotePage ? 'max-[759.98px]:hidden' : ''
+              } ${showQuote ? 'visible opacity-100 [translate:0_0]' : 'invisible opacity-0 [translate:8px_0]'}`}
             >
-              Get Quote
+              {/* 360px phones have about 320px of bar, and the wordmark and a 44px tap
+                  target claim most of it. The short label is what makes the three fit on
+                  one row with 12px between them; the full one returns when there is room. */}
+              <span className="min-[400px]:hidden">Quote</span>
+              <span className="hidden min-[400px]:inline">Get Quote</span>
             </Link>
             <button
               type="button"
@@ -179,15 +223,20 @@ export default function Header() {
             );
           })}
         </ul>
-        <div className="site-frame mt-auto pb-8 pt-4">
-          <Link
-            href={QUOTE_HREF}
-            onClick={closeMenu}
-            className="flex w-full items-center justify-center rounded-control bg-accent-primary px-6 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent transition-colors hover:bg-accent-hover"
-          >
-            Get a quote
-          </Link>
-        </div>
+        {/* The menu's own closing action. Dropped on the quote page, where it would be an invitation
+            to the page already underneath the menu. */}
+        {!onQuotePage && (
+          <div className="site-frame mt-auto pb-8 pt-4">
+            <Link
+              href={QUOTE_HREF}
+              onClick={closeMenu}
+              className="group flex w-full items-center justify-center gap-2.5 rounded-control bg-accent-primary px-6 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent transition-colors hover:bg-accent-hover"
+            >
+              Get a quote
+              <ArrowRight className="size-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" aria-hidden="true" />
+            </Link>
+          </div>
+        )}
       </nav>
     </MotionConfig>
   );

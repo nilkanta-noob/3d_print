@@ -1,3 +1,14 @@
+import { formatRate, getMaterial } from './materials';
+
+/*
+ * The student and standard PLA rates are read from the materials data rather than typed into the
+ * answer. They were written out here once and went stale the moment the price changed, which is the
+ * one kind of error a visitor is guaranteed to notice.
+ */
+const pla = getMaterial('pla');
+const PLA_STANDARD = `${formatRate(pla.pricePerGram.standard)}/g`;
+const PLA_STUDENT = `${formatRate(pla.pricePerGram.student ?? pla.pricePerGram.standard)}/g`;
+
 export interface Faq {
   question: string;
   answer: string;
@@ -18,7 +29,7 @@ export const FAQS: Faq[] = [
   },
   {
     question: "Can students get a discount?",
-    answer: "Yes — PLA is ₹3/g instead of ₹4/g with a valid college ID or referral. Tick \"Apply Student Discount\" in the quote form and upload your ID."
+    answer: `Yes — PLA is ${PLA_STUDENT} instead of ${PLA_STANDARD} with a valid college ID or referral. Tick "Apply Student Discount" in the quote form and upload your ID.`
   },
   {
     question: "What materials do you offer?",

@@ -1,7 +1,3 @@
-import type React from 'react';
-
-type Icon = React.ComponentType<{ className?: string; strokeWidth?: number }>;
-
 export const SITE = {
   name: 'PrintWarriors',
   email: 'printwarriors.in@gmail.com',
@@ -31,6 +27,15 @@ export const WHATSAPP = {
 
 export const WHATSAPP_HREF = `https://wa.me/${WHATSAPP.number}?text=${encodeURIComponent(WHATSAPP.message).replace(/'/g, '%27')}`;
 
+/*
+ * The canonical origin, and the only place it is written.
+ *
+ * The bare domain redirects to www, so every absolute URL the site hands out — canonicals, the
+ * sitemap, robots, Open Graph — uses the www host. Pointing any of them at the apex would spend a
+ * redirect on every fetch and split the ranking signal across two hostnames.
+ */
+export const SITE_URL = 'https://www.printwarriors.in';
+
 export const QUOTE_HREF = '/get-quote';
 
 // The accent ticker under the hero runs these after the service names.
@@ -44,6 +49,12 @@ export const TRUST_ITEMS: string[] = [
 ];
 
 // Services and Pricing live on the home page (/#services, /#pricing); the rest are pages. The logo links home.
+/*
+ * The hero's own "Get quote" button. The navbar watches this element so its own button can stand in
+ * only once the hero's has scrolled away — see Header.
+ */
+export const HERO_CTA_ID = 'hero-quote-cta';
+
 export const NAV_LINKS: { href: string; label: string }[] = [
   { href: '/about', label: 'About' },
   { href: '/#services', label: 'Services' },

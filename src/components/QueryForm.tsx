@@ -81,7 +81,8 @@ function Step({
 }) {
   return (
     <section className={CARD}>
-      <h3 className="flex items-baseline gap-4">
+      {/* h2, not h3: these sit directly under the page h1 and a jump to h3 skips a level. */}
+      <h2 className="flex items-baseline gap-4">
         <span className="w-[1.25rem] shrink-0 font-mono text-[13px] tabular-nums text-text-muted">
           {complete ? (
             <Check className="size-4 text-accent-primary" strokeWidth={3} aria-label="Step complete" />
@@ -90,7 +91,7 @@ function Step({
           )}
         </span>
         <span className="text-[20px] font-semibold text-text-primary min-[760px]:text-[22px]">{title}</span>
-      </h3>
+      </h2>
       <div className="mt-5 space-y-[22px] min-[760px]:mt-8 min-[760px]:space-y-7">{children}</div>
     </section>
   );
@@ -121,11 +122,15 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   // The service a visitor arrived from, when they came through a "Get a quote for this" link. Read from
   // the query string in an effect rather than with useSearchParams, which would force this form — and so
   // the whole page — behind a Suspense boundary for a value that is only a convenience.
-  const [projectType, setProjectType] = useState('');
-  useEffect(() => {
+  const [projectType, setProjectType] = useState(() => {
+    // Lazy initialiser rather than an effect. Setting state from an effect body renders the form once
+    // empty and again with the service filled in, which React flags as a cascading render; reading it
+    // here means the first render already has the value. window is absent while this is prerendered on
+    // the server, so the empty string stands until it hydrates in the browser.
+    if (typeof window === 'undefined') return '';
     const slug = new URLSearchParams(window.location.search).get('service');
-    if (slug && PROJECT_TYPES.some((type) => type.slug === slug)) setProjectType(slug);
-  }, []);
+    return slug && PROJECT_TYPES.some((type) => type.slug === slug) ? slug : '';
+  });
 
   // Controlled only so the summary panel can read them. The name attributes are unchanged, so what the
   // form submits is exactly what it submitted before.
@@ -476,9 +481,12 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
                     }`
               }`}
             >
+              {/* Invisible, stretched over the whole drop zone, so there is no visible label to tie
+                  it to — the accessible name has to be spelled out here. */}
               <input
                 name="file"
                 type="file"
+                aria-label="Choose a CAD file to upload"
                 required
                 accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf,.zip"
                 onChange={handleFileChange}

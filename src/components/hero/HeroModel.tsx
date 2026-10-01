@@ -19,7 +19,10 @@ import type { HeroScene } from './heroModelScene';
 // The one object in the hero. It used to be a pair with an arrow to cycle between them; the second
 // model and its control are gone, so there is no index to track and nothing to swap.
 const MODEL = { url: '/hero/benchy.glb', color: '#C9CED6', scaleFactor: 0.9 };
-const FALLBACK_IMAGE = '/hero/model-fallback.png';
+// WebP, not the PNG the capture helper below hands you: the same 1200x1200 frame with its alpha
+// intact is 33KB rather than 193KB, and this still is on the critical path of the home page.
+// Re-encode after every capture: sharp, squoosh or any converter will do, keeping the alpha channel.
+const FALLBACK_IMAGE = '/hero/model-fallback.webp';
 
 /*
  * How long the still takes to hand over to the canvas. The scene waits the same 300ms before it starts
@@ -56,8 +59,9 @@ function supportsWebGL(): boolean {
  *     http://localhost:3000/?capture-fallback
  *
  * and the scene renders one square 1200x1200 frame of the part on a transparent background, in the
- * resting pose, and downloads it as model-fallback.png. Drop that file into public/hero/ to replace the
- * still. It is gated on NODE_ENV so the query string does nothing in a production build.
+ * resting pose, and downloads it as model-fallback.png. Convert that to model-fallback.webp, drop it
+ * into public/hero/ and it replaces the still. It is gated on NODE_ENV so the query string does nothing
+ * in a production build.
  */
 function captureRequested(): boolean {
   if (process.env.NODE_ENV !== 'development') return false;

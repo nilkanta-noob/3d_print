@@ -7,8 +7,19 @@ import { GALLERY_ITEMS } from '@/components/content/gallery';
 import { QUOTE_HREF } from '@/components/content/site';
 
 export const metadata: Metadata = {
-  title: 'Gallery | PrintWarriors',
-  description: 'Photographs of parts printed by PrintWarriors: functional prints, prototypes and everyday pieces.',
+  title: 'Gallery | 3D Printed Parts by PrintWarriors, Kolkata',
+  description:
+    'Photographs of real parts printed by PrintWarriors in Kolkata: functional prints, prototypes and everyday pieces.',
+  alternates: { canonical: '/gallery' },
+  openGraph: {
+    title: 'Gallery | 3D Printed Parts by PrintWarriors, Kolkata',
+    description:
+      'Photographs of real parts printed by PrintWarriors in Kolkata: functional prints, prototypes and everyday pieces.',
+    url: '/gallery',
+    // Spelled out because a page-level openGraph replaces the inherited one wholesale, taking the
+    // root segment's auto-attached card with it. Next serves the generated image at this path.
+    images: ['/opengraph-image'],
+  },
 };
 
 /*

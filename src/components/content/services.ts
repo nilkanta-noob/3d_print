@@ -1,4 +1,5 @@
 import type { PartVariant } from '../PartIllustration';
+import { formatRate, getMaterial } from './materials';
 
 // Home page Services, in the order a customer usually grows through them:
 // Student Projects → Rapid Prototyping → Custom Parts → Product Development.
@@ -24,14 +25,18 @@ export interface Service {
 
 const STANDARD_TURNAROUND = 'Quote within the hour; delivered in 3–4 business days after confirmation (faster in Kolkata via Porter).';
 
+// The student rate, read from the materials data rather than retyped, so a price change lands here too.
+const pla = getMaterial('pla');
+const PLA_STUDENT_RATE = formatRate(pla.pricePerGram.student ?? pla.pricePerGram.standard);
+
 export const SERVICES: Service[] = [
   {
     slug: 'student-projects',
     index: '01',
     title: 'Student Projects',
     description: 'Built for final-year projects, robotics teams, competitions, and academic prototypes.',
-    meta: ['PLA (Student Rate)', 'PLA+ or PETG', '3-4 business days'],
-    audience: 'Students with a valid college ID — PLA at the ₹3/g student rate.',
+    meta: ['PLA (Student Rate)', 'PLA+ or PETG', '3–4 business days'],
+    audience: `Students with a valid college ID — PLA at the ${PLA_STUDENT_RATE}/g student rate.`,
     examples: ['Robot chassis parts', 'Sensor and PCB mounts', 'Competition and project models'],
     turnaround: STANDARD_TURNAROUND,
     materials: 'PLA (student rate); PLA+ or PETG for moving parts',

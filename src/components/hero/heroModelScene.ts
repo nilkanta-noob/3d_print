@@ -19,7 +19,7 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
  * geometry is normalised to D = 1 on load, so these hold for any STL put through this module.
  */
 
-// The object's starting spin. The fallback PNG (public/hero/model-fallback.png) is rendered from the
+// The object's starting spin. The fallback still (public/hero/model-fallback.webp) is rendered from the
 // same camera at the same yaw, so the still and the live model line up.
 const INITIAL_YAW = -0.55;
 const INITIAL_PITCH = 0;
@@ -170,7 +170,7 @@ export interface HeroScene {
   /**
    * Development only, and only with `capture: true`. Renders one square frame of the part alone — no
    * build plate, no contact shadow, transparent background — in the resting pose, and hands back a PNG
-   * data URL. This is what public/hero/model-fallback.png is made from, which is the only way the still
+   * data URL. This is what public/hero/model-fallback.webp is made from, which is the only way the still
    * and the live part can be guaranteed to agree: the still IS a frame of this scene.
    */
   captureStill: (size: number) => string;

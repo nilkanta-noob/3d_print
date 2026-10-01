@@ -1,4 +1,15 @@
+import type { Metadata } from 'next';
 import QuoteForm from '@/components/QuoteForm';
+
+/*
+ * An older version of /get-quote that nothing links to. It stays reachable so any bookmark still
+ * works, but it is kept out of search: it duplicates /get-quote, and it renders outside the (site)
+ * route group, so it has no navbar and no footer and would be a dead end for anyone who landed on it
+ * from a search result.
+ */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default function QuotePage() {
   return (

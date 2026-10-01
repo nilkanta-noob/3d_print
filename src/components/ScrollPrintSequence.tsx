@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, MotionConfig, type Variants } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import HeroModel from './hero/HeroModel';
+import { HERO_CTA_ID } from './content/site';
 
 /*
  * The hero: headline left, the printed object right.
@@ -103,6 +104,7 @@ export default function ScrollPrintSequence({ onOpenQuery }: ScrollPrintSequence
                 across the screen reads as a form control rather than as an invitation. */}
             <motion.div variants={rise} className="mt-8 min-[760px]:mt-[clamp(2.5rem,6vh,4rem)]">
               <button
+                id={HERO_CTA_ID}
                 type="button"
                 onClick={onOpenQuery}
                 className="hover-lift group inline-flex h-[52px] items-center justify-center gap-2.5 whitespace-nowrap rounded-control bg-accent-primary px-6 text-[14px] font-semibold uppercase tracking-[0.08em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary min-[760px]:h-auto min-[760px]:px-7 min-[760px]:py-3.5 min-[760px]:text-[13px] min-[760px]:tracking-[0.12em]"

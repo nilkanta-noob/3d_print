@@ -3,14 +3,6 @@ import React from 'react';
 import Link from 'next/link';
 import { NAV_LINKS, SITE, WHATSAPP_HREF } from './content/site';
 
-const InstagramIcon = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-  </svg>
-);
-
 const LinkedinIcon = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
@@ -40,7 +32,6 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
 // WhatsApp leads: it is the number people actually reach us on, so it takes the first box.
 const SOCIAL = [
   { label: 'Chat with PrintWarriors on WhatsApp', Icon: WhatsappIcon, href: WHATSAPP_HREF, external: true },
-  { label: 'Instagram', Icon: InstagramIcon, href: 'https://www.instagram.com/___izts.nil___/', external: true },
   { label: 'LinkedIn', Icon: LinkedinIcon, href: 'https://www.linkedin.com/in/nilkanta-dinda/', external: true },
   { label: 'YouTube', Icon: YoutubeIcon, href: 'https://www.youtube.com/channel/UCMAHetZ_k6MWnGYiVCYhuKg', external: true },
 ];
@@ -73,9 +64,13 @@ export default function Footer() {
           <div className="flex flex-col gap-8 sm:flex-row sm:gap-16 lg:gap-24">
           <div>
             <h2 className="label-micro text-text-muted">Navigation</h2>
-            <nav aria-label="Footer" className="mt-3 flex flex-col items-start gap-2 text-[15px]">
+            <nav aria-label="Footer" className="mt-3 flex flex-col items-start gap-2 text-[15px] max-[759.98px]:gap-0">
               {NAV_LINKS.map((link) => (
-                <Link key={link.href} href={link.href} className="transition-colors duration-200 hover:text-text-primary">
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="transition-colors duration-200 hover:text-text-primary max-[759.98px]:py-[9px]"
+                >
                   {link.label}
                 </Link>
               ))}
@@ -88,7 +83,10 @@ export default function Footer() {
           <div className="flex min-w-0 flex-col items-start">
             <h2 className="label-micro text-text-muted">Contact</h2>
             <div className="mt-3 flex min-w-0 max-w-full flex-col gap-2 text-[15px]">
-              <a href={`mailto:${SITE.email}`} className="min-w-0 break-all transition-colors duration-200 hover:text-text-primary">
+              <a
+                href={`mailto:${SITE.email}`}
+                className="min-w-0 break-all transition-colors duration-200 hover:text-text-primary max-[759.98px]:-my-[9px] max-[759.98px]:py-[9px]"
+              >
                 {SITE.email}
               </a>
               <span className="text-text-muted">{SITE.location}</span>
@@ -103,7 +101,7 @@ export default function Footer() {
                   href={href}
                   aria-label={label}
                   {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : null)}
-                  className="hover-lift grid size-9 place-items-center rounded-chip border border-border text-text-secondary [transition-property:transform,color,border-color] hover:border-accent-primary/50 hover:text-accent-primary"
+                  className="hover-lift grid size-9 place-items-center rounded-chip border border-border max-[759.98px]:size-11 text-text-secondary [transition-property:transform,color,border-color] hover:border-accent-primary/50 hover:text-accent-primary"
                 >
                   <Icon className="size-4" />
                 </a>

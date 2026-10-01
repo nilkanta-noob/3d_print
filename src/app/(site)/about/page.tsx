@@ -8,8 +8,19 @@ import CtaBanner from '@/components/CtaBanner';
 import { PROCESS_STEPS, QUOTE_HREF } from '@/components/content/site';
 
 export const metadata: Metadata = {
-  title: 'About | PrintWarriors',
-  description: 'PrintWarriors is a Kolkata 3D printing service founded by an engineering student to make prototyping accessible.',
+  title: 'About PrintWarriors | 3D Printing in Kolkata',
+  description:
+    'PrintWarriors is a Kolkata 3D printing service founded by an engineering student to make prototyping accessible across India.',
+  alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About PrintWarriors | 3D Printing in Kolkata',
+    description:
+      'PrintWarriors is a Kolkata 3D printing service founded by an engineering student to make prototyping accessible across India.',
+    url: '/about',
+    // Spelled out because a page-level openGraph replaces the inherited one wholesale, taking the
+    // root segment's auto-attached card with it. Next serves the generated image at this path.
+    images: ['/opengraph-image'],
+  },
 };
 
 export default function AboutPage() {

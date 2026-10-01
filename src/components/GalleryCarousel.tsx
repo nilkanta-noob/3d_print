@@ -176,9 +176,10 @@ export default function GalleryCarousel({ items }: { items: GalleryItem[] }) {
             }}
             aria-label={`Show ${item.title}, ${i + 1} of ${items.length}`}
             aria-current={i === index ? 'true' : undefined}
-            className="group h-6 w-6 shrink-0 p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+            className="group -my-[10px] h-11 w-6 shrink-0 p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
           >
-            {/* The target is 24px tall for a thumb; the mark inside it is the 2px the design asks for. */}
+            {/* The target is 44px tall for a thumb, pulled back out of the layout by the negative margin;
+                the mark inside it is still the 2px the design asks for. */}
             <span className="block h-[3px] w-6 overflow-hidden bg-white/[0.18]">
               <span
                 /* Remounted on every change of active tile, so the fill restarts from empty rather than

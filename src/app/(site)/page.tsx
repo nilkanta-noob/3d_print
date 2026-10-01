@@ -6,11 +6,13 @@ import PricingSection from '@/components/PricingSection';
 import GalleryPreview from '@/components/GalleryPreview';
 import TrustTicker from '@/components/TrustTicker';
 import CtaBanner from '@/components/CtaBanner';
+import LocalBusinessJsonLd from '@/components/LocalBusinessJsonLd';
 import { QUOTE_HREF } from '@/components/content/site';
 
 export default function HomePage() {
   return (
     <>
+      <LocalBusinessJsonLd />
       <HomeHero />
 
       {/* The hero used to pin its footage to the viewport as a fixed z-0 layer, and everything below it

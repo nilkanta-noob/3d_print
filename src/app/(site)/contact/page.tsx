@@ -4,8 +4,19 @@ import ContactForm from '@/components/ContactForm';
 import PageTrail from '@/components/PageTrail';
 
 export const metadata: Metadata = {
-  title: 'Contact | PrintWarriors',
-  description: 'Contact PrintWarriors in Kolkata by phone, email or the contact form. Delivery across India.',
+  title: 'Contact PrintWarriors | 3D Printing in Kolkata',
+  description:
+    'Contact PrintWarriors in Kolkata by phone, email or the enquiry form. 3D printing delivered across India.',
+  alternates: { canonical: '/contact' },
+  openGraph: {
+    title: 'Contact PrintWarriors | 3D Printing in Kolkata',
+    description:
+      'Contact PrintWarriors in Kolkata by phone, email or the enquiry form. 3D printing delivered across India.',
+    url: '/contact',
+    // Spelled out because a page-level openGraph replaces the inherited one wholesale, taking the
+    // root segment's auto-attached card with it. Next serves the generated image at this path.
+    images: ['/opengraph-image'],
+  },
 };
 
 /*

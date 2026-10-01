@@ -4,8 +4,19 @@ import PageTrail from '@/components/PageTrail';
 import { QuoteFormCore } from '@/components/QueryForm';
 
 export const metadata: Metadata = {
-  title: 'Get a Quote | PrintWarriors',
-  description: 'Upload your CAD file, choose a material and get a 3D printing quote by email — usually within the hour.',
+  title: 'Get a 3D Printing Quote | PrintWarriors India',
+  description:
+    'Upload your CAD file, choose a material and get a 3D printing quote by email — usually within the hour. Delivered across India from Kolkata.',
+  alternates: { canonical: '/get-quote' },
+  openGraph: {
+    title: 'Get a 3D Printing Quote | PrintWarriors India',
+    description:
+      'Upload your CAD file, choose a material and get a 3D printing quote by email — usually within the hour. Delivered across India from Kolkata.',
+    url: '/get-quote',
+    // Spelled out because a page-level openGraph replaces the inherited one wholesale, taking the
+    // root segment's auto-attached card with it. Next serves the generated image at this path.
+    images: ['/opengraph-image'],
+  },
 };
 
 /*

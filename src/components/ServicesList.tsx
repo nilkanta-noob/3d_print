@@ -219,7 +219,7 @@ export default function ServicesList() {
                   <Link
                     href={`${QUOTE_HREF}?service=${service.slug}`}
                     tabIndex={active ? undefined : -1}
-                    className="group/quote pointer-events-auto mt-6 inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-on-accent md:mt-5"
+                    className="group/quote pointer-events-auto -my-[11px] mt-[13px] inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap py-[11px] text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-on-accent md:mt-5"
                   >
                     <span className="underline decoration-1 underline-offset-[10px]">Get a quote for this</span>
                     <ArrowUpRight

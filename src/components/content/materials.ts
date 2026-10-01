@@ -66,7 +66,7 @@ export const MATERIALS: Material[] = [
     useCases: ['Brackets and mounts', 'Jigs', 'Light-load parts'],
     description: 'A step up in toughness and layer adhesion from standard PLA, while staying easy to print — the middle ground before PETG.',
     advantages: ['Tougher and less brittle than standard PLA', 'Stronger layer adhesion', 'Keeps PLA’s fine detail'],
-    limitations: ['Heat resistance similar to standard PLA', 'Costs more per gram than PLA', 'Student rate not available yet'],
+    limitations: ['Heat resistance similar to standard PLA', 'Student rate not available yet'],
     applications: ['Functional prototypes (durability)', 'Brackets, enclosures, jigs', 'Light-mechanical-stress parts'],
     ratings: {
       strength: { level: 3, label: 'Good' },

@@ -6,6 +6,10 @@
  * arrives. The masonry sets no aspect ratio of its own — a tray and an upright bearing are different
  * shapes, and forcing both into one crop is how a gallery starts looking like a catalogue.
  *
+ * The filenames below are matched to what is actually in each photograph rather than to the order the
+ * camera happened to number them, so a re-export that renames the files can be reconciled by looking at
+ * them rather than by guessing. Every path here must exist in public/all-images/3d-print-our-gallery.
+ *
  * PLACEHOLDERS: the values marked TODO are yours to fill. Everything else is live.
  */
 export interface GalleryImage {
@@ -36,7 +40,7 @@ export interface GalleryItem {
 
 const SHOT = '/all-images/3d-print-our-gallery';
 
-// 4:3 landscape, the shape every phone photo in the first batch came in at.
+// 4:3 landscape, the shape every phone photo in this batch came in at.
 const landscape = (file: string): GalleryImage => ({ src: `${SHOT}/${file}`, width: 1600, height: 1200 });
 
 export const GALLERY_ITEMS: GalleryItem[] = [
@@ -49,7 +53,9 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     // material instead.
     note: 'Rings and balls printed separately, then assembled.',
     images: [
-      { src: `${SHOT}/functionalparts1_result.webp`, width: 1199, height: 1600 },
+      // Landscape, not portrait: this one is 1600x1199 on disk and was recorded the other way round,
+      // which reserved an upright box for a photo that arrived on its side.
+      { src: `${SHOT}/functionalparts1_result.webp`, width: 1600, height: 1199 },
       // The file on disk is spelled "paers", not "parts". Left as found rather than renamed, so the
       // path keeps matching the asset.
       { src: `${SHOT}/functionalpaers2_result.webp`, width: 1441, height: 1600 },
@@ -61,8 +67,10 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     title: 'Oval tray',
     material: 'PLA', // TODO: confirm material
     images: [
-      landscape('IMG-20260920-WA0014_result.webp'),
-      landscape('IMG-20260920-WA0003_result.webp'),
+      // The top-down frame leads: it shows the whole oval and the ribbing in one look, which the
+      // side-on shot cannot. That one follows, then the frame shared with the calibration cubes.
+      landscape('cube-tray2.webp'),
+      landscape('tray.webp'),
       landscape('IMG-20260920-WA0006_result.webp'),
     ],
   },
@@ -71,7 +79,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     showOnHome: true,
     title: 'Box with lid',
     material: 'PLA', // TODO: confirm material
-    images: [landscape('IMG-20260920-WA0011_result.webp')],
+    images: [landscape('silica-box.webp')],
   },
   {
     slug: 'calibration-cube',
@@ -79,16 +87,16 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     material: 'PLA', // TODO: confirm material
     note: 'Dimensional accuracy test.',
     images: [
-      landscape('IMG-20260920-WA0005_result.webp'),
-      landscape('IMG-20260920-WA0002_result.webp'),
-      landscape('IMG-20260920-WA0012_result.webp'),
+      landscape('calibaration-cubes.webp'),
+      landscape('calibaration-cube-2.webp'),
+      landscape('cube-tray.webp'),
     ],
   },
   {
     slug: 'item-five',
-    title: 'Printed part', // TODO: name this one
+    title: 'Printed part', // TODO: name this one — the photo is a two-roller assembly behind a slotted grid
     material: 'PLA', // TODO: confirm material
-    images: [landscape('IMG-20260920-WA0010_result.webp')],
+    images: [landscape('assembled-parts.webp')],
   },
 ];
 
