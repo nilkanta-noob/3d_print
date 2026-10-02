@@ -69,7 +69,6 @@ export const GALLERY_ITEMS: GalleryItem[] = [
   },
   {
     slug: 'multi-part-bearing',
-    showOnHome: true,
     title: 'Multi-part bearing',
     note: 'Rings and balls printed separately, then assembled.',
     images: [
@@ -122,6 +121,20 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       landscape('calibaration-cubes.webp'),
       landscape('calibaration-cube-2.webp'),
       landscape('cube-tray.webp'),
+    ],
+  },
+  {
+    slug: 'hoodie-pen-stand',
+    showOnHome: true,
+    title: 'Hoodie pen stand',
+    // Each of these came off the camera at its own ratio rather than the flat 1600x1200 the rest of the
+    // batch shares, so they are written out in full instead of going through the two helpers.
+    images: [
+      { src: `${SHOT}/hoodie-penstand-front1.webp`, width: 1600, height: 1254 },
+      { src: `${SHOT}/hoodie-penstand-front2.webp`, width: 1600, height: 1256 },
+      { src: `${SHOT}/hoodie-penstand-front3.webp`, width: 1263, height: 1600 },
+      { src: `${SHOT}/hoodie-penstand-side.webp`, width: 1258, height: 1600 },
+      { src: `${SHOT}/hoodie-penstand-back.webp`, width: 1600, height: 1296 },
     ],
   },
 ];
