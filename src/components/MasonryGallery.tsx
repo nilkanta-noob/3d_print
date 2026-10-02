@@ -4,12 +4,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import GalleryTile from './GalleryTile';
-import { BLUR, altFor, captionFor, type GalleryItem } from './content/gallery';
+import { BLUR, altFor, indexLabel, type GalleryItem } from './content/gallery';
 
 /*
  * A grid of photographs, and a lightbox for looking at them properly.
  *
- * Every tile is the same 4:3 box with the picture cropped to fill it, so the grid reads as a set rather
+ * Every tile is the same square with the picture cropped to fill it, so the grid reads as a set rather
  * than as a pile of different shapes. Where a crop takes a bite out of the subject, the fix is the
  * per-image objectPosition in the data rather than a special case here.
  *
@@ -37,6 +37,9 @@ export default function MasonryGallery({ items }: { items: GalleryItem[] }) {
   }, []);
 
   const item = openIndex === null ? null : items[openIndex];
+  // Narrowed for the caption: inside the dialog openIndex is never null, but it is typed as
+  // nullable and nothing here tells the compiler that the dialog only renders when it is set.
+  const activeIndex = openIndex ?? 0;
   const total = item?.images.length ?? 0;
 
   const step = useCallback(
@@ -90,12 +93,13 @@ export default function MasonryGallery({ items }: { items: GalleryItem[] }) {
     <>
       {/* Uniform grid. Items flow left to right and the last row is simply short — nothing stretches
           to fill it, which is what a grid does by default and what a flex row would not. */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-x-2 gap-y-6 lg:grid-cols-4 lg:gap-x-3 lg:gap-y-8">
         {items.map((entry, index) => (
           <GalleryTile
             key={entry.slug}
             item={entry}
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            index={index}
+            sizes="(min-width: 1024px) 25vw, 50vw"
             label={`Open ${entry.title}`}
             onClick={() => open(index)}
             buttonRef={(el) => {
@@ -175,12 +179,20 @@ export default function MasonryGallery({ items }: { items: GalleryItem[] }) {
             )}
           </div>
 
+          {/* The index is carried through from the grid so the thing on screen is still identifiably
+              the fourth print, and the note — which the grid never shows — lands here under the title. */}
           <div className="mt-6 shrink-0 text-center">
-            <p className="text-[18px] font-medium text-text-primary">{item.title}</p>
-            <p className="mt-1 text-[14px] text-text-muted">
-              {captionFor(item)}
-              {total > 1 && <span className="ml-3 font-mono">{shot + 1}/{total}</span>}
+            <p className="text-[18px] font-medium text-text-primary">
+              <span className="font-mono text-text-muted">{indexLabel(activeIndex)}</span>
+              <span className="mx-2 text-text-muted" aria-hidden="true">·</span>
+              {item.title}
             </p>
+            {item.material && (
+              <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted">
+                {item.material}
+              </p>
+            )}
+            {item.note && <p className="mt-1 text-[14px] text-text-muted">{item.note}</p>}
           </div>
         </div>
       )}

@@ -1,10 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BLUR, altFor, captionFor, type GalleryItem } from './content/gallery';
+import { BLUR, altFor, indexLabel, type GalleryItem } from './content/gallery';
 
 /*
- * One gallery tile: a 4:3 crop of the item's cover photograph, with its title and material underneath.
+ * One gallery tile: a square crop of the item's cover photograph, with its index and title underneath.
  *
  * Two places show gallery items — the gallery's own grid, where a tile opens the lightbox, and the home
  * page's preview row, where it links through to the gallery. The only thing that differs between them is
@@ -16,6 +16,8 @@ import { BLUR, altFor, captionFor, type GalleryItem } from './content/gallery';
  */
 interface GalleryTileProps {
   item: GalleryItem;
+  /** Position in the gallery, used for the "01" that opens the caption. Omitted by the preview row. */
+  index?: number;
   /** The `sizes` hint for the breakpoints this tile is being laid out at. */
   sizes: string;
   /** The wrapper's accessible name — it names the picture, which has an empty alt of its own. */
@@ -46,6 +48,7 @@ const WRAPPER =
 
 export default function GalleryTile({
   item,
+  index,
   sizes,
   label,
   href,
@@ -54,11 +57,15 @@ export default function GalleryTile({
   className = '',
   variant = 'default',
 }: GalleryTileProps) {
-  const cover = item.images[0];
   const preview = variant === 'preview';
+  // The preview row may be pointed at a different frame from the one that leads the gallery.
+  const cover = item.images[(preview && item.homeCover) || 0];
+  // How many photographs are behind the cover. The chip is the grid's only sign that an item opens
+  // into a set, so it is drawn whenever there is more than one.
+  const extras = item.images.length - 1;
 
   const picture = (
-    <span className={`relative block aspect-[4/3] w-full overflow-hidden ${preview ? '' : 'border border-border'}`}>
+    <span className={`relative block w-full overflow-hidden ${preview ? 'aspect-[4/3]' : 'aspect-square'}`}>
       <Image
         src={cover.src}
         alt={altFor(item)}
@@ -70,9 +77,18 @@ export default function GalleryTile({
         className={
           preview
             ? 'object-cover motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-[cubic-bezier(0.2,0.7,0.2,1)] motion-safe:group-hover:scale-[1.03]'
-            : 'object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.02]'
+            : 'object-cover motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]'
         }
       />
+
+      {/* "+2" rather than "1/3": the grid is showing one photograph, and what the chip has to say is how
+          many more are behind it. Tailwind wraps hover: in @media (hover: hover) already, so the scale
+          above answers a pointer and never a tap. */}
+      {!preview && extras > 0 && (
+        <span className="pointer-events-none absolute right-2 top-2 bg-black/55 px-1.5 py-0.5 font-mono text-[11px] leading-none text-white backdrop-blur-[2px]">
+          +{extras}
+        </span>
+      )}
       {/* A foot of shadow on the picture itself, so a pale subject still has an edge against the page
           below it. Decorative and never over the caption, hence inset-0 on the frame rather than a
           wrapper around the whole tile. */}
@@ -96,10 +112,24 @@ export default function GalleryTile({
           {picture}
         </Link>
       )}
+      {/*
+        One line, and it has to stay one line at 360px. min-w-0 lets the title shrink below its content
+        width — without it a flex child refuses to, and a long title pushes the material off the tile
+        instead of truncating. The material never shrinks and never wraps.
+      */}
       {!preview && (
-        <figcaption className="mt-3">
-          <span className="block text-[18px] font-medium text-text-primary">{item.title}</span>
-          <span className="mt-1 block text-[14px] text-text-muted">{captionFor(item)}</span>
+        <figcaption className="mt-3 flex items-baseline gap-[10px]">
+          <span className="shrink-0 font-mono text-[12px] leading-none text-text-muted">
+            {indexLabel(index ?? 0)}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-[15px] font-medium leading-none text-text-primary">
+            {item.title}
+          </span>
+          {item.material && (
+            <span className="shrink-0 whitespace-nowrap font-mono text-[11px] uppercase leading-none tracking-[0.12em] text-text-muted">
+              {item.material}
+            </span>
+          )}
         </figcaption>
       )}
     </figure>

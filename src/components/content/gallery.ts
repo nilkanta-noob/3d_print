@@ -2,24 +2,27 @@
  * The gallery: photographs of prints that have actually come off our machine. Nothing here is a render
  * or a placeholder, which is why every item carries real image files and real dimensions.
  *
- * Dimensions are stored rather than guessed so next/image can reserve the right box before a photo
- * arrives. The masonry sets no aspect ratio of its own — a tray and an upright bearing are different
- * shapes, and forcing both into one crop is how a gallery starts looking like a catalogue.
+ * Dimensions are read off the files rather than guessed, so next/image can reserve the right box before
+ * a photo arrives. The grid crops every cover to a square; the lightbox shows each photograph whole, at
+ * its own ratio, which is what these dimensions are really for.
  *
  * The filenames below are matched to what is actually in each photograph rather than to the order the
  * camera happened to number them, so a re-export that renames the files can be reconciled by looking at
  * them rather than by guessing. Every path here must exist in public/all-images/3d-print-our-gallery.
  *
- * PLACEHOLDERS: the values marked TODO are yours to fill. Everything else is live.
+ * MATERIALS are deliberately absent. Every item used to carry material: 'PLA' marked "TODO: confirm",
+ * which is a guess rather than a record — and a guess printed under a photograph on a page that sells
+ * printing reads as a specification. The field is optional: fill one in and it appears in that item's
+ * caption and in its lightbox; leave it out and nothing is shown in its place.
  */
 export interface GalleryImage {
   src: string;
   width: number;
   height: number;
   /*
-   * Where the 4:3 grid crop sits on the photograph. Defaults to the centre, which is right for most of
-   * them; set it per image when the subject sits off-centre and the crop takes a bite out of it, e.g.
-   * 'center 30%' to favour the top of the frame.
+   * Where the square grid crop sits on the photograph. Defaults to the centre, which is right for most
+   * of them. The portrait shots lose the most to the crop — set this per image when it takes a bite out
+   * of the subject, e.g. 'center 30%' to favour the top of the frame.
    */
   objectPosition?: string;
 }
@@ -27,7 +30,9 @@ export interface GalleryImage {
 export interface GalleryItem {
   slug: string;
   title: string;
-  material: string;
+  /** Omitted wherever it has not been confirmed. Nothing is rendered in its place. */
+  material?: string;
+  /** Shown in the lightbox only, under the title — never in the grid. */
   note?: string;
   images: GalleryImage[]; // images[0] is the cover
   /*
@@ -36,25 +41,39 @@ export interface GalleryItem {
    * here rather than keeping a second list somewhere that has to be kept in step with this one.
    */
   showOnHome?: boolean;
+  /*
+   * Which photograph the home page's preview row uses, as an index into images. Defaults to the cover.
+   *
+   * The two rows crop differently — the gallery is a square, the preview is 4:3 — so the frame that
+   * leads an item in the grid is not always the one that survives the wider crop. Set this rather than
+   * reordering images, which would change the gallery's cover as well.
+   */
+  homeCover?: number;
 }
 
 const SHOT = '/all-images/3d-print-our-gallery';
 
-// 4:3 landscape, the shape every phone photo in this batch came in at.
+// The two shapes this batch came in at. Anything that is neither is written out in full below.
 const landscape = (file: string): GalleryImage => ({ src: `${SHOT}/${file}`, width: 1600, height: 1200 });
+const portrait = (file: string): GalleryImage => ({ src: `${SHOT}/${file}`, width: 1200, height: 1600 });
 
 export const GALLERY_ITEMS: GalleryItem[] = [
+  {
+    slug: 'phone-stand',
+    showOnHome: true,
+    // The demo shot leads the gallery, but it is portrait and the preview's 4:3 frame takes the top and
+    // bottom off it. The landscape shot of the stand fills that frame as it was taken.
+    homeCover: 1,
+    title: 'Phone stand',
+    images: [portrait('phone-stand-demo.webp'), landscape('phone-stand.webp'), portrait('phone-stand-top.webp')],
+  },
   {
     slug: 'multi-part-bearing',
     showOnHome: true,
     title: 'Multi-part bearing',
-    material: 'PLA', // TODO: confirm material
-    // The note appears on /gallery only — the home page's preview caption is one line and carries the
-    // material instead.
     note: 'Rings and balls printed separately, then assembled.',
     images: [
-      // Landscape, not portrait: this one is 1600x1199 on disk and was recorded the other way round,
-      // which reserved an upright box for a photo that arrived on its side.
+      // 1600x1199, not the flat 1600x1200 the rest of the landscape shots came in at.
       { src: `${SHOT}/functionalparts1_result.webp`, width: 1600, height: 1199 },
       // The file on disk is spelled "paers", not "parts". Left as found rather than renamed, so the
       // path keeps matching the asset.
@@ -65,7 +84,6 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     slug: 'oval-tray',
     showOnHome: true,
     title: 'Oval tray',
-    material: 'PLA', // TODO: confirm material
     images: [
       // The top-down frame leads: it shows the whole oval and the ribbing in one look, which the
       // side-on shot cannot. That one follows, then the frame shared with the calibration cubes.
@@ -75,16 +93,30 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     ],
   },
   {
-    slug: 'box-with-lid',
-    showOnHome: true,
-    title: 'Box with lid',
-    material: 'PLA', // TODO: confirm material
+    slug: 'battery-case',
+    title: 'Battery case',
+    images: [portrait('battery-case.webp')],
+  },
+  {
+    slug: 'pen-holder',
+    title: 'Pen holder',
+    images: [portrait('pen-holder-1.webp'), portrait('pen-holder-2.webp')],
+  },
+  {
+    slug: 'silica-box',
+    title: 'Silica box',
     images: [landscape('silica-box.webp')],
   },
   {
-    slug: 'calibration-cube',
-    title: 'Calibration cube',
-    material: 'PLA', // TODO: confirm material
+    slug: 'assembled-parts',
+    // Placeholder: the photograph is a two-roller assembly behind a slotted grid, and this name is
+    // standing in until it is given its real one.
+    title: 'Assembled parts',
+    images: [landscape('assembled-parts.webp')],
+  },
+  {
+    slug: 'calibration-cubes',
+    title: 'Calibration cubes',
     note: 'Dimensional accuracy test.',
     images: [
       landscape('calibaration-cubes.webp'),
@@ -92,21 +124,22 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       landscape('cube-tray.webp'),
     ],
   },
-  {
-    slug: 'item-five',
-    title: 'Printed part', // TODO: name this one — the photo is a two-roller assembly behind a slotted grid
-    material: 'PLA', // TODO: confirm material
-    images: [landscape('assembled-parts.webp')],
-  },
 ];
 
-// One line, built the same way everywhere it appears.
-export function captionFor(item: GalleryItem): string {
-  return item.note ? `${item.material} · ${item.note}` : item.material;
+/*
+ * The two-digit index a item is shown under — "01" through "08" — and the count in the page header.
+ *
+ * Both are computed from the array rather than written down, so adding a ninth print renumbers the grid
+ * and updates the header without anything else being touched.
+ */
+export function indexLabel(index: number): string {
+  return String(index + 1).padStart(2, '0');
 }
 
+export const PRINT_COUNT = indexLabel(GALLERY_ITEMS.length - 1);
+
 export function altFor(item: GalleryItem): string {
-  return `${item.title}, 3D printed in ${item.material}`;
+  return item.material ? `${item.title}, 3D printed in ${item.material}` : `${item.title}, 3D printed`;
 }
 
 /*
