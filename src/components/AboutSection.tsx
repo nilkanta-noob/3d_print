@@ -83,10 +83,30 @@ export default function AboutSection() {
                 </p>
               </div>
 
-              <ul className="label-micro mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 text-text-muted md:mt-12">
-                {CLAIMS.map((claim, i) => (
-                  <li key={claim} className="flex items-center gap-3">
-                    {i > 0 && <span aria-hidden="true">·</span>}
+              {/*
+                Three claims on one line on a phone.
+                
+                The separator is a ::before on each item rather than an element between them, so it can
+                never be left at the start of a line — a dot belongs to the claim that follows it, and
+                the first claim simply has none. It also means the row can drop the separators entirely
+                at a breakpoint without the markup changing.
+
+                The type is written out rather than taken from label-micro: two of its values have to
+                change on a phone, and a utility competing with label-micro for font-size would be
+                settled by the order of the stylesheet rather than by this line. From 760px the values
+                are label-micro's own, so the desktop row is untouched — including the spacing, where
+                the 12px either side of each dot replaces the 12px that used to come from the list's
+                own gap plus the gap inside each item.
+
+                Under 375px the three no longer fit on one line, so they become
+                three columns, left-aligned, free to take a second line, and the dots go.
+              */}
+              <ul className="mt-10 flex items-center text-[10.5px] font-medium uppercase leading-[1.2] tracking-[0.06em] text-text-muted max-[374.98px]:grid max-[374.98px]:grid-cols-3 max-[374.98px]:items-start max-[374.98px]:gap-x-3 min-[760px]:flex-wrap min-[760px]:gap-y-2 min-[760px]:text-[11px] min-[760px]:tracking-[0.12em] md:mt-12">
+                {CLAIMS.map((claim) => (
+                  <li
+                    key={claim}
+                    className="whitespace-nowrap before:mx-2 before:content-['·'] first:before:content-none max-[374.98px]:whitespace-normal max-[374.98px]:before:content-none min-[760px]:before:mx-3"
+                  >
                     {claim}
                   </li>
                 ))}
@@ -119,15 +139,13 @@ export default function AboutSection() {
               without any of them wrapping; from 760px the rule goes and the 40px gap comes back.
               24px of the 48px above them sits over the border and 24px under it, so the rule lands in
               the middle of the space rather than against the figures. */}
-          <dl className="mt-6 grid grid-cols-3 border-t border-border pt-6 min-[760px]:mt-20 min-[760px]:gap-10 min-[760px]:pt-10 md:mt-24">
-            {FACTS.map((fact, index) => (
+          <dl className="mt-8 grid grid-cols-3 gap-x-4 border-t border-border pt-8 min-[760px]:mt-20 min-[760px]:gap-10 min-[760px]:pt-10 md:mt-24">
+            {FACTS.map((fact) => (
               // Reversed, so the figure reads first and its label sits underneath — while the markup keeps
               // the term before its definition, which is the order a description list has to be written in.
               <div
                 key={fact.label}
-                className={`flex flex-col-reverse items-center px-3 text-center min-[760px]:items-start min-[760px]:px-0 min-[760px]:text-left ${
-                  index > 0 ? 'border-l border-border min-[760px]:border-l-0' : ''
-                }`}
+                className="flex flex-col-reverse items-center text-center min-[760px]:items-start min-[760px]:text-left"
               >
                 {/* The properties are written out rather than taken from label-micro, because two of them
                     have to change on a phone and a utility competing with label-micro for font-size would
