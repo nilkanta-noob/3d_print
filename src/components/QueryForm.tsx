@@ -1,12 +1,166 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X, UploadCloud, File, CheckCircle, Check, ShieldCheck, Mail } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { X, UploadCloud, CheckCircle, Check, ShieldCheck, ArrowRight } from 'lucide-react';
 import ModelViewer from './ModelViewer';
+import { PROJECT_TYPES } from './content/services';
+import { WHATSAPP_HREF } from './content/site';
 import { useUploadThing } from '@/lib/uploadthing';
+
+// Sentence case, Inter, 14px. Uppercase is kept for the eyebrow and the buttons only.
+const LABEL = 'mb-2 block text-[14px] font-medium text-text-secondary min-[760px]:mb-2.5';
+
+/*
+ * The card keeps the page's own colour. Only its edge is lifted: a white hairline rather than the 8%
+ * --border, so the panels are drawn by their outline instead of by a change of tone.
+ */
+const CARD =
+  'border-y border-white/[0.12] bg-background px-5 py-7 -mx-[var(--frame-gutter)] ' +
+  'min-[760px]:mx-0 min-[760px]:border min-[760px]:p-6 lg:p-12';
+
+/*
+ * Fields carry no fill at all. Against a card this faint, a filled control was the heaviest thing on the
+ * page; an outline on the card's own surface is enough to say where to type.
+ */
+const FIELD =
+  'w-full rounded-control border border-white/[0.12] bg-transparent px-4 py-3 text-[16px] h-[50px] min-[760px]:h-auto font-sans text-text-primary outline-none transition-colors placeholder:text-text-muted hover:border-white/20 focus:border-accent-primary focus:ring-[3px] focus:ring-accent-primary/20';
+const HINT = 'mt-2 text-[13px] text-text-muted';
+
+/*
+ * FIELD with its text colour swapped, for a select that has nothing chosen yet.
+ *
+ * Swapped rather than appended. Adding text-text-muted after FIELD would leave two text-colour utilities
+ * on one element, and those resolve by their order in the generated stylesheet — not by the order they
+ * appear in the class attribute — so which one lands would not be something this file decides. Replacing
+ * the token means there is only ever one.
+ */
+const FIELD_EMPTY = FIELD.replace('text-text-primary', 'text-text-muted');
+
+/*
+ * The verify controls. Outlined at the same height as the field beside them, and only lit once there is
+ * something worth sending to: an enabled-looking button that does nothing is worse than a dim one.
+ */
+const ACTION =
+  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-control border px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.12em] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary';
+const ACTION_ON = 'cursor-pointer border-accent-primary text-accent-primary hover:bg-accent-primary hover:text-on-accent';
+const ACTION_OFF = 'cursor-not-allowed border-white/[0.12] text-text-muted';
+
+function Spinner() {
+  return <span aria-hidden="true" className="size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />;
+}
+
+const MATERIAL_LABELS: Record<string, string> = {
+  PLA: 'PLA',
+  'PLA Pro+': 'PLA+',
+  PETG: 'PETG',
+};
+
+const FINISH_LABELS: Record<string, string> = {
+  Standard: 'Standard, supports removed',
+  Sanding: 'Sanded and smoothed',
+  Priming: 'Primed, ready for paint',
+  Painting: 'Painted',
+};
+
+/*
+ * A step is a card, carrying the same hairline and square corners as the summary panel beside it.
+ *
+ * Each step keeps its number. A check used to replace it once the step was satisfied, but the number
+ * is what the eye follows down the form, and a step that arrives already satisfied — print settings
+ * does, with a material chosen by default and a project type filled in from the service link — would
+ * announce itself complete before the visitor had touched it.
+ */
+function Step({
+  number,
+  title,
+  children,
+}: {
+  number: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={CARD}>
+      {/* h2, not h3: these sit directly under the page h1 and a jump to h3 skips a level. */}
+      <h2 className="flex items-baseline gap-4">
+        <span className="w-[1.25rem] shrink-0 font-mono text-[13px] tabular-nums text-text-muted">
+          {number}
+        </span>
+        <span className="text-[20px] font-semibold text-text-primary min-[760px]:text-[22px]">{title}</span>
+      </h2>
+      <div className="mt-5 space-y-[22px] min-[760px]:mt-8 min-[760px]:space-y-7">{children}</div>
+    </section>
+  );
+}
+
+function SummaryRow({ label, value, tone }: { label: string; value: string; tone?: 'accent' | 'pending' }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-t border-border py-3">
+      <span className="text-[13px] text-text-muted">{label}</span>
+      <span
+        className={`text-right text-[14px] ${
+          tone === 'accent' ? 'text-accent-primary' : tone === 'pending' ? 'text-[#D9A441]' : 'text-text-primary'
+        }`}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function formatSize(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  /*
+   * The service a visitor arrived from, when they came through a "Get a quote for this" link.
+   *
+   * This has to come from the router rather than from window.location. On a client-side navigation Next
+   * renders the new route's tree before it commits the new URL, so anything reading window at first
+   * render sees the page the visitor is leaving — from the home page that URL carries no ?service at
+   * all, and a value read once at mount never corrects itself. useSearchParams is fed by the router, so
+   * it is right on the first render and stays right if the query changes underneath a mounted form.
+   * It also makes this subtree depend on the request, which is why the page wraps it in <Suspense>.
+   *
+   * An unknown or absent slug leaves the field on its placeholder; it is a convenience, not an input to
+   * validate, so there is nothing to report.
+   */
+  const serviceParam = useSearchParams().get('service');
+  const preselected = PROJECT_TYPES.some((type) => type.slug === serviceParam) ? (serviceParam as string) : '';
+
+  const [projectType, setProjectType] = useState(preselected);
+  // Adjusting state during render — React's own pattern for "a value changed and some state derives
+  // from it". The alternative is an effect, which would paint the empty field first and overwrite
+  // whatever the visitor had already picked on every unrelated re-render. Tracking the slug we last
+  // applied means a visitor's own choice survives, and only an actual change of ?service moves the
+  // field again.
+  const [appliedService, setAppliedService] = useState(preselected);
+  if (appliedService !== preselected) {
+    setAppliedService(preselected);
+    setProjectType(preselected);
+  }
+
+  // Controlled only so the summary panel can read them. The name attributes are unchanged, so what the
+  // form submits is exactly what it submitted before.
+  const [material, setMaterial] = useState('PLA');
+  const [infill, setInfill] = useState('20%');
+  const [finish, setFinish] = useState('Standard');
+  const [fileSize, setFileSize] = useState<number | null>(null);
+  const [notes, setNotes] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  /*
+   * Mirrors of the four uncontrolled text fields in step 03, kept only so the step can show whether it
+   * is complete. The inputs stay uncontrolled — they have no value prop — so the form still submits
+   * straight from the DOM and nothing about the payload changes.
+   */
+  const [details, setDetails] = useState({ name: '', state: '', city: '', pincode: '' });
+  const track = (field: keyof typeof details) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setDetails((current) => ({ ...current, [field]: e.target.value }));
+
   const [isSuccess, setIsSuccess] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isStudent, setIsStudent] = useState(false);
@@ -48,6 +202,49 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   const [verifiedToken, setVerifiedToken] = useState<string | null>(null);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  // Inline messages replace the alert()s around the code exchange: an alert interrupts the page to say
+  // something about one field, and leaves nothing behind once dismissed.
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const [verifyPrompt, setVerifyPrompt] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
+  const emailRef = React.useRef<HTMLInputElement>(null);
+
+  // The resend cooldown. Counts down only while it is running, and clears itself on unmount.
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = window.setInterval(() => setResendIn((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => window.clearInterval(timer);
+  }, [resendIn]);
+
+  // Editing the address after verifying invalidates the verification: the token belongs to the address
+  // that was checked, not to whatever is in the field now.
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (isOtpVerified || isOtpSent) {
+      setIsOtpVerified(false);
+      setVerifiedToken(null);
+      setIsOtpSent(false);
+      setOtp('');
+      setOtpError(null);
+      setSentTo(null);
+    }
+  };
+
+  // The button is live only when there is a plausible address to send to, and never while a request is
+  // in flight or the resend cooldown is running.
+  const emailLooksValid = /^\S+@\S+\.\S+$/.test(email);
+  const canSend = emailLooksValid && !isSendingOtp && resendIn === 0;
+
+  const resetVerification = () => {
+    setIsOtpVerified(false);
+    setVerifiedToken(null);
+    setIsOtpSent(false);
+    setOtp('');
+    setOtpError(null);
+    setSentTo(null);
+    setResendIn(0);
+  };
 
   // Cleanup object URL to avoid memory leaks
   useEffect(() => {
@@ -75,12 +272,13 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       const url = URL.createObjectURL(file);
       setFileUrl(url);
       setFileName(file.name);
-      
+      setFileSize(file.size);
+
       // Start upload to cloud immediately
       setUploadProgress(0);
       setUploadedFileUrl(null);
       startUpload([file]);
-      
+
     } else {
       setFileUrl(null);
       setFileName('');
@@ -89,10 +287,14 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   const handleSendOtp = async () => {
-    if (!email) return alert("Please enter your email first.");
+    if (!email) {
+      setOtpError("Enter your email first.");
+      return;
+    }
 
     if (!/^\S+@\S+\.\S+$/.test(email)) {
-      return alert("Please enter a valid email address.");
+      setOtpError("That does not look like an email address.");
+      return;
     }
 
     setIsSendingOtp(true);
@@ -104,20 +306,26 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       });
       if (res.ok) {
         setIsOtpSent(true);
-        alert("OTP sent to your email!");
+        setSentTo(email);
+        setOtpError(null);
+        setVerifyPrompt(false);
+        setResendIn(30);
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to send OTP");
+        setOtpError(data.error || "We could not send the code. Try again.");
       }
     } catch (e) {
-      alert("Error sending OTP");
+      setOtpError("We could not send the code. Try again.");
     } finally {
       setIsSendingOtp(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp) return alert("Please enter the OTP.");
+    if (!otp) {
+      setOtpError("Enter the code we emailed you.");
+      return;
+    }
     setIsVerifyingOtp(true);
     try {
       const res = await fetch('/api/quote/verify-otp', {
@@ -129,11 +337,13 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       if (res.ok && data.success) {
         setIsOtpVerified(true);
         setVerifiedToken(data.verifiedToken);
+        setOtpError(null);
+        setVerifyPrompt(false);
       } else {
-        alert(data.error || "Invalid OTP");
+        setOtpError(data.error || "That code is not right. Check it and try again.");
       }
     } catch (e) {
-      alert("Error verifying OTP");
+      setOtpError("We could not check that code. Try again.");
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -141,8 +351,12 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // Submitting never starts the code exchange. It says what is missing, and puts the cursor there.
     if (!isOtpVerified || !verifiedToken) {
-      return alert("Please verify your email with the OTP before submitting.");
+      setVerifyPrompt(true);
+      emailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      emailRef.current?.focus({ preventScroll: true });
+      return;
     }
 
     if (!uploadedFileUrl) {
@@ -166,13 +380,18 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
       formData.append('verifiedToken', verifiedToken); // Attach verified token
       // Ensure email in formData matches verified email just in case
       formData.set('email', email);
-      
+
       // Don't send the physical files, send the cloud URLs
       formData.delete('file');
       formData.delete('studentId');
-      
+
       formData.append('fileUrl', uploadedFileUrl);
-      
+
+      // set, not append: both fields carry a name attribute, so the constructor has already put them in
+      // the payload. Appending would send each one twice, and the server reads the first entry.
+      formData.set('notes', notes.trim());
+      formData.set('projectType', projectType);
+
       if (isStudent) {
         if (!studentIdUrl) {
           if (isStudentIdUploading) {
@@ -209,17 +428,21 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
 
   if (isSuccess) {
     return (
-      <div className="p-12 flex flex-col items-center justify-center text-center bg-surface border border-accent-primary/20 rounded-sm h-full">
+      <div className="flex h-full flex-col items-center justify-center border border-accent-primary/20 bg-surface p-12 text-center">
         <CheckCircle className="w-16 h-16 text-accent-primary mb-4 animate-pulse" strokeWidth={1.5} />
-        <h3 className="text-2xl font-display font-black text-text-primary uppercase tracking-widest mb-2">Request Logged</h3>
-        <p className="text-text-muted font-sans mb-8">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
+        <h3 className="mb-4 text-[2rem] text-text-primary">Request logged</h3>
+        <p className="mb-10 max-w-[52ch] text-[15px] text-text-secondary">After review, you will get a price quotation on your registered email ID. We will reach out to you within 30 minutes to 1 hour.</p>
 
         <button
           onClick={() => {
             setIsSuccess(false);
+            // These two are the only fields held in state rather than by the DOM, so resetting the form
+            // does not clear them on its own.
+            setNotes('');
+            setProjectType('');
             if (onSuccess) onSuccess();
           }}
-          className="px-8 py-3 bg-accent-primary/10 text-accent-primary border border-accent-primary/50 hover:bg-accent-primary hover:text-surface rounded-sm font-bold text-sm uppercase tracking-wider transition-colors whitespace-nowrap"
+          className="hover-lift whitespace-nowrap rounded-control border border-accent-primary/50 bg-accent-primary/10 px-7 py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-accent-primary [transition-property:transform,background-color,color] hover:bg-accent-primary hover:text-on-accent"
         >
           Go Back
         </button>
@@ -227,298 +450,469 @@ export function QuoteFormCore({ onSuccess }: { onSuccess?: () => void }) {
     );
   }
 
+  const projectLabel = PROJECT_TYPES.find((type) => type.slug === projectType)?.label ?? 'Not chosen yet';
+
   return (
-    <form onSubmit={handleSubmit} className="p-4 lg:p-8 bg-surface rounded-sm relative overflow-hidden flex flex-col min-h-full">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary-deep/10 blur-[80px] rounded-full pointer-events-none"></div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 flex-grow">
-
-        {/* Left Column: Form Details (6 cols to give viewer more space) */}
-        <div className="lg:col-span-6 space-y-6 flex flex-col">
-
-          <div className="space-y-4">
-            <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Client Details</h3>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Full Name</label>
+    <form onSubmit={handleSubmit} className="relative">
+      {/*
+        Three grid items rather than two columns of content: the steps, the summary, and the submit. On a
+        phone that DOM order is the layout, which puts the summary between the last field and the button,
+        where it was asked to sit. From 1024px the summary takes the second column and spans both rows, so
+        it can stick while the steps scroll past it.
+      */}
+      <div className="grid gap-4 min-[760px]:gap-8 lg:grid-cols-[minmax(0,62fr)_minmax(0,38fr)] lg:items-start lg:gap-x-16 lg:gap-y-8">
+        <div className="space-y-4 min-[760px]:space-y-10 lg:col-start-1 lg:row-start-1">
+          <Step number="01" title="Your file">
+            {/*
+              One area, two states. Before a file is chosen it is the drop target; after, the preview
+              renders inside the same box, so nothing appears or disappears around it. The input covers
+              the box only while it is empty — once a model is loaded the pointer belongs to the viewer,
+              and "Replace file" is the way back.
+            */}
+            <div
+              // Drag state is tracked by hand because :hover does not fire while a file is being
+              // dragged, and the drop target should answer to the drag, not to the pointer alone.
+              onDragEnter={() => setIsDragging(true)}
+              onDragOver={() => setIsDragging(true)}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={() => setIsDragging(false)}
+              className={`relative rounded-control border border-dashed bg-transparent transition-colors ${
+                fileUrl
+                  ? 'border-white/[0.15]'
+                  : `min-h-[160px] min-[760px]:min-h-[220px] hover:border-accent-primary hover:bg-accent-primary/5 ${
+                      isDragging ? 'border-accent-primary bg-accent-primary/5' : 'border-white/[0.15]'
+                    }`
+              }`}
+            >
+              {/* Invisible, stretched over the whole drop zone, so there is no visible label to tie
+                  it to — the accessible name has to be spelled out here. */}
               <input
-                name="name"
-                type="text"
+                name="file"
+                type="file"
+                aria-label="Choose a CAD file to upload"
                 required
-                className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans"
-                placeholder="John Doe"
+                accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf,.zip"
+                onChange={handleFileChange}
+                className={`absolute inset-0 h-full w-full cursor-pointer opacity-0 ${fileUrl ? 'pointer-events-none' : 'z-20'}`}
               />
+
+              {fileUrl ? (
+                <div className="p-4">
+                  <div className="h-[360px] overflow-hidden border border-border bg-background">
+                    <ModelViewer fileUrl={fileUrl} fileName={fileName} />
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <p className="min-w-0 text-[15px] text-text-primary">
+                      <span className="break-all">{fileName}</span>
+                      {fileSize !== null && (
+                        <span className="ml-3 font-mono text-[13px] text-text-muted">{formatSize(fileSize)}</span>
+                      )}
+                    </p>
+                    <label className="cursor-pointer text-[14px] text-text-secondary underline underline-offset-4 transition-colors hover:text-text-primary">
+                      Replace file
+                      <input
+                        type="file"
+                        accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf,.zip"
+                        onChange={handleFileChange}
+                        className="sr-only"
+                      />
+                    </label>
+                  </div>
+                  <p className={HINT}>Drag to rotate, scroll to zoom.</p>
+                  {isUploading && (
+                    <p className="mt-1 font-mono text-[13px] text-text-muted">Uploading {uploadProgress}%</p>
+                  )}
+                </div>
+              ) : (
+                <div className="pointer-events-none flex min-h-[160px] min-[760px]:min-h-[220px] flex-col items-center justify-center p-8 text-center">
+                  {/* A finger cannot drop a file and has nothing to hover, so a touch device is told
+                      what it can actually do: the whole zone is the target. */}
+                  <p className="text-[16px] text-text-primary">
+                    <span className="[@media(hover:none)_and_(pointer:coarse)]:hidden">
+                      Drop your file here, or <span className="underline underline-offset-4">browse</span>
+                    </span>
+                    <span className="hidden [@media(hover:none)_and_(pointer:coarse)]:inline">Tap to choose a file</span>
+                  </p>
+                  {/* Non-breaking spaces so the size never wraps to leave "MB" alone on its own line. */}
+                  <p className="mt-2 text-[13px] text-text-muted">
+                    STL, OBJ, STEP, IGES, 3MF or ZIP · up to 100 MB
+                  </p>
+                </div>
+              )}
+            </div>
+          </Step>
+
+          <Step number="02" title="Print settings">
+            <div className="grid gap-x-6 gap-y-[22px] min-[760px]:gap-y-7 md:grid-cols-2">
+              <div>
+                <label htmlFor="q-project" className={LABEL}>Project type</label>
+                {/* The only select on the page that starts empty, so the only one that needs the closed
+                    field to read as a placeholder rather than as an answer. text-text-muted while the
+                    value is "", the field's normal colour once something real is chosen. */}
+                <select
+                  id="q-project"
+                  name="projectType"
+                  required
+                  value={projectType}
+                  onChange={(e) => setProjectType(e.target.value)}
+                  className={`${projectType ? FIELD : FIELD_EMPTY} appearance-none`}
+                >
+                  {/* hidden as well as disabled: disabled alone still lists it as a greyed row that
+                      cannot be picked, which is just clutter once the real options are on screen. */}
+                  <option value="" disabled hidden>Select project type</option>
+                  {PROJECT_TYPES.map((type) => (
+                    <option key={type.slug} value={type.slug}>{type.label}</option>
+                  ))}
+                </select>
+                {projectType === 'student-projects' && !isStudent && (
+                  <p className={HINT}>Student? Tick the student discount below. College ID required.</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="q-material" className={LABEL}>Material</label>
+                <select
+                  id="q-material"
+                  name="material"
+                  required
+                  value={material}
+                  onChange={(e) => setMaterial(e.target.value)}
+                  className={`${FIELD} appearance-none`}
+                >
+                  {/* "PLA+" is shown to customers, but the submitted value stays "PLA Pro+" so existing
+                      orders remain consistent. */}
+                  <option value="PLA">PLA, standard</option>
+                  <option value="PLA Pro+">PLA+, engineering grade</option>
+                  <option value="PETG">PETG, durable and water resistant</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="q-infill" className={LABEL}>Infill</label>
+                <select
+                  id="q-infill"
+                  name="infill"
+                  required
+                  value={infill}
+                  onChange={(e) => setInfill(e.target.value)}
+                  className={`${FIELD} appearance-none`}
+                >
+                  <option value="20%">20% · Standard</option>
+                  <option value="50%">40% · Strong</option>
+                  <option value="100%">100% · Solid</option>
+                </select>
+                <p className={HINT}>How solid the inside of the part is.</p>
+              </div>
+
+              <div>
+                <label htmlFor="q-finish" className={LABEL}>Finish</label>
+                <select
+                  id="q-finish"
+                  name="finalize"
+                  required
+                  value={finish}
+                  onChange={(e) => setFinish(e.target.value)}
+                  className={`${FIELD} appearance-none`}
+                >
+                  <option value="Standard">Standard, supports removed</option>
+                  <option value="Sanding">Sanding and smoothing</option>
+                  <option value="Priming">Priming, ready for paint</option>
+                  <option value="Painting">Painting, custom finish</option>
+                </select>
+              </div>
             </div>
 
-            {/* Email & OTP Section */}
-            <div className="p-4 border border-border/50 bg-background/30 rounded-sm space-y-3">
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted">Email Verification</label>
+            <div>
+              <label htmlFor="q-notes" className={LABEL}>Notes</label>
+              <textarea
+                id="q-notes"
+                name="notes"
+                rows={3}
+                maxLength={1000}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Colour, deadline, tolerances, anything we should know"
+                className={`${FIELD} h-auto resize-y placeholder:text-text-muted`}
+              />
+              {/* Amber near the ceiling rather than only at it, so the limit is visible before it bites. */}
+              <p
+                className={`mt-2 text-right font-mono text-[12px] ${
+                  notes.length >= 900 ? 'text-[#D9A441]' : 'text-text-muted'
+                }`}
+              >
+                {notes.length} / 1000
+              </p>
+            </div>
 
-              <div className="flex gap-2">
-                <div className="relative flex-grow">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+            <label className="flex cursor-pointer items-start gap-3">
+              <span className="relative mt-0.5 flex items-center">
+                <input
+                  type="checkbox"
+                  name="isStudent"
+                  checked={isStudent}
+                  onChange={(e) => setIsStudent(e.target.checked)}
+                  className="peer h-4 w-4 appearance-none rounded-chip border border-border bg-background text-accent-primary transition-colors checked:bg-accent-primary focus:ring-accent-primary focus:ring-offset-background"
+                />
+                <Check className="pointer-events-none absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 text-on-accent opacity-0 peer-checked:opacity-100" />
+              </span>
+              <span>
+                <span className="block text-[14px] font-medium text-text-primary">Apply student discount</span>
+                <span className="mt-1 block text-[13px] text-text-muted">PLA only · college ID required</span>
+              </span>
+            </label>
+
+            {isStudent && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+                <label className={LABEL}>College ID</label>
+                <div className="flex flex-col gap-2">
                   <input
+                    name="studentId"
+                    type="file"
+                    accept="image/*"
+                    required={isStudent && !studentIdUrl}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 16 * 1024 * 1024) {
+                          alert("Student ID image must be under 16MB.");
+                          e.target.value = "";
+                          return;
+                        }
+                        setStudentIdUrl(null);
+                        startStudentIdUpload([file]);
+                      }
+                    }}
+                    className="w-full font-sans text-sm text-text-secondary transition-colors file:mr-4 file:rounded-chip file:border-0 file:bg-surface file:px-4 file:py-2.5 file:text-xs file:font-bold file:uppercase file:tracking-widest file:text-text-primary hover:file:bg-border"
+                  />
+                  {isStudentIdUploading && (
+                    <span className="animate-pulse text-xs text-text-secondary">Uploading ID...</span>
+                  )}
+                  {studentIdUrl && (
+                    <span className="flex items-center gap-1 text-xs font-bold text-text-primary">
+                      <CheckCircle className="h-3 w-3 text-accent-primary" /> ID uploaded
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </Step>
+
+          <Step number="03" title="Your details">
+            <div className="grid gap-x-6 gap-y-[22px] min-[760px]:gap-y-7 md:grid-cols-2">
+              <div>
+                <label htmlFor="q-name" className={LABEL}>Name</label>
+                <input id="q-name" name="name" type="text" required onChange={track('name')} placeholder="Your name" className={`${FIELD} placeholder:text-text-muted`} />
+              </div>
+
+              <div>
+                <label htmlFor="q-phone" className={LABEL}>Phone (optional)</label>
+                <input id="q-phone" name="phone" type="tel" placeholder="10-digit mobile" className={`${FIELD} placeholder:text-text-muted`} />
+              </div>
+            </div>
+
+            {/* Email takes its own full-width row: paired with the name it had half the line, and a
+                35-character address ran out of field before it ran out of characters. */}
+            <div>
+              <label htmlFor="q-email" className={LABEL}>Email</label>
+
+              {/* The button is attached to the field rather than boxed with it: one row, one control,
+                  and the states that follow appear underneath instead of opening a panel. On a phone the
+                  row becomes a column and the button takes the full width under the input. */}
+              <div className="flex flex-col items-stretch gap-2 sm:flex-row">
+                  <input
+                    ref={emailRef}
+                    id="q-email"
                     name="email"
                     type="email"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isOtpVerified || isOtpSent}
-                    className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans disabled:opacity-50"
-                    placeholder="john@example.com"
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    readOnly={isOtpVerified}
+                    placeholder="you@email.com"
+                    className={`${FIELD} min-w-0 flex-1 placeholder:text-text-muted read-only:text-text-secondary`}
                   />
-                </div>
-                {!isOtpVerified && (
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={isSendingOtp || isOtpSent || !email}
-                    className="px-4 py-2.5 bg-surface border border-border rounded-sm text-xs font-bold uppercase tracking-wider text-text-primary hover:text-accent-primary hover:border-accent-primary transition-colors disabled:opacity-50"
-                  >
-                    {isSendingOtp ? "Sending..." : isOtpSent ? "Sent" : "Send OTP"}
-                  </button>
-                )}
-              </div>
 
-              {isOtpSent && !isOtpVerified && (
-                <div className="flex gap-2 animate-in fade-in slide-in-from-top-2">
-                  <input
-                    type="text"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    maxLength={6}
-                    placeholder="Enter 6-digit OTP"
-                    className="w-full px-4 py-2 bg-background border border-border rounded-sm focus:border-accent-primary outline-none text-text-primary font-sans text-center tracking-widest"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={isVerifyingOtp || otp.length < 5}
-                    className="px-4 py-2 bg-accent-primary text-surface rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-accent-primary-deep transition-colors disabled:opacity-50 whitespace-nowrap"
-                  >
-                    {isVerifyingOtp ? "Verifying..." : "Verify"}
-                  </button>
-                </div>
-              )}
-
-              {isOtpVerified && (
-                <div className="flex items-center gap-2 text-green-500 text-xs font-bold uppercase tracking-wider mt-2 animate-in fade-in">
-                  <ShieldCheck className="w-4 h-4" /> Email Verified Successfully
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Phone Number</label>
-              <input
-                name="phone"
-                type="tel"
-                className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans"
-                placeholder="+91 98765 43210 (Optional)"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4 pt-2">
-            <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Billing & Shipping</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">State/Province</label>
-                <input
-                  name="state" type="text" required
-                  className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans"
-                  placeholder="Maharashtra"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">City</label>
-                <input
-                  name="city" type="text" required
-                  className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans"
-                  placeholder="Mumbai"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Pin/Zip Code</label>
-                <input
-                  name="pincode" type="text" required
-                  className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors font-sans"
-                  placeholder="400001"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4 pt-2">
-            <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Printing Configuration</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Material</label>
-                <select
-                  name="material"
-                  required
-                  className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors appearance-none font-sans"
-                >
-                  <option value="PLA">PLA (Standard)</option>
-                  <option value="ABS">ABS (Tough)</option>
-                  <option value="PETG">PETG (Durable / Water-resistant)</option>
-                  <option value="TPU">TPU (Flexible)</option>
-                  <option value="Resin (Standard)">Resin (Standard Detail)</option>
-                  <option value="Resin (Tough)">Resin (Tough Engineering)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Infill Density</label>
-                <select
-                  name="infill"
-                  required
-                  className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors appearance-none font-sans"
-                >
-                  <option value="20%">20% (Standard - Fast & Cheap)</option>
-                  <option value="50%">50% (Strong - Functional Parts)</option>
-                  <option value="100%">100% (Solid - Maximum Strength)</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-text-muted mb-1.5">Finalize (Post-Processing)</label>
-              <select
-                name="finalize"
-                required
-                className="w-full px-4 py-2.5 bg-background border border-border rounded-sm focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none text-text-primary transition-colors appearance-none font-sans"
-              >
-                <option value="Standard">Standard (Support Removal Only)</option>
-                <option value="Sanding">Sanding & Smoothing</option>
-                <option value="Priming">Priming (Ready for Paint)</option>
-                <option value="Painting">Painting (Custom Finish)</option>
-              </select>
-            </div>
-          </div>
-
-          <label className="flex items-center gap-3 cursor-pointer mt-2 p-3 border border-border bg-background/50 rounded-sm">
-            <div className="relative flex items-center">
-              <input
-                type="checkbox"
-                name="isStudent"
-                checked={isStudent}
-                onChange={(e) => setIsStudent(e.target.checked)}
-                className="peer w-4 h-4 text-accent-primary bg-background border-border rounded-sm focus:ring-accent-primary focus:ring-offset-background appearance-none checked:bg-accent-primary transition-colors"
-              />
-              <Check className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 text-background opacity-0 peer-checked:opacity-100 pointer-events-none" />
-            </div>
-            <span className="text-sm font-medium text-text-primary opacity-90 font-sans">Apply Student Discount</span>
-          </label>
-
-          {isStudent && (
-            <div className="animate-in fade-in slide-in-from-top-4 duration-300 pt-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-accent-secondary mb-1.5">Verification: College ID</label>
-              <div className="flex flex-col gap-2">
-                <input
-                  name="studentId"
-                  type="file"
-                  accept="image/*"
-                  required={isStudent && !studentIdUrl}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      if (file.size > 16 * 1024 * 1024) {
-                        alert("Student ID image must be under 16MB.");
-                        e.target.value = "";
-                        return;
-                      }
-                      setStudentIdUrl(null);
-                      startStudentIdUpload([file]);
-                    }
-                  }}
-                  className="w-full text-sm text-text-muted file:mr-4 file:py-2.5 file:px-4 file:rounded-sm file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-surface file:text-text-primary hover:file:bg-border transition-colors font-sans"
-                />
-                {isStudentIdUploading && (
-                  <span className="text-xs text-text-muted animate-pulse">Uploading ID...</span>
-                )}
-                {studentIdUrl && (
-                  <span className="text-xs text-green-500 font-bold flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" /> ID Uploaded Successfully
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column: 3D Viewer & Upload (Expanded to 6 cols, increased height) */}
-        <div className="lg:col-span-6 space-y-5 flex flex-col h-full min-h-[500px]">
-          <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">3D Model Asset</h3>
-
-          <div className="flex flex-col gap-4 flex-grow">
-            <div className={`relative flex items-center justify-center px-6 py-4 border-2 border-dashed rounded-sm transition-colors group bg-background/50 ${fileUrl ? 'border-accent-primary/30' : 'border-border hover:border-accent-primary/50'}`}>
-              <input
-                name="file"
-                type="file"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                required
-                accept=".stl,.obj,.stp,.step,.igs,.iges,.3mf,.zip"
-                onChange={handleFileChange}
-              />
-              <div className="text-center pointer-events-none relative z-10 flex flex-col items-center gap-2">
-                <File className={`h-6 w-6 transition-colors ${fileUrl ? 'text-accent-primary' : 'text-text-muted group-hover:text-accent-primary'}`} strokeWidth={1.5} />
-                <div className="text-sm">
-                  {fileName ? (
-                    <span className="font-bold text-accent-primary">{fileName}</span>
+                  {isOtpVerified ? (
+                    <span className="flex shrink-0 items-center gap-2 whitespace-nowrap px-1 text-[14px] text-accent-primary">
+                      <ShieldCheck className="h-4 w-4" aria-hidden="true" /> Verified
+                    </span>
                   ) : (
-                    <span className="font-bold text-text-muted uppercase tracking-wide">Select or Drop 3D File</span>
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={!canSend}
+                      className={`${ACTION} ${canSend ? ACTION_ON : ACTION_OFF}`}
+                    >
+                      {isSendingOtp ? (
+                        <>
+                          <Spinner /> Sending…
+                        </>
+                      ) : isOtpSent ? (
+                        resendIn > 0 ? `Resend in ${resendIn}s` : 'Resend'
+                      ) : (
+                        'Verify email'
+                      )}
+                    </button>
                   )}
                 </div>
-                <p className="text-xs text-text-muted font-sans mt-1">.stl, .obj, .stp, .iges, .3mf, .zip (Max: 100MB)</p>
+
+                {isOtpVerified ? (
+                  <p className={HINT}>
+                    <button
+                      type="button"
+                      onClick={resetVerification}
+                      className="underline underline-offset-4 transition-colors hover:text-text-primary"
+                    >
+                      Change
+                    </button>
+                  </p>
+                ) : (
+                  <>
+                    {sentTo && !otpError && <p className={HINT}>Code sent to {sentTo}</p>}
+
+                    {isOtpSent && (
+                      <div className="mt-3 animate-in fade-in slide-in-from-top-2">
+                        <div className="flex flex-col items-stretch gap-2 sm:flex-row">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={otp}
+                            onChange={(e) => {
+                              setOtp(e.target.value);
+                              if (otpError) setOtpError(null);
+                            }}
+                            maxLength={6}
+                            aria-label="6-digit code"
+                            className={`${FIELD} min-w-0 flex-1 text-center font-mono tracking-[0.3em] sm:max-w-[14rem]`}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleVerifyOtp}
+                            disabled={isVerifyingOtp || otp.length < 5}
+                            className={`${ACTION} ${isVerifyingOtp || otp.length < 5 ? ACTION_OFF : ACTION_ON}`}
+                          >
+                            {isVerifyingOtp ? (
+                              <>
+                                <Spinner /> Checking…
+                              </>
+                            ) : (
+                              'Verify'
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {otpError && <p className="mt-2 text-[13px] text-text-primary">{otpError}</p>}
+                    {verifyPrompt && !otpError && (
+                      <p className="mt-2 text-[13px] text-text-primary">Verify your email to continue</p>
+                    )}
+                  </>
+                )}
+            </div>
+
+            <div className="grid gap-x-6 gap-y-[22px] min-[760px]:gap-y-7 md:grid-cols-3">
+              <div>
+                <label htmlFor="q-state" className={LABEL}>State</label>
+                <input id="q-state" name="state" type="text" required onChange={track('state')} className={FIELD} />
+              </div>
+              <div>
+                <label htmlFor="q-city" className={LABEL}>City</label>
+                <input id="q-city" name="city" type="text" required onChange={track('city')} className={FIELD} />
+              </div>
+              <div>
+                <label htmlFor="q-pincode" className={LABEL}>PIN</label>
+                <input id="q-pincode" name="pincode" type="text" required onChange={track('pincode')} className={FIELD} />
               </div>
             </div>
-
-            <div className="flex-grow rounded-sm overflow-hidden border border-border/50 bg-background flex flex-col min-h-[400px]">
-              {fileUrl ? (
-                <ModelViewer fileUrl={fileUrl} fileName={fileName} />
-              ) : (
-                <div className="flex items-center justify-center w-full h-full p-8 text-center text-text-muted flex-col">
-                  <div className="w-16 h-16 rounded-full border border-border/50 flex items-center justify-center mb-4 bg-surface/50">
-                    <span className="text-xs font-bold uppercase">3D</span>
-                  </div>
-                  <p className="text-xs uppercase tracking-widest font-bold mb-2">Awaiting Upload</p>
-                  <p className="text-xs font-sans opacity-70">Upload a 3D model above to generate an interactive preview and verify your geometry before quoting.</p>
-                </div>
-              )}
-            </div>
-          </div>
+          </Step>
         </div>
-      </div>
 
-      <div className="mt-8 pt-6 border-t border-border flex justify-end relative z-10 shrink-0">
-        <button
-          type="submit"
-          disabled={isSubmitting || !isOtpVerified}
-          className={`group relative w-full md:w-auto px-10 py-4 rounded-3xl font-bold text-sm tracking-widest uppercase transition-all flex items-center justify-center gap-2 overflow-hidden ${
-            !isOtpVerified 
-              ? 'bg-background text-text-muted border border-border cursor-not-allowed' 
-              : 'bg-text-primary hover:bg-[#e0e0e0] text-surface shadow-lg disabled:opacity-50 disabled:cursor-not-allowed'
-          }`}
-        >
-          <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"></div>
-          {isSubmitting || isUploading || isStudentIdUploading ? (
-            <>
-              <UploadCloud className="w-5 h-5 animate-pulse" strokeWidth={2} />
-              {isUploading ? `Uploading File: ${uploadProgress}%` : isStudentIdUploading ? 'Uploading ID...' : 'Processing Request...'}
-            </>
-          ) : !isOtpVerified ? (
-            <>
-              <ShieldCheck className="w-5 h-5" strokeWidth={2} />
-              Verify Email to Submit
-            </>
-          ) : (
-            <>
-              <UploadCloud className="w-5 h-5" strokeWidth={2} />
-              Submit For Quoting
-            </>
+        {/* The panel sticks below the navbar rather than at the top of the viewport, which is what the
+            24px on top of --nav-height is for. */}
+        <aside className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-[calc(var(--nav-height,72px)+1.5rem)]">
+          <div className={CARD}>
+            <h3 className="text-[16px] font-semibold text-text-primary">Your print</h3>
+
+            <div className="mt-5 flex items-center gap-3">
+              <span className="grid size-10 shrink-0 place-items-center border border-border font-mono text-[11px] uppercase text-text-muted">
+                {fileName ? (fileName.split('.').pop() || '3D') : '3D'}
+              </span>
+              <span className="min-w-0 break-all text-[14px] text-text-primary">
+                {fileName || <span className="text-text-muted">No file yet</span>}
+              </span>
+            </div>
+
+            <div className="mt-5">
+              <SummaryRow label="Project" value={projectLabel} />
+              <SummaryRow label="Material" value={MATERIAL_LABELS[material] ?? material} />
+              <SummaryRow label="Infill" value={infill} />
+              <SummaryRow label="Finish" value={FINISH_LABELS[finish] ?? finish} />
+              {/* The one amber on the site. It is not a palette colour, and it is here because a pending
+                  state is neither neutral nor an error, and the accent is already spoken for. */}
+              <SummaryRow
+                label="Email"
+                value={isOtpVerified ? 'Verified' : 'Not verified'}
+                tone={isOtpVerified ? 'accent' : 'pending'}
+              />
+            </div>
+
+            <h4 className="mt-7 text-[13px] font-medium text-text-secondary">What happens next</h4>
+            <ol className="mt-3 space-y-2.5">
+              {[
+                'We check your file.',
+                'You get the exact price by email, usually within the hour.',
+                'Pay by UPI and we print and ship.',
+              ].map((line, i) => (
+                <li key={line} className="flex gap-3 text-[14px] leading-[1.6] text-text-secondary">
+                  <span className="font-mono text-[13px] text-text-muted">{i + 1}.</span>
+                  {line}
+                </li>
+              ))}
+            </ol>
+
+            <p className="mt-6 text-[13px] text-text-muted">
+              Rather chat?{' '}
+              <a
+                href={WHATSAPP_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-text-secondary underline underline-offset-4 transition-colors hover:text-accent-primary"
+              >
+                WhatsApp us your file
+              </a>
+            </p>
+          </div>
+        </aside>
+
+        <div className="-mx-[var(--frame-gutter)] mt-6 px-5 min-[760px]:mx-0 min-[760px]:mt-0 min-[760px]:px-0 lg:col-start-1 lg:row-start-2">
+          {/*
+            One button. Until the address is verified it sends the code and the input appears under it;
+            after that the same button submits. The old second button that only said "verify email to
+            submit" is gone, along with the box that used to hold the whole exchange.
+          */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="hover-lift group inline-flex h-[52px] w-full items-center justify-center gap-2.5 rounded-control bg-accent-primary px-10 min-[760px]:h-auto min-[760px]:py-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-on-accent [transition-property:transform,background-color] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          >
+            {isSubmitting || isUploading || isStudentIdUploading ? (
+              <>
+                <UploadCloud className="h-5 w-5 animate-pulse" strokeWidth={2} />
+                {isUploading ? `Uploading file ${uploadProgress}%` : isStudentIdUploading ? 'Uploading ID' : 'Sending'}
+              </>
+            ) : (
+              <>
+                Send for review
+                <ArrowRight className="size-4 transition-transform duration-300 motion-safe:group-hover:translate-x-1" aria-hidden="true" />
+              </>
+            )}
+          </button>
+
+          {verifyPrompt && !isOtpVerified && (
+            <p className="mt-3 text-[13px] text-text-muted">Verify your email in step 03 to continue.</p>
           )}
-        </button>
+        </div>
       </div>
     </form>
   );
@@ -535,25 +929,25 @@ export default function QueryFormModal({ isOpen, onClose }: QueryFormModalProps)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 lg:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 lg:p-8 bg-background/80 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className="bg-background border border-border rounded-sm w-full max-w-6xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-[95vh] lg:h-[85vh]"
+        className="flex h-[95vh] w-full max-w-6xl flex-col overflow-hidden border border-border bg-surface duration-200 animate-in fade-in lg:h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-6 border-b border-border shrink-0 bg-surface/50">
+        <div className="flex shrink-0 items-center justify-between border-b border-border bg-surface p-6 lg:px-10">
           <div>
-            <h2 className="text-xl font-display font-black text-text-primary uppercase tracking-widest">Job Specifications</h2>
-            <p className="text-xs text-text-muted uppercase tracking-widest mt-1">Configure parameters & preview geometry</p>
+            <h2 className="leading-[1] text-2xl text-text-primary">Job specifications</h2>
+            <p className="mt-2 text-sm text-text-secondary">Configure parameters and preview geometry</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-text-muted hover:text-text-primary hover:bg-white/5 rounded-sm transition-colors"
+            className="rounded-chip p-2 text-text-secondary transition-colors hover:bg-elevated hover:text-text-primary"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-grow p-0">
+        <div className="overflow-y-auto flex-grow p-6 lg:p-10">
           <QuoteFormCore onSuccess={onClose} />
         </div>
       </div>

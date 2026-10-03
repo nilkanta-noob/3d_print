@@ -1,83 +1,98 @@
 import React from 'react';
-import { Layers, Zap, Droplet } from 'lucide-react';
+import { Check } from 'lucide-react';
+import CornerSteps from './CornerSteps';
+import Section from './Section';
+import SectionHeading from './SectionHeading';
+import { MATERIALS, formatRate, type Material } from './content/materials';
 
+/*
+ * One material as a card.
+ *
+ * Three separate cards with air between them rather than one rectangle divided twice. The featured card
+ * carries its emphasis entirely in the colour inversion — it is filled with the accent and its type is
+ * the page's own dark navy. It is not lifted, not scaled and casts nothing; it is the same box as the
+ * other two, inverted.
+ *
+ * The mono face is the site's IBM Plex Mono, already loaded, and it is used for two things only: the
+ * category label and the rate. Everything else stays on the sans.
+ */
+function MaterialCard({ material }: { material: Material }) {
+  const featured = material.highlighted === true;
+  const muted = featured ? 'text-on-accent/70' : 'text-text-muted';
+
+  return (
+    <article
+      className={`relative flex w-full min-w-0 flex-col p-7 lg:p-10 ${
+        featured ? 'bg-accent-primary text-on-accent' : 'border border-text-primary/10'
+      }`}
+    >
+      {featured && <CornerSteps />}
+
+      <p className={`font-mono text-[11px] uppercase tracking-[0.15em] ${muted}`}>{material.tag}</p>
+
+      {/* The name is the hero of the card and keeps the size it has always had. */}
+      <h3 className={`mt-8 text-[2.5rem] lg:text-[3rem] ${featured ? 'text-on-accent' : 'text-text-primary'}`}>
+        {material.name}
+      </h3>
+
+      {/* The rate sits directly under the name at roughly 45% of its size and a lighter weight, so it
+          reads as a figure attached to the name rather than as a second heading. */}
+      <p className="mt-4 flex items-baseline gap-1 font-mono">
+        <span className={`text-[1.375rem] font-medium ${featured ? 'text-on-accent' : 'text-text-primary'}`}>
+          {formatRate(material.pricePerGram.standard)}
+        </span>
+        <span className={`text-[13px] ${muted}`}>/g</span>
+      </p>
+
+      <p className={`mt-6 text-[15px] leading-[1.7] ${featured ? 'text-on-accent/80' : 'text-text-secondary'}`}>
+        <strong className={`font-semibold ${featured ? 'text-on-accent' : 'text-text-primary'}`}>
+          {material.summaryLead}
+        </strong>
+        {material.summary.slice(material.summaryLead.length)}
+      </p>
+
+      {/* The checklist replaces the old "Best for" label and the rule above it: each use gets its own
+          row, which is what the label and the dot-separated line were standing in for. */}
+      <ul className="mt-7 space-y-2.5">
+        {material.useCases.map((use) => (
+          <li
+            key={use}
+            className={`flex items-start gap-3 text-[15px] ${featured ? 'text-on-accent' : 'text-text-secondary'}`}
+          >
+            <Check
+              aria-hidden="true"
+              strokeWidth={2.5}
+              className={`mt-[5px] size-3 shrink-0 ${featured ? 'text-on-accent/70' : 'text-accent-primary'}`}
+            />
+            {use}
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
+// Home page materials preview. id="materials" is the target of the navbar's Materials link.
 export default function MaterialsSection() {
   return (
-    <section className="py-24 bg-transparent border-t border-border/50" id="materials">
-      <div className="container relative z-10 mx-auto px-4 max-w-6xl">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-5xl font-display font-black text-text-primary uppercase tracking-tight mb-4">
-            Materials <span className="text-accent-primary">Guide</span>
-          </h2>
-          <p className="text-text-muted text-lg font-sans">
-            Compare material properties to select the optimal filament for your engineering, prototyping, or display application.
-          </p>
-        </div>
+    <Section id="materials">
+      <SectionHeading
+        eyebrow="Materials"
+        title="Three materials, chosen for real parts"
+        description="Each filament is stocked for what it is actually good at — fine detail, impact strength or heat and water resistance. Choose by what the part has to survive."
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-
-          {/* PLA */}
-          <div className="bg-surface border border-border hover:border-accent-primary/30 p-8 flex flex-col transition-colors duration-300">
-            <div className="w-12 h-12 bg-accent-primary-deep/20 border border-accent-primary/20 rounded-sm flex items-center justify-center mb-6">
-              <Layers className="w-6 h-6 text-accent-primary" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-2xl font-display font-black text-text-primary tracking-widest uppercase mb-3">PLA</h3>
-            <p className="text-text-muted mb-8 leading-relaxed flex-1">
-              The industry standard for high-detail visual models and rapid non-functional prototyping. Excellent dimensional accuracy.
-            </p>
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Applications</h4>
-              <ul className="text-sm text-text-primary opacity-80 space-y-2">
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Visual prototypes and display models</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Low-stress, easy-to-print parts</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Best entry point — fast, cheap</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* PLA Pro+ */}
-          <div className="bg-surface border border-border hover:border-accent-primary/30 p-8 flex flex-col transition-colors duration-300 relative">
-            <div className="absolute top-0 right-0 bg-accent-primary-deep/20 text-accent-primary px-4 py-1.5 text-xs font-bold uppercase tracking-widest border-b border-l border-accent-primary/20">
-              Engineering
-            </div>
-            <div className="w-12 h-12 bg-accent-primary-deep/20 border border-accent-primary/20 rounded-sm flex items-center justify-center mb-6">
-              <Zap className="w-6 h-6 text-accent-primary" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-2xl font-display font-black text-text-primary tracking-widest uppercase mb-3">PLA Pro+</h3>
-            <p className="text-text-muted mb-8 leading-relaxed flex-1">
-              A step up in toughness and layer adhesion from standard PLA, while staying easy to print — the middle ground before PETG.
-            </p>
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Applications</h4>
-              <ul className="text-sm text-text-primary opacity-80 space-y-2">
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Functional prototypes (durability)</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Brackets, enclosures, jigs</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Light-mechanical-stress parts</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* PETG */}
-          <div className="bg-surface border border-border hover:border-accent-primary/30 p-8 flex flex-col transition-colors duration-300">
-            <div className="w-12 h-12 bg-accent-primary-deep/20 border border-accent-primary/20 rounded-sm flex items-center justify-center mb-6">
-              <Droplet className="w-6 h-6 text-accent-primary" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-2xl font-display font-black text-text-primary tracking-widest uppercase mb-3">PETG</h3>
-            <p className="text-text-muted mb-8 leading-relaxed flex-1">
-              More impact-resistant and flexible than PLA, better dimensional stability than ABS. Ideal for parts needing real durability.
-            </p>
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold text-text-muted uppercase tracking-widest border-b border-border pb-2">Applications</h4>
-              <ul className="text-sm text-text-primary opacity-80 space-y-2">
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Water-resistant containers</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Snap-fit joints</li>
-                <li className="flex items-center gap-2 before:content-[''] before:w-1 before:h-1 before:bg-accent-primary">Mechanical parts (moderate stress)</li>
-              </ul>
-            </div>
-          </div>
-
-        </div>
+      <div className="mt-16 grid gap-5 md:mt-20 lg:mt-24 lg:grid-cols-3">
+        {MATERIALS.map((material) => (
+          <MaterialCard key={material.slug} material={material} />
+        ))}
       </div>
-    </section>
+
+      {/* Reading text rather than another micro-label: the labels inside the cards are there to name
+          fields, and a sentence set the same way would read as one more of them. */}
+      <p className="mt-6 text-[15px] leading-[1.6] text-text-secondary">
+        Priced per gram of printed part. Final cost confirmed in your quote.
+      </p>
+    </Section>
   );
 }

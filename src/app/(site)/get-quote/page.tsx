@@ -1,0 +1,54 @@
+import React, { Suspense } from 'react';
+import type { Metadata } from 'next';
+import PageTrail from '@/components/PageTrail';
+import { QuoteFormCore } from '@/components/QueryForm';
+
+export const metadata: Metadata = {
+  title: 'Get a 3D Printing Quote | PrintWarriors India',
+  description:
+    'Upload your CAD file, choose a material and get a 3D printing quote by email — usually within the hour. Delivered across India from Kolkata.',
+  alternates: { canonical: '/get-quote' },
+  openGraph: {
+    title: 'Get a 3D Printing Quote | PrintWarriors India',
+    description:
+      'Upload your CAD file, choose a material and get a 3D printing quote by email — usually within the hour. Delivered across India from Kolkata.',
+    url: '/get-quote',
+    // Spelled out because a page-level openGraph replaces the inherited one wholesale, taking the
+    // root segment's auto-attached card with it. Next serves the generated image at this path.
+    images: ['/opengraph-image'],
+  },
+};
+
+/*
+ * A compact header and then the form, with nothing between them.
+ *
+ * PageHeader is not used here: its smallest title is still display size, and it carries a rule and its
+ * own bottom padding, which together pushed the first field off a 768px-tall screen. The header is built
+ * inline so the whole block is about 180px and the form starts on the first screen at 1366x768.
+ *
+ * There is no card around the form either. It used to sit in a bordered panel with its own bordered
+ * boxes inside it; the steps and the summary carry their own structure now.
+ */
+export default function GetQuotePage() {
+  return (
+    <section className="bg-background">
+      <div className="site-frame pb-28 pt-[calc(var(--nav-height,72px)+2rem)] md:pb-36">
+        <header className="max-w-[46rem]">
+          <PageTrail eyebrow="Get a quote" page="Get a quote" />
+          <h1 className="mt-3 min-[760px]:mt-4 text-[clamp(2rem,4vw,3rem)] text-text-primary">Start your print</h1>
+          <p className="mt-3 min-[760px]:mt-4 text-[17px] leading-[1.6] text-text-secondary">
+            Upload your file, pick your settings, and we&apos;ll email you the exact price within the hour.
+          </p>
+        </header>
+
+        <div className="mt-7 min-[760px]:mt-12">
+          {/* The form reads ?service= through useSearchParams, which cannot be resolved while the page
+              is prerendered — this boundary is what lets the rest of the page stay static around it. */}
+          <Suspense fallback={<div className="min-h-[60svh]" />}>
+            <QuoteFormCore />
+          </Suspense>
+        </div>
+      </div>
+    </section>
+  );
+}

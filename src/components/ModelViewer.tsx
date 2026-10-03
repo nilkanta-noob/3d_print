@@ -2,7 +2,7 @@
 
 import React, { useMemo, Suspense } from 'react';
 import { Canvas, useLoader } from '@react-three/fiber';
-import { OrbitControls, Center, Html } from '@react-three/drei';
+import { OrbitControls, Bounds, Center, Html } from '@react-three/drei';
 import { STLLoader } from 'three-stdlib';
 import { OBJLoader } from 'three-stdlib';
 import * as THREE from 'three';
@@ -20,11 +20,21 @@ function Loader() {
   );
 }
 
+/*
+ * A light grey matte, the colour of an unfinished print. It was a copper brown, chosen when the viewer
+ * sat on a light panel; against the dark card it now sits in, a warm mid-tone read as murky. Matte
+ * because a shiny part hides its own layer lines, which are the thing worth seeing in a preview.
+ */
+const MODEL_COLOR = '#D5D9E0';
+
+// The card this viewer sits in, so the canvas reads as part of it rather than as a window cut into it.
+const VIEWER_BACKGROUND = '#0F1218';
+
 function STLModel({ url }: { url: string }) {
   const geometry = useLoader(STLLoader, url);
   return (
     <mesh geometry={geometry}>
-      <meshStandardMaterial color="#22d3ee" roughness={0.3} metalness={0.1} />
+      <meshStandardMaterial color={MODEL_COLOR} roughness={0.85} metalness={0} />
     </mesh>
   );
 }
@@ -36,9 +46,9 @@ function OBJModel({ url }: { url: string }) {
     obj.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         (child as THREE.Mesh).material = new THREE.MeshStandardMaterial({
-          color: "#22d3ee",
-          roughness: 0.3,
-          metalness: 0.1,
+          color: MODEL_COLOR,
+          roughness: 0.85,
+          metalness: 0,
         });
       }
     });
@@ -54,7 +64,7 @@ export default function ModelViewer({ fileUrl, fileName }: { fileUrl: string; fi
 
   if (!isStl && !isObj) {
     return (
-      <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-background/50 rounded-sm border border-border flex-col text-text-muted">
+      <div className="w-full h-full min-h-[300px] flex items-center justify-center bg-background/50 rounded-sm border border-border flex-col text-text-secondary">
         <div className="w-16 h-16 mb-4 rounded-full bg-accent-primary/10 flex items-center justify-center">
           <span className="font-bold text-accent-primary uppercase tracking-widest">{extension || 'CAD'}</span>
         </div>
@@ -65,28 +75,31 @@ export default function ModelViewer({ fileUrl, fileName }: { fileUrl: string; fi
   }
 
   return (
-    <div className="w-full h-full min-h-[300px] bg-background/50 rounded-sm border border-border relative overflow-hidden group">
-      <div className="absolute top-4 left-4 z-10 bg-background/80 backdrop-blur px-3 py-1.5 rounded-sm border border-border/50">
-        <span className="text-[10px] font-bold text-accent-primary uppercase tracking-widest flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          Interactive Preview
-        </span>
-      </div>
-      
-      <div className="absolute top-4 right-4 z-10 text-[10px] font-bold text-text-muted uppercase tracking-widest bg-background/80 backdrop-blur px-3 py-1.5 rounded-sm border border-border/50">
-        Drag to rotate • Scroll to zoom
-      </div>
-
+    // No overlay pills: the one line of guidance now sits under the frame, where it does not cover the
+    // part it is describing.
+    <div className="group relative h-full min-h-[300px] w-full overflow-hidden bg-background">
       <Canvas shadows camera={{ position: [0, 0, 150], fov: 45 }}>
-        <color attach="background" args={['transparent']} />
+        {/*
+          An explicit colour, not 'transparent'. three.js has no such named colour, so the old value
+          resolved to white and the preview sat as a bright rectangle in a dark card.
+        */}
+        <color attach="background" args={[VIEWER_BACKGROUND]} />
         <Suspense fallback={<Loader />}>
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 10]} intensity={1.5} />
           <directionalLight position={[-10, -10, -10]} intensity={0.5} />
-          <Center>
-            {isStl && <STLModel url={fileUrl} />}
-            {isObj && <OBJModel url={fileUrl} />}
-          </Center>
+          {/*
+            Bounds frames the model from its own bounding box, so a 2mm washer and a 200mm bracket both
+            arrive filling the frame — the fixed camera distance suited whichever file was tried first.
+            `observe` re-runs the fit when the geometry changes, which is what "Replace file" does, and
+            the 1.4 margin leaves the part at roughly 70% of the frame rather than against its edges.
+          */}
+          <Bounds fit clip observe margin={1.4}>
+            <Center>
+              {isStl && <STLModel url={fileUrl} />}
+              {isObj && <OBJModel url={fileUrl} />}
+            </Center>
+          </Bounds>
         </Suspense>
         <OrbitControls makeDefault />
       </Canvas>

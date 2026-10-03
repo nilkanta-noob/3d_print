@@ -9,6 +9,20 @@ import { verifyQuoteJwt } from '@/lib/otp';
 
 const prisma = new PrismaClient();
 
+/*
+ * Everything a customer types is interpolated into the notification email's HTML. Without this, a
+ * quote mentioning "5 < 10 mm" silently loses the rest of the line, and anything sharper than that is
+ * markup injected straight into whatever reads our mail.
+ */
+function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -21,6 +35,8 @@ export async function POST(request: NextRequest) {
     const studentIdUrl = formData.get('studentIdUrl') as string | null;
     const infill = formData.get('infill') as string || 'Not Specified';
     const finalize = formData.get('finalize') as string || 'Not Specified';
+    const notes = ((formData.get('notes') as string) || '').trim();
+    const projectType = (formData.get('projectType') as string) || 'Not specified';
     
     // Address Fields
     const country = formData.get('country') as string || 'Pending';
@@ -34,6 +50,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields or unverified email' }, { status: 400 });
     }
 
+    // The field is capped in the browser too, but that cap is a convenience, not a guarantee.
+    if (notes.length > 1000) {
+      return NextResponse.json({ error: 'Notes must be 1000 characters or fewer.' }, { status: 400 });
+    }
+
     // Verify the JWT
     const jwtResult = verifyQuoteJwt(verifiedToken);
     if (!jwtResult.valid || jwtResult.email !== email) {
@@ -42,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     // The file is already uploaded to UploadThing.
     // We will just send the link in the email to avoid Vercel/Resend latency.
-    let fileName = fileUrl.split('/').pop() || '3d_model.stl';
+    const fileName = fileUrl.split('/').pop() || '3d_model.stl';
 
     // Save to Database
     const dbUser = await prisma.user.upsert({
@@ -58,7 +79,9 @@ export async function POST(request: NextRequest) {
         quantity: 1,
         material: material,
         color: "Not Specified",
-        customerNotes: `Infill: ${infill}, Finalize: ${finalize}, Student: ${isStudent ? 'Yes' : 'No'}`,
+        // Kept as one string so the settings and the customer's own words travel together without a
+        // schema change.
+        customerNotes: `Project: ${projectType} | Infill: ${infill} | Finish: ${finalize} | Student: ${isStudent ? 'Yes' : 'No'}\n\nCustomer notes: ${notes || 'None'}`,
         billingName: name,
         billingAddress: "Pending", // Address line not provided by UI
         billingCity: city,
@@ -80,12 +103,19 @@ export async function POST(request: NextRequest) {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif;">
         <h2 style="color: #333;">New Query Request: ${order.orderNumber}</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Material:</strong> ${material}</p>
-        <p><strong>Address:</strong> ${city}, ${state} - ${pincode}</p>
-        <p><strong>Notes:</strong> Infill: ${infill}, Finalize: ${finalize}, Student: ${isStudent ? 'Yes' : 'No'}</p>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
+        <p><strong>Material:</strong> ${escapeHtml(material)}</p>
+        <p><strong>Address:</strong> ${escapeHtml(city)}, ${escapeHtml(state)} - ${escapeHtml(pincode)}</p>
+        <p><strong>Project type:</strong> ${escapeHtml(projectType)}</p>
+        <p><strong>Infill:</strong> ${escapeHtml(infill)}</p>
+        <p><strong>Finish:</strong> ${escapeHtml(finalize)}</p>
+        <p><strong>Student discount:</strong> ${isStudent ? 'Yes' : 'No'}</p>
+        <div style="margin-top: 16px; padding: 14px; background-color: #f3f4f6; border-radius: 5px;">
+          <p style="margin-top: 0; margin-bottom: 6px;"><strong>Customer notes:</strong></p>
+          <p style="margin: 0; white-space: pre-wrap;">${notes ? escapeHtml(notes).replace(/\n/g, '<br>') : 'None'}</p>
+        </div>
         ${isStudent && studentIdUrl ? `
         <div style="margin-top: 10px; padding: 10px; background-color: #fef2f2; border-radius: 5px;">
           <p style="margin-top: 0; color: #dc2626; font-weight: bold;">Student ID Verification:</p>
@@ -102,9 +132,21 @@ export async function POST(request: NextRequest) {
     `;
 
     const emailPayload = {
-      to: process.env.ADMIN_EMAIL || 'hello@printwarriors.com',
+      to: process.env.ADMIN_EMAIL || 'printwarriors.in@gmail.com',
       subject: `New Query: ${order.orderNumber}`,
-      text: `New query received from ${name} (${email}). Phone: ${phone}. Material: ${material}. Download File: ${fileUrl}`,
+      text: [
+        `New query received from ${name} (${email}).`,
+        `Phone: ${phone}`,
+        `Project type: ${projectType}`,
+        `Material: ${material}`,
+        `Infill: ${infill}`,
+        `Finish: ${finalize}`,
+        `Student discount: ${isStudent ? 'Yes' : 'No'}`,
+        '',
+        `Customer notes: ${notes || 'None'}`,
+        '',
+        `Download File: ${fileUrl}`,
+      ].join('\n'),
       html: emailHtml,
       attachments: undefined // No longer attaching the file to speed up delivery
     };
@@ -121,8 +163,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, orderNumber: order.orderNumber });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error handling quote request:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal Server Error' }, { status: 500 });
   }
 }
