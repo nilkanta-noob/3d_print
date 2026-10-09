@@ -58,14 +58,38 @@ const landscape = (file: string): GalleryImage => ({ src: `${SHOT}/${file}`, wid
 const portrait = (file: string): GalleryImage => ({ src: `${SHOT}/${file}`, width: 1200, height: 1600 });
 
 export const GALLERY_ITEMS: GalleryItem[] = [
+    {
+    slug: 'dino',
+    showOnHome: true,
+    title: 'Dino model',
+    images: [
+      landscape('dino-zoomed_result.webp'),
+      landscape('dino-zoomed-out_result.webp'),
+    ],
+  },
+  
+  {
+    slug: 'hoodie-pen-stand',
+    showOnHome: true,
+    title: 'Hoodie pen stand',
+    // Each of these came off the camera at its own ratio rather than the flat 1600x1200 the rest of the
+    // batch shares, so they are written out in full instead of going through the two helpers.
+    images: [
+      { src: `${SHOT}/hoodie-penstand-front1.webp`, width: 1600, height: 1254 },
+      { src: `${SHOT}/hoodie-penstand-front2.webp`, width: 1600, height: 1256 },
+      { src: `${SHOT}/hoodie-penstand-front3.webp`, width: 1263, height: 1600 },
+      { src: `${SHOT}/hoodie-penstand-side.webp`, width: 1258, height: 1600 },
+      { src: `${SHOT}/hoodie-penstand-back.webp`, width: 1600, height: 1296 },
+    ],
+  },
   {
     slug: 'phone-stand',
     showOnHome: true,
     // The demo shot leads the gallery, but it is portrait and the preview's 4:3 frame takes the top and
     // bottom off it. The landscape shot of the stand fills that frame as it was taken.
-    homeCover: 1,
+    homeCover: 0,
     title: 'Phone stand',
-    images: [portrait('phone-stand-demo.webp'), landscape('phone-stand.webp'), portrait('phone-stand-top.webp')],
+    images: [landscape('phone-stand.webp'), portrait('phone-stand-demo.webp'), portrait('phone-stand-top.webp')],
   },
   {
     slug: 'multi-part-bearing',
@@ -81,14 +105,13 @@ export const GALLERY_ITEMS: GalleryItem[] = [
   },
   {
     slug: 'oval-tray',
-    showOnHome: true,
+    showOnHome: false,
     title: 'Oval tray',
     images: [
       // The top-down frame leads: it shows the whole oval and the ribbing in one look, which the
       // side-on shot cannot. That one follows, then the frame shared with the calibration cubes.
       landscape('cube-tray2.webp'),
       landscape('tray.webp'),
-      landscape('IMG-20260920-WA0006_result.webp'),
     ],
   },
   {
@@ -123,20 +146,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
       landscape('cube-tray.webp'),
     ],
   },
-  {
-    slug: 'hoodie-pen-stand',
-    showOnHome: true,
-    title: 'Hoodie pen stand',
-    // Each of these came off the camera at its own ratio rather than the flat 1600x1200 the rest of the
-    // batch shares, so they are written out in full instead of going through the two helpers.
-    images: [
-      { src: `${SHOT}/hoodie-penstand-front1.webp`, width: 1600, height: 1254 },
-      { src: `${SHOT}/hoodie-penstand-front2.webp`, width: 1600, height: 1256 },
-      { src: `${SHOT}/hoodie-penstand-front3.webp`, width: 1263, height: 1600 },
-      { src: `${SHOT}/hoodie-penstand-side.webp`, width: 1258, height: 1600 },
-      { src: `${SHOT}/hoodie-penstand-back.webp`, width: 1600, height: 1296 },
-    ],
-  },
+  
 ];
 
 /*
